@@ -55,7 +55,7 @@ export function ResetPasswordForm({ token, isTokenValid }: ResetPasswordFormProp
           <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
             <Gem className="w-6 h-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold">Luminique</span>
+          <span className="text-xl font-semibold">Aarshhmi</span>
         </div>
 
         {/* Error Message */}
@@ -98,7 +98,7 @@ export function ResetPasswordForm({ token, isTokenValid }: ResetPasswordFormProp
           <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
             <Gem className="w-6 h-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold">Luminique</span>
+          <span className="text-xl font-semibold">Aarshhmi</span>
         </div>
 
         {/* Success Message */}
@@ -132,7 +132,7 @@ export function ResetPasswordForm({ token, isTokenValid }: ResetPasswordFormProp
         <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
           <Gem className="w-6 h-6 text-primary-foreground" />
         </div>
-        <span className="text-xl font-semibold">Luminique</span>
+        <span className="text-xl font-semibold">Aarshhmi</span>
       </div>
 
       {/* Header */}

@@ -38,7 +38,7 @@ export function LoginForm() {
         <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
           <Gem className="w-6 h-6 text-primary-foreground" />
         </div>
-        <span className="text-xl font-semibold">Luminique</span>
+        <span className="text-xl font-semibold">Aarshhmi</span>
       </div>
 
       {/* Header */}
@@ -65,7 +65,7 @@ export function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@luminique.com"
+                placeholder="admin@aarshhmi.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 h-12 bg-card border-border"

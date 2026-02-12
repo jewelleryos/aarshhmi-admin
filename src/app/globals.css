@@ -9,52 +9,52 @@
 */
 
 :root {
-  /* Luminique Brand Colors */
-  --luminique-deep-blue: #14344A;
-  --soft-sage-cream: #C7D3D9;
-  --warm-stone-beige: #EDE5DB;
-  --ivory-white: #FBFAF7;
-  --powder-blue-grey: #C7D3D9;
-  --champagne-gold: #14344A;
+  /* aarshhmi Brand Colors */
+  --aarshhmi-deep-blue: #AE37B2;
+  --soft-sage-cream: #FAF5FA;
+  --warm-stone-beige: #F5EBF5;
+  --ivory-white: #FEFCFE;
+  --powder-blue-grey: #EDE5ED;
+  --champagne-gold: #D468D8;
   /* Renamed/Replaced to Primary Blue */
-  --misty-sage: #e4e7c6;
+  --misty-sage: #F3E0F4;
 
-  --background: #FBFAF7;
-  --foreground: #14344A;
-  --card: #FBFAF7;
-  --card-foreground: #14344A;
-  --popover: #FBFAF7;
-  --popover-foreground: #14344A;
-  --primary: #14344A;
-  --primary-foreground: #FBFAF7;
-  --secondary: #EDE5DB;
-  --secondary-foreground: #14344A;
-  --muted: #C7D3D9;
-  --muted-foreground: #14344A;
-  --accent: #D8E6ED;
+  --background: #FEFCFE;
+  --foreground: #1C1019;
+  --card: #FFFFFF;
+  --card-foreground: #1C1019;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1019;
+  --primary: #AE37B2;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FAF5FA;
+  --secondary-foreground: #1C1019;
+  --muted: #F5EBF5;
+  --muted-foreground: #7A6B79;
+  --accent: #F3E0F4;
   /* Soft Light Blue for hover states */
-  --accent-foreground: #14344A;
-  --destructive: #dc2626;
-  --destructive-foreground: #FBFAF7;
-  --border: #C7D3D9;
-  --input: #C7D3D9;
-  --ring: #14344A;
-  --chart-1: #14344A;
-  --chart-2: #D8E6ED;
+  --accent-foreground: #1C1019;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #EDE5ED;
+  --input: #EDE5ED;
+  --ring: #AE37B2;
+  --chart-1: #AE37B2;
+  --chart-2: #8A2C8E;
   /* Replaced Gold with Accent Blue */
-  --chart-3: #C7D3D9;
-  --chart-4: #EDE5DB;
-  --chart-5: #e4e7c6;
+  --chart-3: #D468D8;
+  --chart-4: #E9A8EB;
+  --chart-5: #16A34A;
   --radius: 0.5rem;
-  --sidebar: #14344A;
-  --sidebar-foreground: #FBFAF7;
-  --sidebar-primary: #D8E6ED;
+  --sidebar: #7A2A7E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #F3E0F4;
   /* Replaced Gold with Accent Blue for active items */
-  --sidebar-primary-foreground: #14344A;
-  --sidebar-accent: #1e4a66;
-  --sidebar-accent-foreground: #FBFAF7;
-  --sidebar-border: #1e4a66;
-  --sidebar-ring: #E6F0F5;
+  --sidebar-primary-foreground: #7A2A7E;
+  --sidebar-accent: #922F96;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #922F96;
+  --sidebar-ring: #D468D8;
   /* Replaced Gold with Accent Blue */
 }
 

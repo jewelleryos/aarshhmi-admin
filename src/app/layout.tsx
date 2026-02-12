@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Luminique - Admin",
-  description: "Admin Dashboard for Luminique",
+  title: "Aarshhmi - Admin",
+  description: "Admin Dashboard for Aarshhmi",
 }
 
 export default function RootLayout({

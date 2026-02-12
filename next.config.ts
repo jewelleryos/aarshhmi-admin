@@ -7,7 +7,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "luminique.b-cdn.net",
+        hostname: "aarshhmi-dev.b-cdn.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "aarshhmi-live.b-cdn.net",
         pathname: "/**",
       },
     ],

@@ -311,29 +311,7 @@ const API_ENDPOINTS = {
   },
 
   // CMS endpoints
-  CMS: {
-    HOMEPAGE: {
-      HERO_DESKTOP_BANNER: '/api/cms/homepage/hero-desktop-banner',
-      HERO_MOBILE_BANNER: '/api/cms/homepage/hero-mobile-banner',
-      SHOP_BY_CATEGORY: '/api/cms/homepage/shop-by-category',
-      MEDIA_GRID: '/api/cms/homepage/media-grid',
-      LUMINIQUE_COLLECTION: '/api/cms/homepage/luminique-collection',
-      ABOUT_LUMINIQUE: '/api/cms/homepage/about-luminique',
-      LUMINIQUE_TRUST: '/api/cms/homepage/luminique-trust',
-      FAQ: '/api/cms/homepage/faq',
-    },
-    POLICY_PAGES: {
-      LIFETIME_EXCHANGE: '/api/cms/policy-pages/lifetime-exchange',
-      RETURN_POLICY: '/api/cms/policy-pages/return-policy',
-      RESIZE_REPAIR: '/api/cms/policy-pages/resize-repair',
-      CANCELLATION_POLICY: '/api/cms/policy-pages/cancellation-policy',
-      SHIPPING_POLICY: '/api/cms/policy-pages/shipping-policy',
-      PRIVACY_POLICY: '/api/cms/policy-pages/privacy-policy',
-      TERMS_CONDITIONS: '/api/cms/policy-pages/terms-conditions',
-    },
-    FAQS: '/api/cms/faqs',
-    ABOUT_US: '/api/cms/about-us',
-  },
+ 
 }
 
 export default API_ENDPOINTS
