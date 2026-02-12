@@ -1,0 +1,5 @@
+export { TagsContent } from './tags-content'
+export { TagsTable } from './tags-table'
+export { TagAddDrawer } from './tag-add-drawer'
+export { TagEditDrawer } from './tag-edit-drawer'
+export { TagSeoDrawer } from './tag-seo-drawer'

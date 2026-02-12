@@ -1,0 +1,6 @@
+export { JewelleryDefaultContent } from "./jewellery-default/jewellery-default-content"
+export { BasicDetailsSection } from "./jewellery-default/basic-details-section"
+export { MetalDetailsSection } from "./jewellery-default/metal-details-section"
+export { StoneDetailsSection } from "./jewellery-default/stone-details-section"
+export { AttributesSection } from "./jewellery-default/attributes-section"
+export { SeoSection } from "./jewellery-default/seo-section"

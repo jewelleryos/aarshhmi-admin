@@ -1,0 +1,293 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+
+/* ===== CENTRALIZED DESIGN SYSTEM =====
+   Change these values to update the entire theme.
+   All colors use oklch for better color manipulation.
+*/
+
+:root {
+  /* Luminique Brand Colors */
+  --luminique-deep-blue: #14344A;
+  --soft-sage-cream: #C7D3D9;
+  --warm-stone-beige: #EDE5DB;
+  --ivory-white: #FBFAF7;
+  --powder-blue-grey: #C7D3D9;
+  --champagne-gold: #14344A;
+  /* Renamed/Replaced to Primary Blue */
+  --misty-sage: #e4e7c6;
+
+  --background: #FBFAF7;
+  --foreground: #14344A;
+  --card: #FBFAF7;
+  --card-foreground: #14344A;
+  --popover: #FBFAF7;
+  --popover-foreground: #14344A;
+  --primary: #14344A;
+  --primary-foreground: #FBFAF7;
+  --secondary: #EDE5DB;
+  --secondary-foreground: #14344A;
+  --muted: #C7D3D9;
+  --muted-foreground: #14344A;
+  --accent: #D8E6ED;
+  /* Soft Light Blue for hover states */
+  --accent-foreground: #14344A;
+  --destructive: #dc2626;
+  --destructive-foreground: #FBFAF7;
+  --border: #C7D3D9;
+  --input: #C7D3D9;
+  --ring: #14344A;
+  --chart-1: #14344A;
+  --chart-2: #D8E6ED;
+  /* Replaced Gold with Accent Blue */
+  --chart-3: #C7D3D9;
+  --chart-4: #EDE5DB;
+  --chart-5: #e4e7c6;
+  --radius: 0.5rem;
+  --sidebar: #14344A;
+  --sidebar-foreground: #FBFAF7;
+  --sidebar-primary: #D8E6ED;
+  /* Replaced Gold with Accent Blue for active items */
+  --sidebar-primary-foreground: #14344A;
+  --sidebar-accent: #1e4a66;
+  --sidebar-accent-foreground: #FBFAF7;
+  --sidebar-border: #1e4a66;
+  --sidebar-ring: #E6F0F5;
+  /* Replaced Gold with Accent Blue */
+}
+
+
+
+@theme inline {
+  --font-sans: 'Inter', 'Inter Fallback', sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Georgia', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+@layer utilities {
+
+  /* Glass effect for cards */
+  .glass {
+    background: color-mix(in srgb, var(--background), transparent 30%);
+    backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in srgb, var(--foreground), transparent 90%);
+  }
+}
+
+/* ===== TIPTAP EDITOR STYLES ===== */
+.tiptap {
+  padding: 1rem;
+  outline: none;
+}
+
+.tiptap p {
+  margin: 1em 0;
+  line-height: 1.6;
+}
+
+.tiptap p:first-child {
+  margin-top: 0;
+}
+
+.tiptap p:last-child {
+  margin-bottom: 0;
+}
+
+.tiptap h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.tiptap h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.tiptap h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.tiptap h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.tiptap h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.tiptap h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.tiptap h1:first-child,
+.tiptap h2:first-child,
+.tiptap h3:first-child,
+.tiptap h4:first-child,
+.tiptap h5:first-child,
+.tiptap h6:first-child {
+  margin-top: 0;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1em 0;
+}
+
+.tiptap ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1em 0;
+}
+
+.tiptap li {
+  margin: 0.25em 0;
+}
+
+.tiptap li p {
+  margin: 0;
+}
+
+.tiptap blockquote {
+  border-left: 4px solid var(--border);
+  padding-left: 1rem;
+  margin: 1em 0;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.tiptap code {
+  background-color: var(--muted);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+.tiptap pre {
+  background-color: var(--muted);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.tiptap pre code {
+  background: none;
+  padding: 0;
+}
+
+.tiptap hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+.tiptap strong {
+  font-weight: 700;
+}
+
+.tiptap em {
+  font-style: italic;
+}
+
+.tiptap s {
+  text-decoration: line-through;
+}
+
+.tiptap a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tiptap a:hover {
+  opacity: 0.8;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Placeholder styling */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}

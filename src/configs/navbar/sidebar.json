@@ -1,0 +1,336 @@
+{
+  "navigation": [
+    {
+      "id": "dashboard",
+      "type": "item",
+      "label": "Dashboard",
+      "icon": "LayoutDashboard",
+      "href": "/dashboard",
+      "permissions": ["DASHBOARD.READ"]
+    },
+    {
+      "type": "group",
+      "label": "Content",
+      "children": [
+        {
+          "id": "media-manager",
+          "type": "item",
+          "label": "Media Manager",
+          "icon": "Image",
+          "href": "/media-manager",
+          "permissions": ["MEDIA_MANAGER.READ"]
+        },
+        {
+          "id": "cms",
+          "type": "item",
+          "label": "CMS",
+          "icon": "FileText",
+          "href": "/cms",
+          "permissions": ["CMS.MANAGE"]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Product Management",
+      "children": [
+        {
+          "id": "products",
+          "type": "item",
+          "label": "Products",
+          "icon": "Package",
+          "href": "/products",
+          "permissions": ["PRODUCT.READ"]
+        },
+        {
+          "id": "add-product",
+          "type": "item",
+          "label": "Add Product",
+          "icon": "Plus",
+          "href": "/add-product/jewellery-default",
+          "permissions": ["PRODUCT.CREATE"]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Attribute Management",
+      "children": [
+        {
+          "id": "tag-management",
+          "type": "dropdown",
+          "label": "Tag Management",
+          "icon": "Tags",
+          "children": [
+            {
+              "id": "tag-groups",
+              "type": "item",
+              "label": "Tag Groups",
+              "icon": "FolderTree",
+              "href": "/attribute-management/tag-groups",
+              "permissions": ["TAG_GROUP.READ"]
+            },
+            {
+              "id": "tags",
+              "type": "item",
+              "label": "Tags",
+              "icon": "Tag",
+              "href": "/attribute-management/tags",
+              "permissions": ["TAG.READ"]
+            }
+          ]
+        },
+        {
+          "id": "categories",
+          "type": "item",
+          "label": "Categories",
+          "icon": "FolderTree",
+          "href": "/attribute-management/categories",
+          "permissions": ["CATEGORY.READ"]
+        },
+        {
+          "id": "badges",
+          "type": "item",
+          "label": "Badges",
+          "icon": "Award",
+          "href": "/attribute-management/badges",
+          "permissions": ["BADGE.READ"]
+        },
+        {
+          "id": "size-chart",
+          "type": "dropdown",
+          "label": "Size Chart",
+          "icon": "Ruler",
+          "children": [
+            {
+              "id": "size-chart-groups",
+              "type": "item",
+              "label": "Size Chart Groups",
+              "icon": "FolderTree",
+              "href": "/attribute-management/size-chart-groups",
+              "permissions": ["SIZE_CHART_GROUP.READ"]
+            },
+            {
+              "id": "size-chart-values",
+              "type": "item",
+              "label": "Size Chart Values",
+              "icon": "List",
+              "href": "/attribute-management/size-chart-values",
+              "permissions": ["SIZE_CHART_VALUE.READ"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Masters Data",
+      "children": [
+        {
+          "id": "metal",
+          "type": "dropdown",
+          "label": "Metal",
+          "icon": "CircleDot",
+          "children": [
+            {
+              "id": "metal-type",
+              "type": "item",
+              "label": "Metal Type",
+              "icon": "Layers",
+              "href": "/masters/metal-type",
+              "permissions": ["METAL_TYPE.READ"]
+            },
+            {
+              "id": "metal-color",
+              "type": "item",
+              "label": "Metal Color",
+              "icon": "Palette",
+              "href": "/masters/metal-color",
+              "permissions": ["METAL_COLOR.READ"]
+            },
+            {
+              "id": "metal-purity",
+              "type": "item",
+              "label": "Metal Purity",
+              "icon": "Gem",
+              "href": "/masters/metal-purity",
+              "permissions": ["METAL_PURITY.READ"]
+            },
+            {
+              "id": "making-charges",
+              "type": "item",
+              "label": "Making Charges",
+              "icon": "Hammer",
+              "href": "/masters/making-charges",
+              "permissions": ["MAKING_CHARGE.READ"]
+            }
+          ]
+        },
+        {
+          "id": "diamond",
+          "type": "dropdown",
+          "label": "Diamond",
+          "icon": "Diamond",
+          "children": [
+            {
+              "id": "diamond-clarity-color",
+              "type": "item",
+              "label": "Diamond Clarity/Color",
+              "icon": "Sparkles",
+              "href": "/masters/diamond-clarity-color",
+              "permissions": ["DIAMOND_CLARITY_COLOR.READ"]
+            },
+            {
+              "id": "diamond-pricing",
+              "type": "item",
+              "label": "Diamond Pricing",
+              "icon": "IndianRupee",
+              "href": "/masters/diamond-pricing",
+              "permissions": ["DIAMOND_PRICING.READ"]
+            }
+          ]
+        },
+        {
+          "id": "gemstone",
+          "type": "dropdown",
+          "label": "Gemstone",
+          "icon": "Gem",
+          "children": [
+            {
+              "id": "gemstone-type",
+              "type": "item",
+              "label": "Gemstone Type",
+              "icon": "Sparkles",
+              "href": "/masters/gemstone-type",
+              "permissions": ["GEMSTONE_TYPE.READ"]
+            },
+            {
+              "id": "gemstone-quality",
+              "type": "item",
+              "label": "Gemstone Quality",
+              "icon": "Award",
+              "href": "/masters/gemstone-quality",
+              "permissions": ["GEMSTONE_QUALITY.READ"]
+            },
+            {
+              "id": "gemstone-color",
+              "type": "item",
+              "label": "Gemstone Color",
+              "icon": "Palette",
+              "href": "/masters/gemstone-color",
+              "permissions": ["GEMSTONE_COLOR.READ"]
+            },
+            {
+              "id": "gemstone-pricing",
+              "type": "item",
+              "label": "Gemstone Pricing",
+              "icon": "IndianRupee",
+              "href": "/masters/gemstone-pricing",
+              "permissions": ["GEMSTONE_PRICING.READ"]
+            }
+          ]
+        },
+        {
+          "id": "pearl",
+          "type": "dropdown",
+          "label": "Pearl",
+          "icon": "Circle",
+          "children": [
+            {
+              "id": "pearl-type",
+              "type": "item",
+              "label": "Pearl Type",
+              "icon": "Sparkles",
+              "href": "/masters/pearl-type",
+              "permissions": ["PEARL_TYPE.READ"]
+            },
+            {
+              "id": "pearl-quality",
+              "type": "item",
+              "label": "Pearl Quality",
+              "icon": "Star",
+              "href": "/masters/pearl-quality",
+              "permissions": ["PEARL_QUALITY.READ"]
+            }
+          ]
+        },
+        {
+          "id": "other",
+          "type": "dropdown",
+          "label": "Other",
+          "icon": "MoreHorizontal",
+          "children": [
+            {
+              "id": "stone-shape",
+              "type": "item",
+              "label": "Diamond Shape",
+              "icon": "Diamond",
+              "href": "/masters/stone-shape",
+              "permissions": ["STONE_SHAPE.READ"]
+            },
+            {
+              "id": "other-charges",
+              "type": "item",
+              "label": "Other Charges",
+              "icon": "Receipt",
+              "href": "/masters/other-charges",
+              "permissions": ["OTHER_CHARGE.READ"]
+            },
+            {
+              "id": "mrp-markup",
+              "type": "item",
+              "label": "MRP Markup",
+              "icon": "Percent",
+              "href": "/masters/mrp-markup",
+              "permissions": ["MRP_MARKUP.READ"]
+            },
+            {
+              "id": "pricing-rule",
+              "type": "item",
+              "label": "Pricing Rule",
+              "icon": "Calculator",
+              "href": "/masters/pricing-rule",
+              "permissions": ["PRICING_RULE.READ"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Store",
+      "children": [
+        {
+          "id": "storefront-filters",
+          "type": "item",
+          "label": "Storefront Filters",
+          "icon": "Filter",
+          "href": "/storefront-filters",
+          "permissions": ["STOREFRONT_FILTER.READ"]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Settings",
+      "children": [
+        {
+          "id": "settings",
+          "type": "dropdown",
+          "label": "Settings",
+          "icon": "Settings",
+          "children": [
+            {
+              "id": "users",
+              "type": "item",
+              "label": "Users",
+              "icon": "Users",
+              "href": "/users",
+              "permissions": ["USER.READ"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

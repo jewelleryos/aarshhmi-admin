@@ -1,0 +1,1490 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { ArrowLeft, Calculator, Loader2, Plus, Trash2 } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
+import { useAppDispatch } from "@/redux/store"
+import { updatePricingRule } from "@/redux/slices/pricingRuleSlice"
+import pricingRuleService from "@/redux/services/pricingRuleService"
+import {
+  CONDITION_CONFIG,
+  type PricingRule,
+  type PricingRuleCondition,
+  type CategoryOption,
+  type TagOption,
+  type BadgeOption,
+  type MetalTypeOption,
+  type MetalColorOption,
+  type MetalPurityOption,
+  type DiamondClarityColorOption,
+  type ConditionType,
+  type ConditionState,
+  type CategoryConditionValue,
+  type DiamondCaratConditionValue,
+  type TagsConditionValue,
+  type MetalWeightConditionValue,
+  type BadgesConditionValue,
+  type MetalTypeConditionValue,
+  type MetalColorConditionValue,
+  type MetalPurityConditionValue,
+  type DiamondClarityColorConditionValue,
+  type GemstoneCaratConditionValue,
+  type PearlGramConditionValue,
+  type PricingRuleActions,
+  generateId,
+} from "./types"
+
+// Default product type (currently only one)
+const DEFAULT_PRODUCT_TYPE = "JEWELLERY_DEFAULT" as const
+
+interface PricingRuleEditProps {
+  id: string
+}
+
+export function PricingRuleEdit({ id }: PricingRuleEditProps) {
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+
+  // Rule data
+  const [rule, setRule] = useState<PricingRule | null>(null)
+
+  // Dropdown data
+  const [categories, setCategories] = useState<CategoryOption[]>([])
+  const [tags, setTags] = useState<TagOption[]>([])
+  const [badges, setBadges] = useState<BadgeOption[]>([])
+  const [metalTypes, setMetalTypes] = useState<MetalTypeOption[]>([])
+  const [metalColors, setMetalColors] = useState<MetalColorOption[]>([])
+  const [metalPurities, setMetalPurities] = useState<MetalPurityOption[]>([])
+  const [diamondClarityColors, setDiamondClarityColors] = useState<DiamondClarityColorOption[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(true)
+
+  // Form state
+  const [name, setName] = useState("")
+  const [conditions, setConditions] = useState<ConditionState[]>([])
+  const [actions, setActions] = useState<PricingRuleActions>({
+    makingChargeMarkup: 0,
+    diamondMarkup: 0,
+    gemstoneMarkup: 0,
+    pearlMarkup: 0,
+  })
+
+  // Loading and error state
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<{
+    name?: string
+    conditions?: string
+    actions?: string
+  }>({})
+
+  // Fetch rule and dropdown data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [
+          ruleRes,
+          categoriesRes,
+          tagsRes,
+          badgesRes,
+          metalTypesRes,
+          metalColorsRes,
+          metalPuritiesRes,
+          diamondClarityColorsRes,
+        ] = await Promise.all([
+          pricingRuleService.getById(id),
+          pricingRuleService.getCategories(),
+          pricingRuleService.getTags(),
+          pricingRuleService.getBadges(),
+          pricingRuleService.getMetalTypes(),
+          pricingRuleService.getMetalColors(),
+          pricingRuleService.getMetalPurities(),
+          pricingRuleService.getDiamondClarityColors(),
+        ])
+
+        // Set dropdown data
+        setCategories(categoriesRes.data.items)
+        setTags(tagsRes.data.items)
+        setBadges(badgesRes.data.items)
+        setMetalTypes(metalTypesRes.data.items)
+        setMetalColors(metalColorsRes.data.items)
+        setMetalPurities(metalPuritiesRes.data.items)
+        setDiamondClarityColors(diamondClarityColorsRes.data.items)
+
+        // Set rule data
+        const fetchedRule = ruleRes.data
+        setRule(fetchedRule)
+        setName(fetchedRule.name)
+        setConditions(
+          fetchedRule.conditions.map((c) => ({
+            id: generateId("cond"),
+            type: c.type,
+            value: c.value,
+          }))
+        )
+        setActions({ ...fetchedRule.actions })
+      } catch (error) {
+        console.error("Failed to fetch data:", error)
+        toast.error("Failed to load pricing rule")
+        router.push("/masters/pricing-rule")
+      } finally {
+        setIsLoadingData(false)
+      }
+    }
+    fetchData()
+  }, [id, router])
+
+  // Get available condition types for the default product type
+  const availableConditionTypes = Object.entries(CONDITION_CONFIG)
+    .filter(([, config]) => config.allowedProductTypes.includes(DEFAULT_PRODUCT_TYPE))
+    .map(([type, config]) => ({ type: type as ConditionType, ...config }))
+
+  // Add empty condition box
+  const handleAddCondition = () => {
+    const newCondition: ConditionState = {
+      id: generateId("cond"),
+      type: null,
+      value: null,
+    }
+    setConditions([...conditions, newCondition])
+  }
+
+  // Remove condition
+  const handleRemoveCondition = (conditionId: string) => {
+    setConditions(conditions.filter((c) => c.id !== conditionId))
+  }
+
+  // Set condition type (when user selects from dropdown)
+  const handleSetConditionType = (conditionId: string, type: ConditionType) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId) {
+          // Initialize with default value based on type
+          let defaultValue: CategoryConditionValue | DiamondCaratConditionValue | TagsConditionValue | MetalWeightConditionValue | BadgesConditionValue | MetalTypeConditionValue | MetalColorConditionValue | MetalPurityConditionValue | DiamondClarityColorConditionValue
+          if (type === "category") {
+            defaultValue = { matchType: "any", categoryIds: [] }
+          } else if (type === "diamond_carat") {
+            defaultValue = { from: 0, to: 0 }
+          } else if (type === "tags") {
+            defaultValue = { matchType: "any", tagIds: [] }
+          } else if (type === "metal_weight") {
+            defaultValue = { from: 0, to: 0 }
+          } else if (type === "badges") {
+            defaultValue = { matchType: "any", badgeIds: [] }
+          } else if (type === "metal_type") {
+            defaultValue = { metalTypeIds: [] }
+          } else if (type === "metal_color") {
+            defaultValue = { metalColorIds: [] }
+          } else if (type === "metal_purity") {
+            defaultValue = { metalPurityIds: [] }
+          } else if (type === "diamond_clarity_color") {
+            defaultValue = { diamondClarityColorIds: [] }
+          } else if (type === "gemstone_carat") {
+            defaultValue = { from: 0, to: 0 }
+          } else if (type === "pearl_gram") {
+            defaultValue = { from: 0, to: 0 }
+          } else {
+            defaultValue = { diamondClarityColorIds: [] }
+          }
+          return { ...c, type, value: defaultValue }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update category condition
+  const updateCategoryCondition = (
+    conditionId: string,
+    updates: Partial<CategoryConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "category" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as CategoryConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update diamond carat condition
+  const updateDiamondCaratCondition = (
+    conditionId: string,
+    updates: Partial<DiamondCaratConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "diamond_carat" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as DiamondCaratConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update tags condition
+  const updateTagsCondition = (
+    conditionId: string,
+    updates: Partial<TagsConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "tags" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as TagsConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update metal weight condition
+  const updateMetalWeightCondition = (
+    conditionId: string,
+    updates: Partial<MetalWeightConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "metal_weight" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as MetalWeightConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update badges condition
+  const updateBadgesCondition = (
+    conditionId: string,
+    updates: Partial<BadgesConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "badges" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as BadgesConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update metal type condition
+  const updateMetalTypeCondition = (
+    conditionId: string,
+    updates: Partial<MetalTypeConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "metal_type" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as MetalTypeConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update metal color condition
+  const updateMetalColorCondition = (
+    conditionId: string,
+    updates: Partial<MetalColorConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "metal_color" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as MetalColorConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update metal purity condition
+  const updateMetalPurityCondition = (
+    conditionId: string,
+    updates: Partial<MetalPurityConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "metal_purity" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as MetalPurityConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update diamond clarity color condition
+  const updateDiamondClarityColorCondition = (
+    conditionId: string,
+    updates: Partial<DiamondClarityColorConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "diamond_clarity_color" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as DiamondClarityColorConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update gemstone carat condition
+  const updateGemstoneCaratCondition = (
+    conditionId: string,
+    updates: Partial<GemstoneCaratConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "gemstone_carat" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as GemstoneCaratConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Update pearl gram condition
+  const updatePearlGramCondition = (
+    conditionId: string,
+    updates: Partial<PearlGramConditionValue>
+  ) => {
+    setConditions(
+      conditions.map((c) => {
+        if (c.id === conditionId && c.type === "pearl_gram" && c.value) {
+          return {
+            ...c,
+            value: { ...(c.value as PearlGramConditionValue), ...updates },
+          }
+        }
+        return c
+      })
+    )
+  }
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!rule) return
+
+    // Validate
+    const newErrors: typeof errors = {}
+
+    if (!name.trim()) {
+      newErrors.name = "Name is required"
+    }
+
+    // Filter out conditions without type selected
+    const validConditions = conditions.filter((c) => c.type !== null && c.value !== null)
+
+    if (validConditions.length === 0) {
+      newErrors.conditions = "At least one condition is required"
+    } else {
+      // Validate each condition
+      for (const condition of validConditions) {
+        if (condition.type === "category") {
+          const value = condition.value as CategoryConditionValue
+          if (value.categoryIds.length === 0) {
+            newErrors.conditions = "Select at least one category for category condition"
+            break
+          }
+        } else if (condition.type === "diamond_carat") {
+          const value = condition.value as DiamondCaratConditionValue
+          const fromNum = Number(value.from) || 0
+          const toNum = Number(value.to) || 0
+          if (fromNum < 0 || toNum <= 0) {
+            newErrors.conditions = "Invalid carat range"
+            break
+          }
+          if (fromNum >= toNum) {
+            newErrors.conditions = "Carat 'from' must be less than 'to'"
+            break
+          }
+        } else if (condition.type === "tags") {
+          const value = condition.value as TagsConditionValue
+          if (value.tagIds.length === 0) {
+            newErrors.conditions = "Select at least one tag for tags condition"
+            break
+          }
+        } else if (condition.type === "metal_weight") {
+          const value = condition.value as MetalWeightConditionValue
+          const fromNum = Number(value.from) || 0
+          const toNum = Number(value.to) || 0
+          if (fromNum < 0 || toNum <= 0) {
+            newErrors.conditions = "Invalid metal weight range"
+            break
+          }
+          if (fromNum >= toNum) {
+            newErrors.conditions = "Metal weight 'from' must be less than 'to'"
+            break
+          }
+        } else if (condition.type === "badges") {
+          const value = condition.value as BadgesConditionValue
+          if (value.badgeIds.length === 0) {
+            newErrors.conditions = "Select at least one badge for badges condition"
+            break
+          }
+        } else if (condition.type === "metal_type") {
+          const value = condition.value as MetalTypeConditionValue
+          if (value.metalTypeIds.length === 0) {
+            newErrors.conditions = "Select at least one metal type for metal type condition"
+            break
+          }
+        } else if (condition.type === "metal_color") {
+          const value = condition.value as MetalColorConditionValue
+          if (value.metalColorIds.length === 0) {
+            newErrors.conditions = "Select at least one metal color for metal color condition"
+            break
+          }
+        } else if (condition.type === "metal_purity") {
+          const value = condition.value as MetalPurityConditionValue
+          if (value.metalPurityIds.length === 0) {
+            newErrors.conditions = "Select at least one metal purity for metal purity condition"
+            break
+          }
+        } else if (condition.type === "diamond_clarity_color") {
+          const value = condition.value as DiamondClarityColorConditionValue
+          if (value.diamondClarityColorIds.length === 0) {
+            newErrors.conditions = "Select at least one diamond clarity/color for diamond clarity/color condition"
+            break
+          }
+        } else if (condition.type === "gemstone_carat") {
+          const value = condition.value as GemstoneCaratConditionValue
+          const fromNum = Number(value.from) || 0
+          const toNum = Number(value.to) || 0
+          if (fromNum < 0 || toNum <= 0) {
+            newErrors.conditions = "Invalid gemstone carat range"
+            break
+          }
+          if (fromNum >= toNum) {
+            newErrors.conditions = "Gemstone carat 'from' must be less than 'to'"
+            break
+          }
+        } else if (condition.type === "pearl_gram") {
+          const value = condition.value as PearlGramConditionValue
+          const fromNum = Number(value.from) || 0
+          const toNum = Number(value.to) || 0
+          if (fromNum < 0 || toNum <= 0) {
+            newErrors.conditions = "Invalid pearl gram range"
+            break
+          }
+          if (fromNum >= toNum) {
+            newErrors.conditions = "Pearl gram 'from' must be less than 'to'"
+            break
+          }
+        }
+      }
+    }
+
+    const hasAnyMarkup =
+      actions.makingChargeMarkup > 0 ||
+      actions.diamondMarkup > 0 ||
+      actions.gemstoneMarkup > 0 ||
+      actions.pearlMarkup > 0
+
+    if (!hasAnyMarkup) {
+      newErrors.actions = "At least one markup percentage must be greater than 0"
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
+    setIsLoading(true)
+
+    try {
+      // Convert to final format (only valid conditions, with proper number conversion)
+      const finalConditions: PricingRuleCondition[] = validConditions.map((c) => {
+        if (c.type === "diamond_carat") {
+          const value = c.value as DiamondCaratConditionValue
+          return {
+            type: c.type,
+            value: {
+              from: Number(value.from) || 0,
+              to: Number(value.to) || 0,
+            },
+          }
+        }
+        if (c.type === "metal_weight") {
+          const value = c.value as MetalWeightConditionValue
+          return {
+            type: c.type,
+            value: {
+              from: Number(value.from) || 0,
+              to: Number(value.to) || 0,
+            },
+          }
+        }
+        if (c.type === "gemstone_carat") {
+          const value = c.value as GemstoneCaratConditionValue
+          return {
+            type: c.type,
+            value: {
+              from: Number(value.from) || 0,
+              to: Number(value.to) || 0,
+            },
+          }
+        }
+        if (c.type === "pearl_gram") {
+          const value = c.value as PearlGramConditionValue
+          return {
+            type: c.type,
+            value: {
+              from: Number(value.from) || 0,
+              to: Number(value.to) || 0,
+            },
+          }
+        }
+        return {
+          type: c.type!,
+          value: c.value!,
+        }
+      })
+
+      // Update via API
+      const result = await dispatch(
+        updatePricingRule({
+          id: rule.id,
+          data: {
+            name: name.trim(),
+            product_type: DEFAULT_PRODUCT_TYPE,
+            conditions: finalConditions,
+            actions,
+          },
+        })
+      ).unwrap()
+
+      toast.success(result.message)
+      router.push("/masters/pricing-rule")
+    } catch (err: unknown) {
+      const error = err as string
+      toast.error(error || "Something went wrong")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!rule) {
+    return null
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/masters/pricing-rule")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+              <Calculator className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Edit Pricing Rule</h1>
+              <p className="text-muted-foreground">
+                Update the pricing rule configuration
+              </p>
+            </div>
+          </div>
+        </div>
+        <Button onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
+      </div>
+
+      {/* Form Card */}
+      <Card>
+        <CardContent className="pt-6 space-y-6">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="edit-name">
+              Rule Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="edit-name"
+              placeholder="e.g., Premium Diamond Collection"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                if (errors.name) {
+                  setErrors((prev) => ({ ...prev, name: undefined }))
+                }
+              }}
+            />
+            {errors.name && (
+              <p className="text-sm text-destructive pl-1">{errors.name}</p>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Conditions Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-base">Conditions</Label>
+                <p className="text-sm text-muted-foreground">
+                  Define when this rule should apply
+                </p>
+              </div>
+              {/* Add Condition Button */}
+              <Button variant="outline" size="sm" onClick={handleAddCondition}>
+                <Plus className="mr-1 h-4 w-4" />
+                Add Condition
+              </Button>
+            </div>
+
+            {errors.conditions && (
+              <p className="text-sm text-destructive">{errors.conditions}</p>
+            )}
+
+            {/* Empty State */}
+            {conditions.length === 0 && (
+              <div className="border border-dashed rounded-lg p-6 text-center">
+                <p className="text-sm text-muted-foreground">
+                  No conditions added yet. Click "Add Condition" to get started.
+                </p>
+              </div>
+            )}
+
+            {/* Condition Boxes */}
+            {conditions.map((condition) => (
+              <div
+                key={condition.id}
+                className="border rounded-lg p-4 space-y-4"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  {/* Condition Type Select */}
+                  <div className="flex-1">
+                    <Select
+                      value={condition.type || ""}
+                      onValueChange={(value) =>
+                        handleSetConditionType(condition.id, value as ConditionType)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select condition type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableConditionTypes.map(({ type, label }) => (
+                          <SelectItem key={type} value={type}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Remove Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => handleRemoveCondition(condition.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Category Condition Options */}
+                {condition.type === "category" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    {/* Match Type */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Match Type
+                      </Label>
+                      <RadioGroup
+                        value={(condition.value as CategoryConditionValue).matchType}
+                        onValueChange={(value) =>
+                          updateCategoryCondition(condition.id, {
+                            matchType: value as "all" | "any",
+                          })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="any" id={`edit-${condition.id}-any`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-any`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ANY category
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="all" id={`edit-${condition.id}-all`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-all`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ALL categories
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Category Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Categories
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {categories.map((category) => {
+                          const isChecked = (
+                            condition.value as CategoryConditionValue
+                          ).categoryIds.includes(category.id)
+                          return (
+                            <div
+                              key={category.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${category.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as CategoryConditionValue
+                                  ).categoryIds
+                                  const newIds = checked
+                                    ? [...currentIds, category.id]
+                                    : currentIds.filter((id) => id !== category.id)
+                                  updateCategoryCondition(condition.id, {
+                                    categoryIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${category.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {category.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Diamond Carat Condition Options */}
+                {condition.type === "diamond_carat" && condition.value && (
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-from`}>Carat From</Label>
+                      <Input
+                        id={`edit-${condition.id}-from`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as DiamondCaratConditionValue).from}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateDiamondCaratCondition(condition.id, {
+                              from: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-to`}>Carat To</Label>
+                      <Input
+                        id={`edit-${condition.id}-to`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as DiamondCaratConditionValue).to}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateDiamondCaratCondition(condition.id, {
+                              to: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Tags Condition Options */}
+                {condition.type === "tags" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    {/* Match Type */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Match Type
+                      </Label>
+                      <RadioGroup
+                        value={(condition.value as TagsConditionValue).matchType}
+                        onValueChange={(value) =>
+                          updateTagsCondition(condition.id, {
+                            matchType: value as "all" | "any",
+                          })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="any" id={`edit-${condition.id}-tags-any`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-tags-any`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ANY tag
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="all" id={`edit-${condition.id}-tags-all`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-tags-all`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ALL tags
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Tags Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Tags
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {tags.map((tag) => {
+                          const isChecked = (
+                            condition.value as TagsConditionValue
+                          ).tagIds.includes(tag.id)
+                          return (
+                            <div
+                              key={tag.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${tag.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as TagsConditionValue
+                                  ).tagIds
+                                  const newIds = checked
+                                    ? [...currentIds, tag.id]
+                                    : currentIds.filter((id) => id !== tag.id)
+                                  updateTagsCondition(condition.id, {
+                                    tagIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${tag.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {tag.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metal Weight Condition Options */}
+                {condition.type === "metal_weight" && condition.value && (
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-weight-from`}>Weight From (g)</Label>
+                      <Input
+                        id={`edit-${condition.id}-weight-from`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as MetalWeightConditionValue).from}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateMetalWeightCondition(condition.id, {
+                              from: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-weight-to`}>Weight To (g)</Label>
+                      <Input
+                        id={`edit-${condition.id}-weight-to`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as MetalWeightConditionValue).to}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateMetalWeightCondition(condition.id, {
+                              to: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Badges Condition Options */}
+                {condition.type === "badges" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    {/* Match Type */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Match Type
+                      </Label>
+                      <RadioGroup
+                        value={(condition.value as BadgesConditionValue).matchType}
+                        onValueChange={(value) =>
+                          updateBadgesCondition(condition.id, {
+                            matchType: value as "all" | "any",
+                          })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="any" id={`edit-${condition.id}-badges-any`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-badges-any`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ANY badge
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="all" id={`edit-${condition.id}-badges-all`} />
+                          <Label
+                            htmlFor={`edit-${condition.id}-badges-all`}
+                            className="font-normal cursor-pointer"
+                          >
+                            Match ALL badges
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Badges Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Badges
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {badges.map((badge) => {
+                          const isChecked = (
+                            condition.value as BadgesConditionValue
+                          ).badgeIds.includes(badge.id)
+                          return (
+                            <div
+                              key={badge.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${badge.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as BadgesConditionValue
+                                  ).badgeIds
+                                  const newIds = checked
+                                    ? [...currentIds, badge.id]
+                                    : currentIds.filter((id) => id !== badge.id)
+                                  updateBadgesCondition(condition.id, {
+                                    badgeIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${badge.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {badge.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metal Type Condition Options */}
+                {condition.type === "metal_type" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Rule applies if product matches ANY selected metal type
+                    </p>
+                    {/* Metal Type Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Metal Types
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {metalTypes.map((metalType) => {
+                          const isChecked = (
+                            condition.value as MetalTypeConditionValue
+                          ).metalTypeIds.includes(metalType.id)
+                          return (
+                            <div
+                              key={metalType.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${metalType.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as MetalTypeConditionValue
+                                  ).metalTypeIds
+                                  const newIds = checked
+                                    ? [...currentIds, metalType.id]
+                                    : currentIds.filter((id) => id !== metalType.id)
+                                  updateMetalTypeCondition(condition.id, {
+                                    metalTypeIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${metalType.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {metalType.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metal Color Condition Options */}
+                {condition.type === "metal_color" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Rule applies if product matches ANY selected metal color
+                    </p>
+                    {/* Metal Color Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Metal Colors
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {metalColors.map((metalColor) => {
+                          const isChecked = (
+                            condition.value as MetalColorConditionValue
+                          ).metalColorIds.includes(metalColor.id)
+                          return (
+                            <div
+                              key={metalColor.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${metalColor.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as MetalColorConditionValue
+                                  ).metalColorIds
+                                  const newIds = checked
+                                    ? [...currentIds, metalColor.id]
+                                    : currentIds.filter((id) => id !== metalColor.id)
+                                  updateMetalColorCondition(condition.id, {
+                                    metalColorIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${metalColor.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {metalColor.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metal Purity Condition Options */}
+                {condition.type === "metal_purity" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Rule applies if product matches ANY selected metal purity
+                    </p>
+                    {/* Metal Purity Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Metal Purities
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {metalPurities.map((metalPurity) => {
+                          const isChecked = (
+                            condition.value as MetalPurityConditionValue
+                          ).metalPurityIds.includes(metalPurity.id)
+                          return (
+                            <div
+                              key={metalPurity.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${metalPurity.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as MetalPurityConditionValue
+                                  ).metalPurityIds
+                                  const newIds = checked
+                                    ? [...currentIds, metalPurity.id]
+                                    : currentIds.filter((id) => id !== metalPurity.id)
+                                  updateMetalPurityCondition(condition.id, {
+                                    metalPurityIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${metalPurity.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {metalPurity.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Diamond Clarity/Color Condition Options */}
+                {condition.type === "diamond_clarity_color" && condition.value && (
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Rule applies if product matches ANY selected diamond clarity/color
+                    </p>
+                    {/* Diamond Clarity/Color Checkboxes */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Diamond Clarity/Color
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                        {diamondClarityColors.map((diamondClarityColor) => {
+                          const isChecked = (
+                            condition.value as DiamondClarityColorConditionValue
+                          ).diamondClarityColorIds.includes(diamondClarityColor.id)
+                          return (
+                            <div
+                              key={diamondClarityColor.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`edit-${condition.id}-${diamondClarityColor.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = (
+                                    condition.value as DiamondClarityColorConditionValue
+                                  ).diamondClarityColorIds
+                                  const newIds = checked
+                                    ? [...currentIds, diamondClarityColor.id]
+                                    : currentIds.filter((id) => id !== diamondClarityColor.id)
+                                  updateDiamondClarityColorCondition(condition.id, {
+                                    diamondClarityColorIds: newIds,
+                                  })
+                                }}
+                              />
+                              <Label
+                                htmlFor={`edit-${condition.id}-${diamondClarityColor.id}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {diamondClarityColor.name}
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Gemstone Carat Condition Options */}
+                {condition.type === "gemstone_carat" && condition.value && (
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-gemstone-from`}>Carat From</Label>
+                      <Input
+                        id={`edit-${condition.id}-gemstone-from`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as GemstoneCaratConditionValue).from}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateGemstoneCaratCondition(condition.id, {
+                              from: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-gemstone-to`}>Carat To</Label>
+                      <Input
+                        id={`edit-${condition.id}-gemstone-to`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as GemstoneCaratConditionValue).to}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updateGemstoneCaratCondition(condition.id, {
+                              to: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Pearl Gram Condition Options */}
+                {condition.type === "pearl_gram" && condition.value && (
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-pearl-from`}>Gram From</Label>
+                      <Input
+                        id={`edit-${condition.id}-pearl-from`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as PearlGramConditionValue).from}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updatePearlGramCondition(condition.id, {
+                              from: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`edit-${condition.id}-pearl-to`}>Gram To</Label>
+                      <Input
+                        id={`edit-${condition.id}-pearl-to`}
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.000"
+                        value={(condition.value as PearlGramConditionValue).to}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                            updatePearlGramCondition(condition.id, {
+                              to: value as unknown as number,
+                            })
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <Separator />
+
+          {/* Actions Section */}
+          <div className="space-y-4">
+            <div>
+              <Label className="text-base">Markup Percentages</Label>
+              <p className="text-sm text-muted-foreground">
+                Define the markup to apply on each cost component
+              </p>
+            </div>
+
+            {errors.actions && (
+              <p className="text-sm text-destructive">{errors.actions}</p>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Making Charge Markup */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-makingChargeMarkup">Making Charge</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-makingChargeMarkup"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    className="pr-8"
+                    value={actions.makingChargeMarkup || ""}
+                    onChange={(e) =>
+                      setActions((prev) => ({
+                        ...prev,
+                        makingChargeMarkup: parseFloat(e.target.value) || 0,
+                      }))
+                    }
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
+              </div>
+
+              {/* Diamond Markup */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-diamondMarkup">Diamond</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-diamondMarkup"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    className="pr-8"
+                    value={actions.diamondMarkup || ""}
+                    onChange={(e) =>
+                      setActions((prev) => ({
+                        ...prev,
+                        diamondMarkup: parseFloat(e.target.value) || 0,
+                      }))
+                    }
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
+              </div>
+
+              {/* Gemstone Markup */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-gemstoneMarkup">Gemstone</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-gemstoneMarkup"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    className="pr-8"
+                    value={actions.gemstoneMarkup || ""}
+                    onChange={(e) =>
+                      setActions((prev) => ({
+                        ...prev,
+                        gemstoneMarkup: parseFloat(e.target.value) || 0,
+                      }))
+                    }
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
+              </div>
+
+              {/* Pearl Markup */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-pearlMarkup">Pearl</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-pearlMarkup"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    className="pr-8"
+                    value={actions.pearlMarkup || ""}
+                    onChange={(e) =>
+                      setActions((prev) => ({
+                        ...prev,
+                        pearlMarkup: parseFloat(e.target.value) || 0,
+                      }))
+                    }
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
