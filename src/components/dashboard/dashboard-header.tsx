@@ -25,7 +25,7 @@ export function DashboardHeader() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/dashboard">Luminique</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Aarshhmi</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
