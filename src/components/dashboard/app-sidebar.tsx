@@ -78,7 +78,7 @@ export function AppSidebar() {
                   <Gem className="size-4 text-[#14344A]" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Luminique</span>
+                  <span className="font-semibold">Aarshhmi</span>
                   <span className="text-xs text-white">Admin Panel</span>
                 </div>
               </Link>

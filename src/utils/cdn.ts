@@ -3,7 +3,7 @@
 /**
  * Get the full CDN URL for a given path
  * @param path - The file path (e.g., "/masters/metals/gold.png")
- * @returns Full CDN URL (e.g., "https://luminique.b-cdn.net/masters/metals/gold.png")
+ * @returns Full CDN URL (e.g., "https://aarshhmi.b-cdn.net/masters/metals/gold.png")
  */
 export function getCdnUrl(path: string | null | undefined): string {
   if (!path) return ""
