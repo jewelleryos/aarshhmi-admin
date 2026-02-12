@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <Gem className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-semibold">Luminique</span>
+            <span className="text-xl font-semibold">Aarshhmi</span>
           </div>
 
           {/* Center Content */}
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Footer */}
-          <p className="text-sm text-muted-foreground">© 2025 Luminique. Premium jewelry platform.</p>
+          <p className="text-sm text-muted-foreground">© 2026 Aarshhmi. Premium jewelry platform.</p>
         </div>
       </div>
 
