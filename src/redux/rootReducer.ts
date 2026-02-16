@@ -24,6 +24,7 @@ import sizeChartGroupSlice from './slices/sizeChartGroupSlice'
 import sizeChartValueSlice from './slices/sizeChartValueSlice'
 import productSlice from './slices/productSlice'
 import pricingRuleSlice from './slices/pricingRuleSlice'
+import priceRecalculationSlice from './slices/priceRecalculationSlice'
 
 const rootReducer = combineReducers({
   auth: authSlice,
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
   sizeChartValue: sizeChartValueSlice,
   product: productSlice,
   pricingRule: pricingRuleSlice,
+  priceRecalculation: priceRecalculationSlice,
 })
 
 export default rootReducer
