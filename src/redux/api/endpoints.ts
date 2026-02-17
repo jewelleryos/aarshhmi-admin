@@ -311,7 +311,11 @@ const API_ENDPOINTS = {
   },
 
   // CMS endpoints
- 
+  // Price Recalculation endpoints
+  PRICE_RECALCULATION: {
+    JOBS: '/api/price-recalculation/jobs',
+    TRIGGER: '/api/price-recalculation/trigger',
+  },
 }
 
 export default API_ENDPOINTS

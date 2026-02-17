@@ -283,6 +283,54 @@
   margin: 1rem 0;
 }
 
+/* Table styles */
+.tiptap table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  overflow: hidden;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.tiptap table td,
+.tiptap table th {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  position: relative;
+  min-width: 80px;
+}
+
+.tiptap table th {
+  background-color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.tiptap table td > *,
+.tiptap table th > * {
+  margin: 0;
+}
+
+.tiptap table .selectedCell {
+  background-color: color-mix(in srgb, var(--primary), transparent 90%);
+}
+
+.tiptap table .column-resize-handle {
+  background-color: var(--primary);
+  width: 3px;
+  position: absolute;
+  right: -1.5px;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.tiptap .tableWrapper {
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
 /* Placeholder styling */
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
