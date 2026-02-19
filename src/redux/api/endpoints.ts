@@ -39,6 +39,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-types/${id}`,
     CREATE: '/api/metal-types',
     UPDATE: (id: string) => `/api/metal-types/${id}`,
+    DELETE: (id: string) => `/api/metal-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-types/${id}/check-dependency`,
     FOR_METAL_COLOR: '/api/metal-types/for-metal-color',
     FOR_METAL_PURITY: '/api/metal-types/for-metal-purity',
     FOR_MAKING_CHARGE: '/api/metal-types/for-making-charge',
