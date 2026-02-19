@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { StorefrontFiltersTable } from "./storefront-filters-table"
 import { FilterGroupEditDrawer } from "./filter-group-edit-drawer"
 import { FilterValueEditDrawer } from "./filter-value-edit-drawer"
+import { PriceRangesContent } from "./price-ranges-content"
+import { SortByContent } from "./sort-by-content"
+import { GroupConfigContent } from "./group-config-content"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
 import storefrontFiltersService from "@/redux/services/storefrontFiltersService"
@@ -126,24 +130,51 @@ export function StorefrontFiltersContent() {
         </div>
       </div>
 
-      {/* Filters Table */}
-      <Card>
-        <CardContent className="pt-6">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <StorefrontFiltersTable
-              filters={filters}
-              isLoading={false}
-              canUpdate={canUpdate}
-              onEditGroup={handleEditGroup}
-              onEditValue={handleEditValue}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <Tabs defaultValue="tag-groups">
+        <TabsList>
+          <TabsTrigger value="tag-groups">Tag Group Filters</TabsTrigger>
+          <TabsTrigger value="price-ranges">Price Ranges</TabsTrigger>
+          <TabsTrigger value="sort-by">Sort By</TabsTrigger>
+          <TabsTrigger value="group-config">Group Settings</TabsTrigger>
+        </TabsList>
+
+        {/* Tab 1: Tag Group Filters (existing) */}
+        <TabsContent value="tag-groups">
+          <Card>
+            <CardContent className="pt-6">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <StorefrontFiltersTable
+                  filters={filters}
+                  isLoading={false}
+                  canUpdate={canUpdate}
+                  onEditGroup={handleEditGroup}
+                  onEditValue={handleEditValue}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab 2: Price Ranges */}
+        <TabsContent value="price-ranges">
+          <PriceRangesContent />
+        </TabsContent>
+
+        {/* Tab 3: Sort By */}
+        <TabsContent value="sort-by">
+          <SortByContent />
+        </TabsContent>
+
+        {/* Tab 4: Group Settings */}
+        <TabsContent value="group-config">
+          <GroupConfigContent />
+        </TabsContent>
+      </Tabs>
 
       {/* Edit Group Drawer */}
       {canUpdate && (
