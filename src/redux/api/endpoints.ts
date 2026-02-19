@@ -308,6 +308,17 @@ const API_ENDPOINTS = {
     UPDATE_GROUP: (id: string) => `/api/storefront-filters/${id}`,
     UPDATE_VALUE: (groupId: string, valueId: string) =>
       `/api/storefront-filters/${groupId}/values/${valueId}`,
+    // Price ranges
+    PRICE_RANGES_LIST: '/api/storefront-filters/price-ranges',
+    PRICE_RANGE_CREATE: '/api/storefront-filters/price-ranges',
+    PRICE_RANGE_UPDATE: (id: string) => `/api/storefront-filters/price-ranges/${id}`,
+    PRICE_RANGE_DELETE: (id: string) => `/api/storefront-filters/price-ranges/${id}`,
+    // Sort-by options
+    SORT_BY_OPTIONS_LIST: '/api/storefront-filters/sort-by',
+    SORT_BY_OPTION_UPDATE: (id: string) => `/api/storefront-filters/sort-by/${id}`,
+    // Group config
+    GROUP_CONFIG_LIST: '/api/storefront-filters/group-config',
+    GROUP_CONFIG_UPDATE: (id: string) => `/api/storefront-filters/group-config/${id}`,
   },
 
   // CMS endpoints
