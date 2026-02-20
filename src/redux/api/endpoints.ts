@@ -62,6 +62,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-purities/${id}`,
     CREATE: '/api/metal-purities',
     UPDATE: (id: string) => `/api/metal-purities/${id}`,
+    DELETE: (id: string) => `/api/metal-purities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-purities/${id}/check-dependency`,
   },
 
   // Stone Shape endpoints
