@@ -102,7 +102,8 @@ export function DeleteDependencyDialog({
     return () => {
       cancelled = true
     }
-  }, [open, checkDependency])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   // Handle delete
   const handleDelete = async () => {

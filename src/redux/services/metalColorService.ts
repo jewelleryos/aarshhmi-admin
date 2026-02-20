@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Metal Color interface - matches backend response
 export interface MetalColor {
@@ -76,6 +77,18 @@ const metalColorService = {
   // Update metal color
   update: async (id: string, data: UpdateMetalColorData): Promise<MetalColorResponse> => {
     const response = await apiService.put(API_ENDPOINTS.METAL_COLOR.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.METAL_COLOR.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete metal color
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.METAL_COLOR.DELETE(id))
     return response.data
   },
 }

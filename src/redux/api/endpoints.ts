@@ -52,6 +52,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-colors/${id}`,
     CREATE: '/api/metal-colors',
     UPDATE: (id: string) => `/api/metal-colors/${id}`,
+    DELETE: (id: string) => `/api/metal-colors/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-colors/${id}/check-dependency`,
   },
 
   // Metal Purity endpoints
