@@ -118,6 +118,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/diamond-prices/${id}`,
     CREATE: '/api/diamond-prices',
     UPDATE: (id: string) => `/api/diamond-prices/${id}`,
+    DELETE: (id: string) => `/api/diamond-prices/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/diamond-prices/${id}/check-dependency`,
     // Bulk operations
     TEMPLATE: '/api/diamond-prices/template',
     REFERENCE: '/api/diamond-prices/reference',
