@@ -90,6 +90,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-qualities/${id}`,
     CREATE: '/api/gemstone-qualities',
     UPDATE: (id: string) => `/api/gemstone-qualities/${id}`,
+        DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-qualities/${id}/check-dependency`,
   },
 
   // Gemstone Color endpoints
