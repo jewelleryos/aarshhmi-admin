@@ -13,6 +13,8 @@ const DEPENDENCY_LABELS: Record<string, string> = {
   tag: "Tags",
   tag_group: "Tag Groups",
   pricing_rule: "Pricing Rules",
+  diamond_price: "Diamond Prices",
+  gemstone_price: "Gemstone Prices",
 }
 
 function formatType(type: string): string {

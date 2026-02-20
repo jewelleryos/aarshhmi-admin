@@ -104,6 +104,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/diamond-clarity-color/${id}`,
     CREATE: '/api/diamond-clarity-color',
     UPDATE: (id: string) => `/api/diamond-clarity-color/${id}`,
+    DELETE: (id: string) => `/api/diamond-clarity-color/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/diamond-clarity-color/${id}/check-dependency`,
     DROPDOWN: '/api/diamond-clarity-color/dropdown',
   },
 
