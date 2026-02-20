@@ -80,6 +80,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-types/${id}`,
     CREATE: '/api/gemstone-types',
     UPDATE: (id: string) => `/api/gemstone-types/${id}`,
+    DELETE: (id: string) => `/api/gemstone-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-types/${id}/check-dependency`,
   },
 
   // Gemstone Quality endpoints
