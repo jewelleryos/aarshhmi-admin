@@ -8,16 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
 import { DiamondPrice } from "@/redux/services/diamondPricingService"
 import { formatCurrency } from "@/utils/currency"
 
 interface DiamondPricingTableProps {
   items: DiamondPrice[]
   onEdit: (item: DiamondPrice) => void
+  onDelete: (item: DiamondPrice) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format carat value (4 decimal places)
@@ -28,7 +31,9 @@ function formatCarat(value: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: DiamondPrice) => void,
-  canUpdate: boolean
+  onDelete: (item: DiamondPrice) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<DiamondPrice>[] {
   return [
     {
@@ -106,6 +111,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -120,12 +135,14 @@ function createColumns(
 export function DiamondPricingTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: DiamondPricingTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state

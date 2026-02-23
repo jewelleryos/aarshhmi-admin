@@ -4,13 +4,16 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchMetalColors } from "@/redux/slices/metalColorSlice"
 import { MetalColorTable } from "./metal-color-table"
 import { MetalColorAddDrawer } from "./metal-color-add-drawer"
 import { MetalColorEditDrawer } from "./metal-color-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import metalColorService from "@/redux/services/metalColorService"
 import type { MetalColor } from "@/redux/services/metalColorService"
 
 export function MetalColorContent() {
@@ -24,10 +27,15 @@ export function MetalColorContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedMetalColor, setSelectedMetalColor] = useState<MetalColor | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<MetalColor | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.METAL_COLOR.CREATE)
   const canUpdate = has(PERMISSIONS.METAL_COLOR.UPDATE)
+  const canDelete = has(PERMISSIONS.METAL_COLOR.DELETE)
 
   // Fetch metal colors on mount
   useEffect(() => {
@@ -39,6 +47,31 @@ export function MetalColorContent() {
     if (!canUpdate) return
     setSelectedMetalColor(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: MetalColor) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return metalColorService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await metalColorService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchMetalColors())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -70,7 +103,9 @@ export function MetalColorContent() {
             <MetalColorTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -90,6 +125,18 @@ export function MetalColorContent() {
           metalColor={selectedMetalColor}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Metal Color"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

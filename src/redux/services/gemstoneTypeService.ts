@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Gemstone Type interface - matches backend response
 export interface GemstoneType {
@@ -74,6 +75,18 @@ const gemstoneTypeService = {
   // Update gemstone type
   update: async (id: string, data: UpdateGemstoneTypeData): Promise<GemstoneTypeResponse> => {
     const response = await apiService.put(API_ENDPOINTS.GEMSTONE_TYPE.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.GEMSTONE_TYPE.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete gemstone type
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.GEMSTONE_TYPE.DELETE(id))
     return response.data
   },
 }

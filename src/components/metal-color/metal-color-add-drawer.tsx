@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   Sheet,
   SheetContent,
@@ -12,17 +12,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Palette, Loader2 } from "lucide-react"
 import { useAppDispatch } from "@/redux/store"
 import { createMetalColor } from "@/redux/slices/metalColorSlice"
-import metalTypeService from "@/redux/services/metalTypeService"
 import { MediaPickerInput } from "@/components/media"
 import { toast } from "sonner"
 
@@ -52,12 +44,7 @@ function generateSlug(name: string): string {
 export function MetalColorAddDrawer({ open, onOpenChange }: MetalColorAddDrawerProps) {
   const dispatch = useAppDispatch()
 
-  // Metal types for dropdown
-  const [metalTypes, setMetalTypes] = useState<{ id: string; name: string }[]>([])
-  const [isLoadingMetalTypes, setIsLoadingMetalTypes] = useState(false)
-
   // Form state
-  const [selectedMetalType, setSelectedMetalType] = useState("")
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
@@ -70,34 +57,12 @@ export function MetalColorAddDrawer({ open, onOpenChange }: MetalColorAddDrawerP
   // Loading and error state
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{
-    metalType?: string
     name?: string
     slug?: string
   }>({})
 
-  // Fetch metal types when drawer opens
-  useEffect(() => {
-    if (open) {
-      setIsLoadingMetalTypes(true)
-      metalTypeService
-        .getForMetalColor()
-        .then((response) => {
-          if (response.success) {
-            setMetalTypes(response.data)
-          }
-        })
-        .catch((err: unknown) => {
-          const error = err as { response?: { data?: { message?: string } } }
-          const message = error.response?.data?.message || "Something went wrong"
-          toast.error(message)
-        })
-        .finally(() => setIsLoadingMetalTypes(false))
-    }
-  }, [open])
-
   // Reset form
   const resetForm = () => {
-    setSelectedMetalType("")
     setName("")
     setSlug("")
     setDescription("")
@@ -136,22 +101,11 @@ export function MetalColorAddDrawer({ open, onOpenChange }: MetalColorAddDrawerP
     }
   }
 
-  // Handle metal type change
-  const handleMetalTypeChange = (value: string) => {
-    setSelectedMetalType(value)
-    if (errors.metalType && value) {
-      setErrors((prev) => ({ ...prev, metalType: undefined }))
-    }
-  }
-
   // Handle form submission
   const handleSubmit = async () => {
     // Validate
     const newErrors: typeof errors = {}
 
-    if (!selectedMetalType) {
-      newErrors.metalType = "Metal type is required"
-    }
     if (!name.trim()) {
       newErrors.name = "Name is required"
     }
@@ -170,7 +124,6 @@ export function MetalColorAddDrawer({ open, onOpenChange }: MetalColorAddDrawerP
     try {
       await dispatch(
         createMetalColor({
-          metal_type_id: selectedMetalType,
           name: name.trim(),
           slug: slug.trim(),
           description: description.trim() || null,
@@ -213,32 +166,6 @@ export function MetalColorAddDrawer({ open, onOpenChange }: MetalColorAddDrawerP
 
         {/* Form */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-          {/* Metal Type Field */}
-          <div className="space-y-2">
-            <Label>
-              Metal Type <span className="text-destructive">*</span>
-            </Label>
-            <Select
-              value={selectedMetalType}
-              onValueChange={handleMetalTypeChange}
-              disabled={isLoadingMetalTypes}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={isLoadingMetalTypes ? "Loading..." : "Select metal type"} />
-              </SelectTrigger>
-              <SelectContent>
-                {metalTypes.map((type) => (
-                  <SelectItem key={type.id} value={type.id}>
-                    {type.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.metalType && (
-              <p className="text-sm text-destructive pl-[5px]">{errors.metalType}</p>
-            )}
-          </div>
-
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">

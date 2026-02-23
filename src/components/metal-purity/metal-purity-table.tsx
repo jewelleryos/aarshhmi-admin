@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -17,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
 import type { MetalPurity } from "@/redux/services/metalPurityService"
 import { getCdnUrl } from "@/utils/cdn"
 import { formatCurrency } from "@/utils/currency"
@@ -25,7 +26,9 @@ import { formatCurrency } from "@/utils/currency"
 interface MetalPurityTableProps {
   items: MetalPurity[]
   onEdit: (item: MetalPurity) => void
+  onDelete: (item: MetalPurity) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -47,7 +50,9 @@ function truncate(text: string | null, maxLength: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: MetalPurity) => void,
-  canUpdate: boolean
+  onDelete: (item: MetalPurity) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<MetalPurity>[] {
   return [
     {
@@ -154,6 +159,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -168,7 +183,9 @@ function createColumns(
 export function MetalPurityTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: MetalPurityTableProps) {
   // Metal type filter state
   const [metalTypeFilter, setMetalTypeFilter] = useState<string>("all")
@@ -190,8 +207,8 @@ export function MetalPurityTable({
 
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state
