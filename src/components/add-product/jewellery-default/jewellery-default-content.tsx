@@ -79,9 +79,9 @@ const initialBasicDetails = {
 
 // Metal details initial state
 const initialMetalDetails = {
+  colorIds: [] as string[],
   selectedMetals: [] as {
     metalTypeId: string
-    colorIds: string[]
     purities: { purityId: string; weight: string }[]
   }[],
 }
@@ -234,23 +234,17 @@ export function JewelleryDefaultContent() {
 
   // Update selected colors when metal details change
   useEffect(() => {
-    const colorIds = new Set<string>()
     const colors: { colorId: string; colorName: string }[] = []
 
-    metalDetails.selectedMetals.forEach((metal) => {
-      metal.colorIds.forEach((colorId) => {
-        if (!colorIds.has(colorId)) {
-          colorIds.add(colorId)
-          const color = metalColors.find((c) => c.id === colorId)
-          if (color) {
-            colors.push({ colorId: color.id, colorName: color.name })
-          }
-        }
-      })
+    metalDetails.colorIds.forEach((colorId) => {
+      const color = metalColors.find((c) => c.id === colorId)
+      if (color) {
+        colors.push({ colorId: color.id, colorName: color.name })
+      }
     })
 
     setSelectedColors(colors)
-  }, [metalDetails, metalColors])
+  }, [metalDetails.colorIds, metalColors])
 
   // Update selected gemstone colors for media when stone details change
   useEffect(() => {
@@ -283,12 +277,14 @@ export function JewelleryDefaultContent() {
           basicDetails.length
         )
       case "metal":
-        // Check if at least one metal is selected with at least one color and one purity with weight
-        return metalDetails.selectedMetals.some(
-          (m) =>
-            m.colorIds.length > 0 &&
-            m.purities.length > 0 &&
-            m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+        // Check if at least one color selected and at least one metal with purity and weight
+        return (
+          metalDetails.colorIds.length > 0 &&
+          metalDetails.selectedMetals.some(
+            (m) =>
+              m.purities.length > 0 &&
+              m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+          )
         )
       case "stone":
         // Stone is optional - valid if no stones selected OR all selected types are configured
@@ -387,20 +383,19 @@ export function JewelleryDefaultContent() {
       return errors
     }
 
+    // Check global colors
+    if (metalDetails.colorIds.length === 0) {
+      errors.noColorSelected = "At least one color must be selected"
+    }
+
     // Check each selected metal
     const metalErrors: MetalDetailsErrors["metalErrors"] = {}
 
     metalDetails.selectedMetals.forEach((metal) => {
       const metalError: {
-        noColorSelected?: string
         noPuritySelected?: string
         weightErrors?: { [purityId: string]: string }
       } = {}
-
-      // Check if no color is selected
-      if (metal.colorIds.length === 0) {
-        metalError.noColorSelected = "At least one color must be selected"
-      }
 
       // Check if no purity is selected
       if (metal.purities.length === 0) {
@@ -712,13 +707,13 @@ export function JewelleryDefaultContent() {
 
       // Metal Details
       metal: {
+        colors: metalDetails.colorIds.map((colorId) => ({
+          colorId,
+          colorName: findName(metalColors, colorId),
+        })),
         selectedMetals: metalDetails.selectedMetals.map((metal) => ({
           metalTypeId: metal.metalTypeId,
           metalTypeName: findName(metalTypes, metal.metalTypeId),
-          colors: metal.colorIds.map((colorId) => ({
-            colorId,
-            colorName: findName(metalColors, colorId),
-          })),
           purities: metal.purities.map((purity) => ({
             purityId: purity.purityId,
             purityName: findName(metalPurities, purity.purityId),
@@ -830,8 +825,8 @@ export function JewelleryDefaultContent() {
               ? stoneDetails.gemstoneColorIds
               : [null]
 
-          for (const selectedMetal of metalDetails.selectedMetals) {
-            for (const colorId of selectedMetal.colorIds) {
+          for (const colorId of metalDetails.colorIds) {
+            for (const selectedMetal of metalDetails.selectedMetals) {
               for (const purity of selectedMetal.purities) {
                 if (!purity.weight || parseFloat(purity.weight) <= 0) continue
 
@@ -885,7 +880,7 @@ export function JewelleryDefaultContent() {
           return variants
         })(),
         totalCount: (() => {
-          let count = 0
+          const colorCount = metalDetails.colorIds.length
           const diamondCount =
             stoneDetails.hasDiamond && stoneDetails.diamondClarityColorIds.length > 0
               ? stoneDetails.diamondClarityColorIds.length
@@ -895,14 +890,13 @@ export function JewelleryDefaultContent() {
               ? stoneDetails.gemstoneColorIds.length
               : 1
 
+          let purityCount = 0
           for (const selectedMetal of metalDetails.selectedMetals) {
-            const validPurities = selectedMetal.purities.filter(
+            purityCount += selectedMetal.purities.filter(
               (p) => p.weight && parseFloat(p.weight) > 0
             ).length
-            count +=
-              selectedMetal.colorIds.length * validPurities * diamondCount * gemstoneCount
           }
-          return count
+          return colorCount * purityCount * diamondCount * gemstoneCount
         })(),
       },
 
@@ -925,30 +919,40 @@ export function JewelleryDefaultContent() {
       // Media
       media: {
         hasGemstoneSubMedia: selectedGemstoneColorsForMedia.length > 0,
-        colorMedia: mediaDetails.colorMedia.map((cm) => ({
-          metalColorId: cm.colorId,
-          metalColorName: cm.colorName,
-          // Direct items (when no gemstones)
-          items: cm.items.map((item) => ({
-            id: item.id,
-            path: item.path,
-            type: item.type,
-            altText: item.altText || null,
-            position: item.position,
-          })),
-          // Gemstone sub-media (when gemstones are selected)
-          gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => ({
-            gemstoneColorId: sm.gemstoneColorId,
-            gemstoneColorName: sm.gemstoneColorName,
-            items: sm.items.map((item) => ({
-              id: item.id,
-              path: item.path,
+        colorMedia: mediaDetails.colorMedia.map((cm) => {
+          const color = metalColors.find((c) => c.id === cm.colorId)
+          return {
+            metalColorId: cm.colorId,
+            metalColorName: cm.colorName,
+            colorSlug: color?.slug || "",
+            // Direct items (when no gemstones)
+            items: cm.items.map((item) => ({
+              ...(item.fileKey
+                ? { fileKey: item.fileKey }
+                : { id: item.id, path: item.path }),
               type: item.type,
               altText: item.altText || null,
               position: item.position,
             })),
-          })),
-        })),
+            // Gemstone sub-media (when gemstones are selected)
+            gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => {
+              const gemColor = gemstoneColors.find((gc) => gc.id === sm.gemstoneColorId)
+              return {
+                gemstoneColorId: sm.gemstoneColorId,
+                gemstoneColorName: sm.gemstoneColorName,
+                gemstoneColorSlug: gemColor?.slug || "",
+                items: sm.items.map((item) => ({
+                  ...(item.fileKey
+                    ? { fileKey: item.fileKey }
+                    : { id: item.id, path: item.path }),
+                  type: item.type,
+                  altText: item.altText || null,
+                  position: item.position,
+                })),
+              }
+            }),
+          }
+        }),
       },
 
       // SEO
@@ -977,10 +981,30 @@ export function JewelleryDefaultContent() {
       },
     }
 
+    // Build FormData with product JSON + file uploads
+    const formData = new FormData()
+    formData.append("data", JSON.stringify(productData))
+
+    // Collect all files from media items
+    for (const cm of mediaDetails.colorMedia) {
+      for (const item of cm.items) {
+        if (item.fileKey && item.file) {
+          formData.append(item.fileKey, item.file)
+        }
+      }
+      for (const sm of cm.gemstoneSubMedia || []) {
+        for (const item of sm.items) {
+          if (item.fileKey && item.file) {
+            formData.append(item.fileKey, item.file)
+          }
+        }
+      }
+    }
+
     // Call API to create product
     setIsCreating(true)
     try {
-      const response = await productService.create(productData)
+      const response = await productService.create(formData)
       toast.success(response.message)
       router.push("/products")
     } catch (err: unknown) {

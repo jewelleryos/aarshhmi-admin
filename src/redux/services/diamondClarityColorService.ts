@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Diamond Clarity/Color interface - matches backend response
 export interface DiamondClarityColor {
@@ -74,6 +75,18 @@ const diamondClarityColorService = {
   // Update diamond clarity/color
   update: async (id: string, data: UpdateDiamondClarityColorData): Promise<DiamondClarityColorResponse> => {
     const response = await apiService.put(API_ENDPOINTS.DIAMOND_CLARITY_COLOR.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.DIAMOND_CLARITY_COLOR.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete diamond clarity/color
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.DIAMOND_CLARITY_COLOR.DELETE(id))
     return response.data
   },
 }

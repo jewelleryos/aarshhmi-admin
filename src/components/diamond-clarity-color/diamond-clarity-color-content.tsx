@@ -4,14 +4,17 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchDiamondClarityColors } from "@/redux/slices/diamondClarityColorSlice"
 import { DiamondClarityColorTable } from "./diamond-clarity-color-table"
 import { DiamondClarityColorAddDrawer } from "./diamond-clarity-color-add-drawer"
 import { DiamondClarityColorEditDrawer } from "./diamond-clarity-color-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { DiamondClarityColor } from "@/redux/services/diamondClarityColorService"
+import diamondClarityColorService from "@/redux/services/diamondClarityColorService"
+import type { DiamondClarityColor } from "@/redux/services/diamondClarityColorService"
 
 export function DiamondClarityColorContent() {
   const dispatch = useAppDispatch()
@@ -22,10 +25,15 @@ export function DiamondClarityColorContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedDiamondClarityColor, setSelectedDiamondClarityColor] = useState<DiamondClarityColor | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<DiamondClarityColor | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.DIAMOND_CLARITY_COLOR.CREATE)
   const canUpdate = has(PERMISSIONS.DIAMOND_CLARITY_COLOR.UPDATE)
+  const canDelete = has(PERMISSIONS.DIAMOND_CLARITY_COLOR.DELETE)
 
   // Fetch diamond clarity/colors on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function DiamondClarityColorContent() {
     if (!canUpdate) return
     setSelectedDiamondClarityColor(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: DiamondClarityColor) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return diamondClarityColorService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await diamondClarityColorService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchDiamondClarityColors())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -68,7 +101,9 @@ export function DiamondClarityColorContent() {
             <DiamondClarityColorTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -88,6 +123,18 @@ export function DiamondClarityColorContent() {
           diamondClarityColor={selectedDiamondClarityColor}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Diamond Clarity/Color"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

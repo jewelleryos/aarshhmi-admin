@@ -10,14 +10,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import type { MetalType } from "@/redux/services/metalTypeService"
 import { getCdnUrl } from "@/utils/cdn"
 
 interface MetalTypeTableProps {
   items: MetalType[]
   onEdit: (item: MetalType) => void
+  onDelete: (item: MetalType) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -39,7 +42,9 @@ function truncate(text: string | null, maxLength: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: MetalType) => void,
-  canUpdate: boolean
+  onDelete: (item: MetalType) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<MetalType>[] {
   return [
     {
@@ -124,6 +129,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -138,12 +153,14 @@ function createColumns(
 export function MetalTypeTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: MetalTypeTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state

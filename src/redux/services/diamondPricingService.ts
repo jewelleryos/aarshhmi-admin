@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Diamond Price interface - matches backend response
 export interface DiamondPrice {
@@ -208,6 +209,18 @@ const diamondPricingService = {
   // Get qualities (clarity/color) for dropdown
   getQualities: async (): Promise<DropdownResponse> => {
     const response = await apiService.get(API_ENDPOINTS.DIAMOND_CLARITY_COLOR.DROPDOWN)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.DIAMOND_PRICING.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete diamond pricing
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.DIAMOND_PRICING.DELETE(id))
     return response.data
   },
 

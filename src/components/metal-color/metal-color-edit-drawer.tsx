@@ -152,19 +152,6 @@ export function MetalColorEditDrawer({ metalColor, open, onOpenChange }: MetalCo
 
         {/* Form */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-          {/* Metal Type Field - Disabled */}
-          <div className="space-y-2">
-            <Label>Metal Type</Label>
-            <Input
-              value={metalColor?.metal_type_name || ""}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">
-              Metal type cannot be changed after creation
-            </p>
-          </div>
-
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="edit-name">

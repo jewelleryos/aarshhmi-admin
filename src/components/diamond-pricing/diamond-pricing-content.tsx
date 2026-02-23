@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import {
   fetchDiamondPrices,
@@ -17,9 +18,11 @@ import { DiamondPricingAddDrawer } from "./diamond-pricing-add-drawer"
 import { DiamondPricingEditDrawer } from "./diamond-pricing-edit-drawer"
 import { DiamondPricingBulkCreateMenu } from "./diamond-pricing-bulk-create-menu"
 import { DiamondPricingBulkUpdateMenu } from "./diamond-pricing-bulk-update-menu"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { DiamondPrice, DiamondPriceFilters } from "@/redux/services/diamondPricingService"
+import diamondPricingService from "@/redux/services/diamondPricingService"
+import type { DiamondPrice, DiamondPriceFilters } from "@/redux/services/diamondPricingService"
 
 export function DiamondPricingContent() {
   const dispatch = useAppDispatch()
@@ -32,10 +35,15 @@ export function DiamondPricingContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedPrice, setSelectedPrice] = useState<DiamondPrice | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<DiamondPrice | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.DIAMOND_PRICING.CREATE)
   const canUpdate = has(PERMISSIONS.DIAMOND_PRICING.UPDATE)
+  const canDelete = has(PERMISSIONS.DIAMOND_PRICING.DELETE)
 
   // Fetch data on mount
   useEffect(() => {
@@ -62,6 +70,31 @@ export function DiamondPricingContent() {
     if (!canUpdate) return
     setSelectedPrice(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: DiamondPrice) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return diamondPricingService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await diamondPricingService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchDiamondPrices(filters))
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -105,7 +138,9 @@ export function DiamondPricingContent() {
             <DiamondPricingTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -128,6 +163,18 @@ export function DiamondPricingContent() {
           onOpenChange={setIsEditDrawerOpen}
           shapes={shapes}
           qualities={qualities}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Diamond Pricing"
+          entityName={`${deleteTarget.shape_name || "Unknown"} - ${deleteTarget.quality_name || "Unknown"} (${deleteTarget.ct_from}–${deleteTarget.ct_to} ct)`}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>
