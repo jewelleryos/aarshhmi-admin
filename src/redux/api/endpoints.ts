@@ -72,6 +72,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/stone-shapes/${id}`,
     CREATE: '/api/stone-shapes',
     UPDATE: (id: string) => `/api/stone-shapes/${id}`,
+    DELETE: (id: string) => `/api/stone-shapes/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/stone-shapes/${id}/check-dependency`,
   },
 
   // Gemstone Type endpoints
