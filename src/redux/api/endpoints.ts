@@ -90,7 +90,7 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-qualities/${id}`,
     CREATE: '/api/gemstone-qualities',
     UPDATE: (id: string) => `/api/gemstone-qualities/${id}`,
-        DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
+    DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
     CHECK_DEPENDENCY: (id: string) => `/api/gemstone-qualities/${id}/check-dependency`,
   },
 
@@ -100,6 +100,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-colors/${id}`,
     CREATE: '/api/gemstone-colors',
     UPDATE: (id: string) => `/api/gemstone-colors/${id}`,
+    DELETE: (id: string) => `/api/gemstone-colors/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-colors/${id}/check-dependency`,
   },
 
   // Diamond Clarity/Color endpoints
