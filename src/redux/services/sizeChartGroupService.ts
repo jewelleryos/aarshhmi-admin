@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Size Chart Group interface - matches backend response
 export interface SizeChartGroup {
@@ -61,6 +62,18 @@ const sizeChartGroupService = {
   // Update size chart group (name only)
   update: async (id: string, data: UpdateSizeChartGroupData): Promise<SizeChartGroupResponse> => {
     const response = await apiService.put(API_ENDPOINTS.SIZE_CHART_GROUP.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.SIZE_CHART_GROUP.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete size chart group
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.SIZE_CHART_GROUP.DELETE(id))
     return response.data
   },
 }

@@ -242,6 +242,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/size-chart-groups/${id}`,
     CREATE: '/api/size-chart-groups',
     UPDATE: (id: string) => `/api/size-chart-groups/${id}`,
+    DELETE: (id: string) => `/api/size-chart-groups/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/size-chart-groups/${id}/check-dependency`,
     DROPDOWN: '/api/size-chart-groups/dropdown',
   },
 

@@ -7,10 +7,13 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchSizeChartGroups } from "@/redux/slices/sizeChartGroupSlice"
 import { SizeChartGroupsTable } from "./size-chart-groups-table"
+import { toast } from "sonner"
 import { SizeChartGroupAddDrawer } from "./size-chart-group-add-drawer"
 import { SizeChartGroupEditDrawer } from "./size-chart-group-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import sizeChartGroupService from "@/redux/services/sizeChartGroupService"
 import type { SizeChartGroup } from "@/redux/services/sizeChartGroupService"
 
 export function SizeChartGroupsContent() {
@@ -22,10 +25,15 @@ export function SizeChartGroupsContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState<SizeChartGroup | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<SizeChartGroup | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.SIZE_CHART_GROUP.CREATE)
   const canUpdate = has(PERMISSIONS.SIZE_CHART_GROUP.UPDATE)
+  const canDelete = has(PERMISSIONS.SIZE_CHART_GROUP.DELETE)
 
   // Fetch size chart groups on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function SizeChartGroupsContent() {
     if (!canUpdate) return
     setSelectedGroup(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: SizeChartGroup) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return sizeChartGroupService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await sizeChartGroupService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchSizeChartGroups())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   // Handle add drawer close - refetch data
@@ -84,7 +117,9 @@ export function SizeChartGroupsContent() {
             <SizeChartGroupsTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -104,6 +139,18 @@ export function SizeChartGroupsContent() {
           group={selectedGroup}
           open={isEditDrawerOpen}
           onOpenChange={handleEditDrawerClose}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Size Chart Group"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>
