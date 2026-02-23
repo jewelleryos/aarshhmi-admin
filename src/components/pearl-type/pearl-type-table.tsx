@@ -8,16 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
 import { PearlType } from "@/redux/services/pearlTypeService"
 import { getCdnUrl } from "@/utils/cdn"
 
 interface PearlTypeTableProps {
   items: PearlType[]
   onEdit: (item: PearlType) => void
+  onDelete: (item: PearlType) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -39,7 +42,9 @@ function truncate(text: string | null, maxLength: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: PearlType) => void,
-  canUpdate: boolean
+  onDelete: (item: PearlType) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<PearlType>[] {
   return [
     {
@@ -124,6 +129,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -138,12 +153,14 @@ function createColumns(
 export function PearlTypeTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: PearlTypeTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state

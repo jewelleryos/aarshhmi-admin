@@ -178,6 +178,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/pearl-types/${id}`,
     CREATE: '/api/pearl-types',
     UPDATE: (id: string) => `/api/pearl-types/${id}`,
+    DELETE: (id: string) => `/api/pearl-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/pearl-types/${id}/check-dependency`,
   },
 
   // Pearl Quality endpoints
