@@ -14,7 +14,6 @@ interface MetalType {
 
 interface MetalColor {
   id: string
-  metal_type_id: string
   name: string
   slug: string
 }
@@ -34,20 +33,20 @@ interface SelectedPurity {
 
 interface SelectedMetal {
   metalTypeId: string
-  colorIds: string[]
   purities: SelectedPurity[]
 }
 
 interface MetalDetailsData {
+  colorIds: string[]
   selectedMetals: SelectedMetal[]
 }
 
 // Error structure for metal details
 export interface MetalDetailsErrors {
   noMetalSelected?: string
+  noColorSelected?: string
   metalErrors?: {
     [metalTypeId: string]: {
-      noColorSelected?: string
       noPuritySelected?: string
       weightErrors?: {
         [purityId: string]: string
@@ -89,11 +88,6 @@ export function MetalDetailsSection({
     return data.selectedMetals.find((m) => m.metalTypeId === metalTypeId)
   }
 
-  // Get colors for a metal type
-  const getColorsForMetalType = (metalTypeId: string) => {
-    return metalColors.filter((c) => c.metal_type_id === metalTypeId)
-  }
-
   // Get purities for a metal type
   const getPuritiesForMetalType = (metalTypeId: string) => {
     return metalPurities.filter((p) => p.metal_type_id === metalTypeId)
@@ -104,14 +98,16 @@ export function MetalDetailsSection({
     if (checked) {
       // Add metal type
       onChange({
+        ...data,
         selectedMetals: [
           ...data.selectedMetals,
-          { metalTypeId, colorIds: [], purities: [] },
+          { metalTypeId, purities: [] },
         ],
       })
     } else {
       // Remove metal type
       onChange({
+        ...data,
         selectedMetals: data.selectedMetals.filter(
           (m) => m.metalTypeId !== metalTypeId
         ),
@@ -119,22 +115,13 @@ export function MetalDetailsSection({
     }
   }
 
-  // Handle color toggle
-  const handleColorToggle = (
-    metalTypeId: string,
-    colorId: string,
-    checked: boolean
-  ) => {
+  // Handle global color toggle
+  const handleColorToggle = (colorId: string, checked: boolean) => {
     onChange({
-      selectedMetals: data.selectedMetals.map((m) => {
-        if (m.metalTypeId !== metalTypeId) return m
-        return {
-          ...m,
-          colorIds: checked
-            ? [...m.colorIds, colorId]
-            : m.colorIds.filter((id) => id !== colorId),
-        }
-      }),
+      ...data,
+      colorIds: checked
+        ? [...data.colorIds, colorId]
+        : data.colorIds.filter((id) => id !== colorId),
     })
   }
 
@@ -145,6 +132,7 @@ export function MetalDetailsSection({
     checked: boolean
   ) => {
     onChange({
+      ...data,
       selectedMetals: data.selectedMetals.map((m) => {
         if (m.metalTypeId !== metalTypeId) return m
         return {
@@ -164,6 +152,7 @@ export function MetalDetailsSection({
     weight: string
   ) => {
     onChange({
+      ...data,
       selectedMetals: data.selectedMetals.map((m) => {
         if (m.metalTypeId !== metalTypeId) return m
         return {
@@ -174,12 +163,6 @@ export function MetalDetailsSection({
         }
       }),
     })
-  }
-
-  // Check if color is selected
-  const isColorSelected = (metalTypeId: string, colorId: string) => {
-    const metal = getSelectedMetal(metalTypeId)
-    return metal?.colorIds.includes(colorId) || false
   }
 
   // Check if purity is selected
@@ -227,14 +210,45 @@ export function MetalDetailsSection({
           )}
         </div>
 
-        {/* Selected Metal Cards */}
+        {/* Global Color Selection */}
+        {metalColors.length > 0 && (
+          <div className="space-y-3">
+            <Label>Select Colors</Label>
+            <div className="flex flex-wrap gap-4">
+              {metalColors.map((color) => (
+                <div
+                  key={color.id}
+                  className="flex items-center space-x-2"
+                >
+                  <Checkbox
+                    id={`color-${color.id}`}
+                    checked={data.colorIds.includes(color.id)}
+                    onCheckedChange={(checked) =>
+                      handleColorToggle(color.id, checked === true)
+                    }
+                  />
+                  <Label
+                    htmlFor={`color-${color.id}`}
+                    className="cursor-pointer font-normal"
+                  >
+                    {color.name}
+                  </Label>
+                </div>
+              ))}
+            </div>
+            {errors.noColorSelected && (
+              <p className="text-sm text-destructive">{errors.noColorSelected}</p>
+            )}
+          </div>
+        )}
+
+        {/* Selected Metal Cards (purities + weights only) */}
         {data.selectedMetals.map((selectedMetal) => {
           const metalType = metalTypes.find(
             (m) => m.id === selectedMetal.metalTypeId
           )
           if (!metalType) return null
 
-          const colors = getColorsForMetalType(selectedMetal.metalTypeId)
           const purities = getPuritiesForMetalType(selectedMetal.metalTypeId)
 
           return (
@@ -243,47 +257,6 @@ export function MetalDetailsSection({
                 <CardTitle className="text-base">{metalType.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Colors */}
-                {colors.length > 0 && (
-                  <div className="space-y-3">
-                    <Label>Colors</Label>
-                    <div className="flex flex-wrap gap-4">
-                      {colors.map((color) => (
-                        <div
-                          key={color.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={`color-${color.id}`}
-                            checked={isColorSelected(
-                              selectedMetal.metalTypeId,
-                              color.id
-                            )}
-                            onCheckedChange={(checked) =>
-                              handleColorToggle(
-                                selectedMetal.metalTypeId,
-                                color.id,
-                                checked === true
-                              )
-                            }
-                          />
-                          <Label
-                            htmlFor={`color-${color.id}`}
-                            className="cursor-pointer font-normal"
-                          >
-                            {color.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                    {errors.metalErrors?.[selectedMetal.metalTypeId]?.noColorSelected && (
-                      <p className="text-sm text-destructive">
-                        {errors.metalErrors[selectedMetal.metalTypeId].noColorSelected}
-                      </p>
-                    )}
-                  </div>
-                )}
-
                 {/* Purities */}
                 {purities.length > 0 && (
                   <div className="space-y-3">
@@ -369,9 +342,9 @@ export function MetalDetailsSection({
                   </div>
                 )}
 
-                {colors.length === 0 && purities.length === 0 && (
+                {purities.length === 0 && (
                   <p className="text-sm text-muted-foreground">
-                    No colors or purities configured for this metal type.
+                    No purities configured for this metal type.
                   </p>
                 )}
               </CardContent>

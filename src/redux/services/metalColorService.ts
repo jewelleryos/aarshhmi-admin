@@ -5,7 +5,6 @@ import type { DependencyCheckResult } from '@/components/ui/delete-dependency-di
 // Metal Color interface - matches backend response
 export interface MetalColor {
   id: string
-  metal_type_id: string
   name: string
   slug: string
   description: string | null
@@ -14,12 +13,10 @@ export interface MetalColor {
   status: boolean
   created_at: string
   updated_at: string
-  metal_type_name: string // Joined from metal_types table
 }
 
 // Create Metal Color request
 export interface CreateMetalColorData {
-  metal_type_id: string
   name: string
   slug?: string
   description?: string | null
@@ -28,7 +25,7 @@ export interface CreateMetalColorData {
   status?: boolean
 }
 
-// Update Metal Color request (metal_type_id NOT included - cannot change)
+// Update Metal Color request
 export interface UpdateMetalColorData {
   name?: string
   slug?: string

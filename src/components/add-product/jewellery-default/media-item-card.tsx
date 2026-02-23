@@ -13,6 +13,10 @@ export interface MediaItem {
   type: "image" | "video"
   altText: string
   position: number
+  // Direct file upload fields (new uploads only)
+  fileKey?: string
+  file?: File
+  previewUrl?: string
 }
 
 interface MediaItemCardProps {
@@ -28,7 +32,7 @@ export function MediaItemCard({
   onUpdatePosition,
   onUpdateAltText,
 }: MediaItemCardProps) {
-  const cdnUrl = getCdnUrl(item.path)
+  const mediaUrl = item.previewUrl || getCdnUrl(item.path)
 
   return (
     <div className="relative border rounded-lg p-3 bg-muted/30">
@@ -47,14 +51,14 @@ export function MediaItemCard({
       <div className="aspect-square rounded-md overflow-hidden bg-muted mb-3 relative">
         {item.type === "image" ? (
           <img
-            src={cdnUrl || ""}
+            src={mediaUrl || ""}
             alt={item.altText || "Product image"}
             className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted relative">
             <video
-              src={cdnUrl || ""}
+              src={mediaUrl || ""}
               className="w-full h-full object-cover"
               muted
             />
