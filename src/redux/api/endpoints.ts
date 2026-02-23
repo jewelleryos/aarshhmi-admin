@@ -188,6 +188,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/pearl-qualities/${id}`,
     CREATE: '/api/pearl-qualities',
     UPDATE: (id: string) => `/api/pearl-qualities/${id}`,
+    DELETE: (id: string) => `/api/pearl-qualities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/pearl-qualities/${id}/check-dependency`,
   },
 
   // MRP Markup endpoints

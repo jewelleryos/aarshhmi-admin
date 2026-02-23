@@ -7,11 +7,14 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchPearlQualities } from "@/redux/slices/pearlQualitySlice"
 import { PearlQualityTable } from "./pearl-quality-table"
+import { toast } from "sonner"
 import { PearlQualityAddDrawer } from "./pearl-quality-add-drawer"
 import { PearlQualityEditDrawer } from "./pearl-quality-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { PearlQuality } from "@/redux/services/pearlQualityService"
+import pearlQualityService from "@/redux/services/pearlQualityService"
+import type { PearlQuality } from "@/redux/services/pearlQualityService"
 
 export function PearlQualityContent() {
   const dispatch = useAppDispatch()
@@ -22,10 +25,15 @@ export function PearlQualityContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedPearlQuality, setSelectedPearlQuality] = useState<PearlQuality | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<PearlQuality | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.PEARL_QUALITY.CREATE)
   const canUpdate = has(PERMISSIONS.PEARL_QUALITY.UPDATE)
+  const canDelete = has(PERMISSIONS.PEARL_QUALITY.DELETE)
 
   // Fetch pearl qualities on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function PearlQualityContent() {
     if (!canUpdate) return
     setSelectedPearlQuality(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: PearlQuality) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return pearlQualityService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await pearlQualityService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchPearlQualities())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -68,7 +101,9 @@ export function PearlQualityContent() {
             <PearlQualityTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -88,6 +123,18 @@ export function PearlQualityContent() {
           pearlQuality={selectedPearlQuality}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Pearl Quality"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>
