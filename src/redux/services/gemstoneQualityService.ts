@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Gemstone Quality interface - matches backend response
 export interface GemstoneQuality {
@@ -74,6 +75,18 @@ const gemstoneQualityService = {
   // Update gemstone quality
   update: async (id: string, data: UpdateGemstoneQualityData): Promise<GemstoneQualityResponse> => {
     const response = await apiService.put(API_ENDPOINTS.GEMSTONE_QUALITY.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.GEMSTONE_QUALITY.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete gemstone quality
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.GEMSTONE_QUALITY.DELETE(id))
     return response.data
   },
 }

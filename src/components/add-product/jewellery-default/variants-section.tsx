@@ -15,7 +15,6 @@ interface MetalType {
 
 interface MetalColor {
   id: string
-  metal_type_id: string
   name: string
   slug: string
 }
@@ -42,11 +41,11 @@ interface SelectedPurity {
 
 interface SelectedMetal {
   metalTypeId: string
-  colorIds: string[]
   purities: SelectedPurity[]
 }
 
 interface MetalDetailsData {
+  colorIds: string[]
   selectedMetals: SelectedMetal[]
 }
 
@@ -93,11 +92,13 @@ const generateVariantId = (
 
 // Check if metal details are complete
 const isMetalDetailsComplete = (metalDetails: MetalDetailsData): boolean => {
-  return metalDetails.selectedMetals.some(
-    (m) =>
-      m.colorIds.length > 0 &&
-      m.purities.length > 0 &&
-      m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+  return (
+    metalDetails.colorIds.length > 0 &&
+    metalDetails.selectedMetals.some(
+      (m) =>
+        m.purities.length > 0 &&
+        m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+    )
   )
 }
 
@@ -146,13 +147,14 @@ export function VariantsSection({
       ? stoneDetails.gemstoneColorIds
       : [null]
 
-    for (const selectedMetal of metalDetails.selectedMetals) {
-      const metalType = metalTypes.find((m) => m.id === selectedMetal.metalTypeId)
-      if (!metalType) continue
+    // Colors are global — iterate at outer level
+    for (const colorId of metalDetails.colorIds) {
+      const color = metalColors.find((c) => c.id === colorId)
+      if (!color) continue
 
-      for (const colorId of selectedMetal.colorIds) {
-        const color = metalColors.find((c) => c.id === colorId)
-        if (!color) continue
+      for (const selectedMetal of metalDetails.selectedMetals) {
+        const metalType = metalTypes.find((m) => m.id === selectedMetal.metalTypeId)
+        if (!metalType) continue
 
         for (const purity of selectedMetal.purities) {
           // Skip purities without valid weight

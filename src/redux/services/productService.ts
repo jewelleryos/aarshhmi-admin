@@ -17,7 +17,6 @@ export interface MetalTypeDropdownItem {
 // Metal Color dropdown item
 export interface MetalColorDropdownItem {
   id: string
-  metal_type_id: string
   name: string
   slug: string
 }
@@ -385,9 +384,9 @@ interface UpdateMediaResponse {
 // Update options request type
 export interface UpdateOptionsRequest {
   metal: {
+    colors: { colorId: string }[]
     selectedMetals: {
       metalTypeId: string
-      colors: { colorId: string }[]
       purities: { purityId: string; weight: number }[]
     }[]
   }
@@ -516,9 +515,11 @@ const productService = {
     return response.data
   },
 
-  // Create product
-  create: async (data: unknown): Promise<CreateProductResponse> => {
-    const response = await apiService.post(API_ENDPOINTS.PRODUCT.CREATE, data)
+  // Create product (sends FormData with 'data' JSON field + file fields)
+  create: async (data: FormData): Promise<CreateProductResponse> => {
+    const response = await apiService.post(API_ENDPOINTS.PRODUCT.CREATE, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
     return response.data
   },
 
@@ -733,9 +734,11 @@ const productService = {
     return response.data
   },
 
-  // Update product media
-  updateMedia: async (id: string, data: UpdateMediaRequest): Promise<UpdateMediaResponse> => {
-    const response = await apiService.put(API_ENDPOINTS.PRODUCT.UPDATE_MEDIA(id), data)
+  // Update product media (sends FormData with 'data' JSON field + file fields for new uploads)
+  updateMedia: async (id: string, data: FormData): Promise<UpdateMediaResponse> => {
+    const response = await apiService.put(API_ENDPOINTS.PRODUCT.UPDATE_MEDIA(id), data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
     return response.data
   },
 

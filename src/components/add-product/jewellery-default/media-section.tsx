@@ -55,14 +55,14 @@ export function MediaSection({
   }
 
   // Handle adding media to a color (no gemstones)
-  const handleAddMedia = (colorId: string, colorName: string, item: MediaItem) => {
+  const handleAddMedia = (colorId: string, colorName: string, items: MediaItem[]) => {
     const existingColorMedia = data.colorMedia.find((cm) => cm.colorId === colorId)
 
     if (existingColorMedia) {
       onChange({
         colorMedia: data.colorMedia.map((cm) =>
           cm.colorId === colorId
-            ? { ...cm, items: [...cm.items, item] }
+            ? { ...cm, items: [...cm.items, ...items] }
             : cm
         ),
       })
@@ -70,7 +70,7 @@ export function MediaSection({
       onChange({
         colorMedia: [
           ...data.colorMedia,
-          { colorId, colorName, items: [item], gemstoneSubMedia: [] },
+          { colorId, colorName, items, gemstoneSubMedia: [] },
         ],
       })
     }
@@ -82,7 +82,7 @@ export function MediaSection({
     metalColorName: string,
     gemstoneColorId: string,
     gemstoneColorName: string,
-    item: MediaItem
+    items: MediaItem[]
   ) => {
     const existingColorMedia = data.colorMedia.find((cm) => cm.colorId === metalColorId)
 
@@ -100,7 +100,7 @@ export function MediaSection({
                   ...cm,
                   gemstoneSubMedia: cm.gemstoneSubMedia.map((sm) =>
                     sm.gemstoneColorId === gemstoneColorId
-                      ? { ...sm, items: [...sm.items, item] }
+                      ? { ...sm, items: [...sm.items, ...items] }
                       : sm
                   ),
                 }
@@ -116,7 +116,7 @@ export function MediaSection({
                   ...cm,
                   gemstoneSubMedia: [
                     ...(cm.gemstoneSubMedia || []),
-                    { gemstoneColorId, gemstoneColorName, items: [item] },
+                    { gemstoneColorId, gemstoneColorName, items },
                   ],
                 }
               : cm
@@ -132,7 +132,7 @@ export function MediaSection({
             colorId: metalColorId,
             colorName: metalColorName,
             items: [],
-            gemstoneSubMedia: [{ gemstoneColorId, gemstoneColorName, items: [item] }],
+            gemstoneSubMedia: [{ gemstoneColorId, gemstoneColorName, items }],
           },
         ],
       })
@@ -141,6 +141,13 @@ export function MediaSection({
 
   // Handle removing media from a color (no gemstones)
   const handleRemoveMedia = (colorId: string, mediaItemId: string) => {
+    // Revoke blob URL if it's a local preview
+    const colorMedia = data.colorMedia.find((cm) => cm.colorId === colorId)
+    const item = colorMedia?.items.find((i) => i.id === mediaItemId)
+    if (item?.previewUrl) {
+      URL.revokeObjectURL(item.previewUrl)
+    }
+
     onChange({
       colorMedia: data.colorMedia.map((cm) =>
         cm.colorId === colorId
@@ -156,6 +163,14 @@ export function MediaSection({
     gemstoneColorId: string,
     mediaItemId: string
   ) => {
+    // Revoke blob URL if it's a local preview
+    const colorMedia = data.colorMedia.find((cm) => cm.colorId === metalColorId)
+    const subMedia = colorMedia?.gemstoneSubMedia?.find((sm) => sm.gemstoneColorId === gemstoneColorId)
+    const item = subMedia?.items.find((i) => i.id === mediaItemId)
+    if (item?.previewUrl) {
+      URL.revokeObjectURL(item.previewUrl)
+    }
+
     onChange({
       colorMedia: data.colorMedia.map((cm) =>
         cm.colorId === metalColorId
@@ -295,8 +310,8 @@ export function MediaSection({
       <CardContent className="space-y-6">
         <p className="text-sm text-muted-foreground">
           {hasGemstones
-            ? "Add images and videos for each metal color and gemstone color combination. Set the position to control the display order (1 = primary image)."
-            : "Add images and videos for each color variant. Set the position to control the display order (1 = primary image)."}
+            ? "Upload images and videos for each metal color and gemstone color combination. Set the position to control the display order (1 = primary image)."
+            : "Upload images and videos for each color variant. Set the position to control the display order (1 = primary image)."}
         </p>
 
         {/* Color media cards */}
@@ -310,9 +325,9 @@ export function MediaSection({
             getGemstoneSubItems={(gemstoneColorId) =>
               getGemstoneSubItems(color.colorId, gemstoneColorId)
             }
-            onAddMedia={(item) => handleAddMedia(color.colorId, color.colorName, item)}
-            onAddGemstoneMedia={(gemstoneColorId, gemstoneColorName, item) =>
-              handleAddGemstoneMedia(color.colorId, color.colorName, gemstoneColorId, gemstoneColorName, item)
+            onAddMedia={(items) => handleAddMedia(color.colorId, color.colorName, items)}
+            onAddGemstoneMedia={(gemstoneColorId, gemstoneColorName, items) =>
+              handleAddGemstoneMedia(color.colorId, color.colorName, gemstoneColorId, gemstoneColorName, items)
             }
             onRemoveMedia={(mediaItemId) => handleRemoveMedia(color.colorId, mediaItemId)}
             onRemoveGemstoneMedia={(gemstoneColorId, mediaItemId) =>

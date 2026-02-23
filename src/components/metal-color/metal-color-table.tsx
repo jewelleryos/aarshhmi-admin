@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
@@ -8,23 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
 import type { MetalColor } from "@/redux/services/metalColorService"
 import { getCdnUrl } from "@/utils/cdn"
 
 interface MetalColorTableProps {
   items: MetalColor[]
   onEdit: (item: MetalColor) => void
+  onDelete: (item: MetalColor) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -46,7 +42,9 @@ function truncate(text: string | null, maxLength: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: MetalColor) => void,
-  canUpdate: boolean
+  onDelete: (item: MetalColor) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<MetalColor>[] {
   return [
     {
@@ -68,16 +66,6 @@ function createColumns(
         <span className="text-muted-foreground text-sm">{row.original.slug}</span>
       ),
       size: 150,
-    },
-    {
-      accessorKey: "metal_type_name",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Metal Type" />
-      ),
-      cell: ({ row }) => (
-        <span className="text-sm">{row.original.metal_type_name}</span>
-      ),
-      size: 120,
     },
     {
       accessorKey: "image",
@@ -141,6 +129,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -155,30 +153,14 @@ function createColumns(
 export function MetalColorTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: MetalColorTableProps) {
-  // Metal type filter state
-  const [metalTypeFilter, setMetalTypeFilter] = useState<string>("all")
-
-  // Get unique metal types from items
-  const metalTypes = useMemo(() => {
-    const unique = new Map<string, string>()
-    items.forEach(item => {
-      unique.set(item.metal_type_id, item.metal_type_name)
-    })
-    return Array.from(unique, ([id, name]) => ({ id, name }))
-  }, [items])
-
-  // Filtered items based on metal type
-  const filteredItems = useMemo(() => {
-    if (metalTypeFilter === "all") return items
-    return items.filter(item => item.metal_type_id === metalTypeFilter)
-  }, [items, metalTypeFilter])
-
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state
@@ -197,31 +179,11 @@ export function MetalColorTable({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Filter */}
-      <div className="flex items-center gap-4">
-        <Select value={metalTypeFilter} onValueChange={setMetalTypeFilter}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by metal type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Metal Types</SelectItem>
-            {metalTypes.map(type => (
-              <SelectItem key={type.id} value={type.id}>
-                {type.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Table */}
-      <DataTable
-        columns={columns}
-        data={filteredItems}
-        showPagination={false}
-        showToolbar={false}
-      />
-    </div>
+    <DataTable
+      columns={columns}
+      data={items}
+      showPagination={false}
+      showToolbar={false}
+    />
   )
 }

@@ -39,6 +39,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-types/${id}`,
     CREATE: '/api/metal-types',
     UPDATE: (id: string) => `/api/metal-types/${id}`,
+    DELETE: (id: string) => `/api/metal-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-types/${id}/check-dependency`,
     FOR_METAL_COLOR: '/api/metal-types/for-metal-color',
     FOR_METAL_PURITY: '/api/metal-types/for-metal-purity',
     FOR_MAKING_CHARGE: '/api/metal-types/for-making-charge',
@@ -50,6 +52,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-colors/${id}`,
     CREATE: '/api/metal-colors',
     UPDATE: (id: string) => `/api/metal-colors/${id}`,
+    DELETE: (id: string) => `/api/metal-colors/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-colors/${id}/check-dependency`,
   },
 
   // Metal Purity endpoints
@@ -58,6 +62,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/metal-purities/${id}`,
     CREATE: '/api/metal-purities',
     UPDATE: (id: string) => `/api/metal-purities/${id}`,
+    DELETE: (id: string) => `/api/metal-purities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/metal-purities/${id}/check-dependency`,
   },
 
   // Stone Shape endpoints
@@ -74,6 +80,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-types/${id}`,
     CREATE: '/api/gemstone-types',
     UPDATE: (id: string) => `/api/gemstone-types/${id}`,
+    DELETE: (id: string) => `/api/gemstone-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-types/${id}/check-dependency`,
   },
 
   // Gemstone Quality endpoints
@@ -82,6 +90,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-qualities/${id}`,
     CREATE: '/api/gemstone-qualities',
     UPDATE: (id: string) => `/api/gemstone-qualities/${id}`,
+        DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-qualities/${id}/check-dependency`,
   },
 
   // Gemstone Color endpoints
@@ -98,6 +108,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/diamond-clarity-color/${id}`,
     CREATE: '/api/diamond-clarity-color',
     UPDATE: (id: string) => `/api/diamond-clarity-color/${id}`,
+    DELETE: (id: string) => `/api/diamond-clarity-color/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/diamond-clarity-color/${id}/check-dependency`,
     DROPDOWN: '/api/diamond-clarity-color/dropdown',
   },
 
@@ -110,6 +122,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/diamond-prices/${id}`,
     CREATE: '/api/diamond-prices',
     UPDATE: (id: string) => `/api/diamond-prices/${id}`,
+    DELETE: (id: string) => `/api/diamond-prices/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/diamond-prices/${id}/check-dependency`,
     // Bulk operations
     TEMPLATE: '/api/diamond-prices/template',
     REFERENCE: '/api/diamond-prices/reference',

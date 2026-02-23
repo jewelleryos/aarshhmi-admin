@@ -40,9 +40,9 @@ type TabId = (typeof TABS)[number]["id"]
 
 // Metal details state type
 interface MetalDetailsState {
+  colorIds: string[]
   selectedMetals: {
     metalTypeId: string
-    colorIds: string[]
     purities: { purityId: string; weight: string }[]
   }[]
 }
@@ -62,6 +62,7 @@ interface StoneDetailsState {
 
 // Initial states
 const initialMetalDetails: MetalDetailsState = {
+  colorIds: [],
   selectedMetals: [],
 }
 
@@ -178,16 +179,18 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
 
     // Initialize metal details from metadata.availableMetals
     if (metadata?.availableMetals) {
-      const availableMetals = metadata.availableMetals as Array<{
-        metalTypeId: string
+      const availableMetals = metadata.availableMetals as {
         colors: { colorId: string }[]
-        purities: { purityId: string; weight: number }[]
-      }>
+        metals: {
+          metalTypeId: string
+          purities: { purityId: string; weight: number }[]
+        }[]
+      }
 
       setMetalDetails({
-        selectedMetals: availableMetals.map((metal) => ({
+        colorIds: availableMetals.colors.map((c) => c.colorId),
+        selectedMetals: availableMetals.metals.map((metal) => ({
           metalTypeId: metal.metalTypeId,
-          colorIds: metal.colors.map((c) => c.colorId),
           purities: metal.purities.map((p) => ({
             purityId: p.purityId,
             weight: String(p.weight),
@@ -336,23 +339,17 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
 
   // Update selected colors when metal details change
   useEffect(() => {
-    const colorIds = new Set<string>()
     const colors: { colorId: string; colorName: string }[] = []
 
-    metalDetails.selectedMetals.forEach((metal) => {
-      metal.colorIds.forEach((colorId) => {
-        if (!colorIds.has(colorId)) {
-          colorIds.add(colorId)
-          const color = metalColors.find((c) => c.id === colorId)
-          if (color) {
-            colors.push({ colorId: color.id, colorName: color.name })
-          }
-        }
-      })
+    metalDetails.colorIds.forEach((colorId) => {
+      const color = metalColors.find((c) => c.id === colorId)
+      if (color) {
+        colors.push({ colorId: color.id, colorName: color.name })
+      }
     })
 
     setSelectedColors(colors)
-  }, [metalDetails, metalColors])
+  }, [metalDetails.colorIds, metalColors])
 
   // Update selected gemstone colors for media
   useEffect(() => {
@@ -374,11 +371,13 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
   const isSectionValid = (tabId: TabId): boolean => {
     switch (tabId) {
       case "metal":
-        return metalDetails.selectedMetals.some(
-          (m) =>
-            m.colorIds.length > 0 &&
-            m.purities.length > 0 &&
-            m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+        return (
+          metalDetails.colorIds.length > 0 &&
+          metalDetails.selectedMetals.some(
+            (m) =>
+              m.purities.length > 0 &&
+              m.purities.every((p) => p.weight && parseFloat(p.weight) > 0)
+          )
         )
       case "stone":
         if (!stoneDetails.hasDiamond && !stoneDetails.hasGemstone && !stoneDetails.hasPearl) {
@@ -438,18 +437,18 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
       return errors
     }
 
+    // Check global colors
+    if (metalDetails.colorIds.length === 0) {
+      errors.noColorSelected = "At least one color must be selected"
+    }
+
     const metalErrors: MetalDetailsErrors["metalErrors"] = {}
 
     metalDetails.selectedMetals.forEach((metal) => {
       const metalError: {
-        noColorSelected?: string
         noPuritySelected?: string
         weightErrors?: { [purityId: string]: string }
       } = {}
-
-      if (metal.colorIds.length === 0) {
-        metalError.noColorSelected = "At least one color must be selected"
-      }
 
       if (metal.purities.length === 0) {
         metalError.noPuritySelected = "At least one purity must be selected"
@@ -694,9 +693,9 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
     // Build request data
     const requestData = {
       metal: {
+        colors: metalDetails.colorIds.map((colorId) => ({ colorId })),
         selectedMetals: metalDetails.selectedMetals.map((metal) => ({
           metalTypeId: metal.metalTypeId,
-          colors: metal.colorIds.map((colorId) => ({ colorId })),
           purities: metal.purities.map((purity) => ({
             purityId: purity.purityId,
             weight: parseFloat(purity.weight),
@@ -771,8 +770,8 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
             ? stoneDetails.gemstoneColorIds
             : [null]
 
-        for (const selectedMetal of metalDetails.selectedMetals) {
-          for (const colorId of selectedMetal.colorIds) {
+        for (const colorId of metalDetails.colorIds) {
+          for (const selectedMetal of metalDetails.selectedMetals) {
             for (const purity of selectedMetal.purities) {
               if (!purity.weight || parseFloat(purity.weight) <= 0) continue
 

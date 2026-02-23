@@ -4,14 +4,17 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchGemstoneTypes } from "@/redux/slices/gemstoneTypeSlice"
 import { GemstoneTypeTable } from "./gemstone-type-table"
 import { GemstoneTypeAddDrawer } from "./gemstone-type-add-drawer"
 import { GemstoneTypeEditDrawer } from "./gemstone-type-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { GemstoneType } from "@/redux/services/gemstoneTypeService"
+import gemstoneTypeService from "@/redux/services/gemstoneTypeService"
+import type { GemstoneType } from "@/redux/services/gemstoneTypeService"
 
 export function GemstoneTypeContent() {
   const dispatch = useAppDispatch()
@@ -22,10 +25,15 @@ export function GemstoneTypeContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedGemstoneType, setSelectedGemstoneType] = useState<GemstoneType | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<GemstoneType | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.GEMSTONE_TYPE.CREATE)
   const canUpdate = has(PERMISSIONS.GEMSTONE_TYPE.UPDATE)
+  const canDelete = has(PERMISSIONS.GEMSTONE_TYPE.DELETE)
 
   // Fetch gemstone types on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function GemstoneTypeContent() {
     if (!canUpdate) return
     setSelectedGemstoneType(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: GemstoneType) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return gemstoneTypeService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await gemstoneTypeService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchGemstoneTypes())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -68,7 +101,9 @@ export function GemstoneTypeContent() {
             <GemstoneTypeTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -88,6 +123,18 @@ export function GemstoneTypeContent() {
           gemstoneType={selectedGemstoneType}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Gemstone Type"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

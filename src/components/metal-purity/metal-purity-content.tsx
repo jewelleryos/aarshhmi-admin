@@ -4,13 +4,16 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchMetalPurities } from "@/redux/slices/metalPuritySlice"
 import { MetalPurityTable } from "./metal-purity-table"
 import { MetalPurityAddDrawer } from "./metal-purity-add-drawer"
 import { MetalPurityEditDrawer } from "./metal-purity-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import metalPurityService from "@/redux/services/metalPurityService"
 import type { MetalPurity } from "@/redux/services/metalPurityService"
 
 export function MetalPurityContent() {
@@ -24,10 +27,15 @@ export function MetalPurityContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedMetalPurity, setSelectedMetalPurity] = useState<MetalPurity | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<MetalPurity | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.METAL_PURITY.CREATE)
   const canUpdate = has(PERMISSIONS.METAL_PURITY.UPDATE)
+  const canDelete = has(PERMISSIONS.METAL_PURITY.DELETE)
 
   // Fetch metal purities on mount
   useEffect(() => {
@@ -39,6 +47,31 @@ export function MetalPurityContent() {
     if (!canUpdate) return
     setSelectedMetalPurity(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: MetalPurity) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return metalPurityService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await metalPurityService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchMetalPurities())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -70,7 +103,9 @@ export function MetalPurityContent() {
             <MetalPurityTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -90,6 +125,18 @@ export function MetalPurityContent() {
           metalPurity={selectedMetalPurity}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Metal Purity"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>
