@@ -145,6 +145,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-prices/${id}`,
     CREATE: '/api/gemstone-prices',
     UPDATE: (id: string) => `/api/gemstone-prices/${id}`,
+    DELETE: (id: string) => `/api/gemstone-prices/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-prices/${id}/check-dependency`,
     // Bulk operations
     TEMPLATE: '/api/gemstone-prices/template',
     REFERENCE: '/api/gemstone-prices/reference',
