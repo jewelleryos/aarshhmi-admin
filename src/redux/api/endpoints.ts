@@ -218,6 +218,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/tags',
     UPDATE: (id: string) => `/api/tags/${id}`,
     UPDATE_SEO: (id: string) => `/api/tags/${id}/seo`,
+    DELETE: (id: string) => `/api/tags/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/tags/${id}/check-dependency`,
   },
 
   // Category endpoints
