@@ -226,6 +226,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/categories',
     UPDATE: (id: string) => `/api/categories/${id}`,
     UPDATE_SEO: (id: string) => `/api/categories/${id}/seo`,
+    DELETE: (id: string) => `/api/categories/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/categories/${id}/check-dependency`,
   },
 
   // Badge endpoints
