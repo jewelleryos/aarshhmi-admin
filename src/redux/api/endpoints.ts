@@ -234,6 +234,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/badges/${id}`,
     CREATE: '/api/badges',
     UPDATE: (id: string) => `/api/badges/${id}`,
+    DELETE: (id: string) => `/api/badges/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/badges/${id}/check-dependency`,
   },
 
   // Size Chart Group endpoints

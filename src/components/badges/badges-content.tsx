@@ -7,10 +7,13 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchBadges } from "@/redux/slices/badgeSlice"
 import { BadgesTable } from "./badges-table"
+import { toast } from "sonner"
 import { BadgeAddDrawer } from "./badge-add-drawer"
 import { BadgeEditDrawer } from "./badge-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import badgeService from "@/redux/services/badgeService"
 import type { Badge } from "@/redux/services/badgeService"
 
 export function BadgesContent() {
@@ -22,10 +25,15 @@ export function BadgesContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Badge | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.BADGE.CREATE)
   const canUpdate = has(PERMISSIONS.BADGE.UPDATE)
+  const canDelete = has(PERMISSIONS.BADGE.DELETE)
 
   // Fetch badges on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function BadgesContent() {
     if (!canUpdate) return
     setSelectedBadge(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: Badge) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return badgeService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await badgeService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchBadges())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   // Handle add drawer close - refetch data
@@ -84,7 +117,9 @@ export function BadgesContent() {
             <BadgesTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -104,6 +139,18 @@ export function BadgesContent() {
           badge={selectedBadge}
           open={isEditDrawerOpen}
           onOpenChange={handleEditDrawerClose}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Badge"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

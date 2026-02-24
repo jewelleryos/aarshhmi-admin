@@ -8,15 +8,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Award, Edit, MoreVertical } from "lucide-react"
+import { Award, Edit, MoreVertical, Trash2 } from "lucide-react"
 import type { Badge } from "@/redux/services/badgeService"
 
 interface BadgesTableProps {
   items: Badge[]
   onEdit: (item: Badge) => void
+  onDelete: (item: Badge) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Position label mapping
@@ -46,7 +49,9 @@ function formatDate(dateString: string): string {
 // Create columns
 function createColumns(
   onEdit: (item: Badge) => void,
-  canUpdate: boolean
+  onDelete: (item: Badge) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<Badge>[] {
   return [
     {
@@ -132,6 +137,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -146,12 +161,14 @@ function createColumns(
 export function BadgesTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: BadgesTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state
