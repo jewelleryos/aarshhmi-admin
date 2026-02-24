@@ -207,6 +207,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/tag-groups',
     UPDATE: (id: string) => `/api/tag-groups/${id}`,
     UPDATE_SEO: (id: string) => `/api/tag-groups/${id}/seo`,
+    DELETE: (id: string) => `/api/tag-groups/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/tag-groups/${id}/check-dependency`,
   },
 
   // Tag endpoints
