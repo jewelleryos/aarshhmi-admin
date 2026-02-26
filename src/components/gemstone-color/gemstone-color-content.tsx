@@ -4,14 +4,17 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchGemstoneColors } from "@/redux/slices/gemstoneColorSlice"
 import { GemstoneColorTable } from "./gemstone-color-table"
 import { GemstoneColorAddDrawer } from "./gemstone-color-add-drawer"
 import { GemstoneColorEditDrawer } from "./gemstone-color-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { GemstoneColor } from "@/redux/services/gemstoneColorService"
+import gemstoneColorService from "@/redux/services/gemstoneColorService"
+import type { GemstoneColor } from "@/redux/services/gemstoneColorService"
 
 export function GemstoneColorContent() {
   const dispatch = useAppDispatch()
@@ -22,10 +25,15 @@ export function GemstoneColorContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedGemstoneColor, setSelectedGemstoneColor] = useState<GemstoneColor | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<GemstoneColor | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.GEMSTONE_COLOR.CREATE)
   const canUpdate = has(PERMISSIONS.GEMSTONE_COLOR.UPDATE)
+  const canDelete = has(PERMISSIONS.GEMSTONE_COLOR.DELETE)
 
   // Fetch gemstone colors on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function GemstoneColorContent() {
     if (!canUpdate) return
     setSelectedGemstoneColor(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: GemstoneColor) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return gemstoneColorService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await gemstoneColorService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchGemstoneColors())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -68,7 +101,9 @@ export function GemstoneColorContent() {
             <GemstoneColorTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -88,6 +123,18 @@ export function GemstoneColorContent() {
           gemstoneColor={selectedGemstoneColor}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Gemstone Color"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

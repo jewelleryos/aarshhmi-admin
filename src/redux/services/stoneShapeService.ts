@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Stone Shape interface - matches backend response
 export interface StoneShape {
@@ -74,6 +75,18 @@ const stoneShapeService = {
   // Update stone shape
   update: async (id: string, data: UpdateStoneShapeData): Promise<StoneShapeResponse> => {
     const response = await apiService.put(API_ENDPOINTS.STONE_SHAPE.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.STONE_SHAPE.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete stone shape
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.STONE_SHAPE.DELETE(id))
     return response.data
   },
 }

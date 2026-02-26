@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import {
   fetchGemstonePrices,
@@ -16,9 +17,11 @@ import { GemstonePricingAddDrawer } from "./gemstone-pricing-add-drawer"
 import { GemstonePricingEditDrawer } from "./gemstone-pricing-edit-drawer"
 import { GemstonePricingBulkCreateMenu } from "./gemstone-pricing-bulk-create-menu"
 import { GemstonePricingBulkUpdateMenu } from "./gemstone-pricing-bulk-update-menu"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { GemstonePrice, GemstonePriceFilters } from "@/redux/services/gemstonePricingService"
+import gemstonePricingService from "@/redux/services/gemstonePricingService"
+import type { GemstonePrice, GemstonePriceFilters } from "@/redux/services/gemstonePricingService"
 
 export function GemstonePricingContent() {
   const dispatch = useAppDispatch()
@@ -31,10 +34,15 @@ export function GemstonePricingContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedPrice, setSelectedPrice] = useState<GemstonePrice | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<GemstonePrice | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.GEMSTONE_PRICING.CREATE)
   const canUpdate = has(PERMISSIONS.GEMSTONE_PRICING.UPDATE)
+  const canDelete = has(PERMISSIONS.GEMSTONE_PRICING.DELETE)
 
   // Fetch data on mount
   useEffect(() => {
@@ -60,6 +68,31 @@ export function GemstonePricingContent() {
     if (!canUpdate) return
     setSelectedPrice(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: GemstonePrice) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return gemstonePricingService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await gemstonePricingService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchGemstonePrices(filters))
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -105,7 +138,9 @@ export function GemstonePricingContent() {
             <GemstonePricingTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -132,6 +167,18 @@ export function GemstonePricingContent() {
           shapes={shapes}
           qualities={qualities}
           colors={colors}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Gemstone Pricing"
+          entityName={`${deleteTarget.type_name || "Unknown"} - ${deleteTarget.shape_name || "Unknown"} - ${deleteTarget.color_name || "Unknown"} (${deleteTarget.ct_from}–${deleteTarget.ct_to} ct)`}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Badge interface - matches backend response
 export interface Badge {
@@ -76,6 +77,18 @@ const badgeService = {
   // Update badge
   update: async (id: string, data: UpdateBadgeData): Promise<BadgeResponse> => {
     const response = await apiService.put(API_ENDPOINTS.BADGE.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependency before delete
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.BADGE.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete badge
+  delete: async (id: string): Promise<BadgeResponse> => {
+    const response = await apiService.delete(API_ENDPOINTS.BADGE.DELETE(id))
     return response.data
   },
 }

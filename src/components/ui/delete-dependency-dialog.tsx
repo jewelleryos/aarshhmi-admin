@@ -57,6 +57,7 @@ const DEPENDENCY_LABELS: Record<string, string> = {
   pricing_rule: "Pricing Rules",
   diamond_price: "Diamond Prices",
   gemstone_price: "Gemstone Prices",
+  size_chart_value: "Size Chart Values",
 }
 
 function formatDependencyType(type: string): string {
