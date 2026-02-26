@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { Edit, FolderTree, MoreVertical, Search } from "lucide-react"
+import { Edit, FolderTree, MoreVertical, Search, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getCdnUrl } from "@/utils/cdn"
 import type { FlattenedCategory, Category } from "@/redux/services/categoryService"
@@ -21,7 +21,9 @@ interface CategoriesTableProps {
   items: FlattenedCategory[]
   onEdit: (item: Category) => void
   onEditSeo: (item: Category) => void
+  onDelete: (item: Category) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -46,7 +48,9 @@ function truncate(text: string | null, maxLength: number): string {
 function createColumns(
   onEdit: (item: Category) => void,
   onEditSeo: (item: Category) => void,
-  canUpdate: boolean
+  onDelete: (item: Category) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<FlattenedCategory>[] {
   return [
     {
@@ -182,6 +186,16 @@ function createColumns(
                   </DropdownMenuItem>
                 </>
               )}
+              {canDelete && (canUpdate && <DropdownMenuSeparator />)}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -197,12 +211,14 @@ export function CategoriesTable({
   items,
   onEdit,
   onEditSeo,
+  onDelete,
   canUpdate,
+  canDelete,
 }: CategoriesTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, onEditSeo, canUpdate),
-    [onEdit, onEditSeo, canUpdate]
+    () => createColumns(onEdit, onEditSeo, onDelete, canUpdate, canDelete),
+    [onEdit, onEditSeo, onDelete, canUpdate, canDelete]
   )
 
   // Empty state

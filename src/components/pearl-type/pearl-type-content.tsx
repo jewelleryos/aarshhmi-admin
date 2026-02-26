@@ -4,14 +4,17 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchPearlTypes } from "@/redux/slices/pearlTypeSlice"
 import { PearlTypeTable } from "./pearl-type-table"
 import { PearlTypeAddDrawer } from "./pearl-type-add-drawer"
 import { PearlTypeEditDrawer } from "./pearl-type-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
-import { PearlType } from "@/redux/services/pearlTypeService"
+import pearlTypeService from "@/redux/services/pearlTypeService"
+import type { PearlType } from "@/redux/services/pearlTypeService"
 
 export function PearlTypeContent() {
   const dispatch = useAppDispatch()
@@ -22,10 +25,15 @@ export function PearlTypeContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedPearlType, setSelectedPearlType] = useState<PearlType | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<PearlType | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.PEARL_TYPE.CREATE)
   const canUpdate = has(PERMISSIONS.PEARL_TYPE.UPDATE)
+  const canDelete = has(PERMISSIONS.PEARL_TYPE.DELETE)
 
   // Fetch pearl types on mount
   useEffect(() => {
@@ -37,6 +45,31 @@ export function PearlTypeContent() {
     if (!canUpdate) return
     setSelectedPearlType(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: PearlType) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return pearlTypeService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await pearlTypeService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchPearlTypes())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -68,7 +101,9 @@ export function PearlTypeContent() {
             <PearlTypeTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -88,6 +123,18 @@ export function PearlTypeContent() {
           pearlType={selectedPearlType}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Pearl Type"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

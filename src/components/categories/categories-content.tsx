@@ -7,11 +7,14 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchCategories, fetchCategoriesFlat } from "@/redux/slices/categorySlice"
 import { CategoriesTable } from "./categories-table"
+import { toast } from "sonner"
 import { CategoryAddDrawer } from "./category-add-drawer"
 import { CategoryEditDrawer } from "./category-edit-drawer"
 import { CategorySeoDrawer } from "./category-seo-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import categoryService from "@/redux/services/categoryService"
 import type { Category } from "@/redux/services/categoryService"
 
 export function CategoriesContent() {
@@ -24,10 +27,15 @@ export function CategoriesContent() {
   const [isSeoDrawerOpen, setIsSeoDrawerOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.CATEGORY.CREATE)
   const canUpdate = has(PERMISSIONS.CATEGORY.UPDATE)
+  const canDelete = has(PERMISSIONS.CATEGORY.DELETE)
 
   // Fetch categories on mount
   useEffect(() => {
@@ -47,6 +55,32 @@ export function CategoriesContent() {
     if (!canUpdate) return
     setSelectedCategory(item)
     setIsSeoDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: Category) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return categoryService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await categoryService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchCategories())
+      dispatch(fetchCategoriesFlat())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   // Handle add drawer close - refetch data
@@ -108,7 +142,9 @@ export function CategoriesContent() {
               items={flattenedItems}
               onEdit={handleEdit}
               onEditSeo={handleEditSeo}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -139,6 +175,18 @@ export function CategoriesContent() {
           category={selectedCategory}
           open={isSeoDrawerOpen}
           onOpenChange={handleSeoDrawerClose}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Category"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

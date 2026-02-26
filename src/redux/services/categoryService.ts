@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // SEO interface
 export interface CategorySeo {
@@ -160,6 +161,18 @@ const categoryService = {
   // Update category SEO
   updateSeo: async (id: string, data: UpdateCategorySeoData): Promise<CategoryResponse> => {
     const response = await apiService.put(API_ENDPOINTS.CATEGORY.UPDATE_SEO(id), data)
+    return response.data
+  },
+
+  // Check dependency before delete
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.CATEGORY.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete category
+  delete: async (id: string): Promise<CategoryResponse> => {
+    const response = await apiService.delete(API_ENDPOINTS.CATEGORY.DELETE(id))
     return response.data
   },
 }

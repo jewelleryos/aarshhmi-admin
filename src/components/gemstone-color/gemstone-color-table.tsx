@@ -8,16 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Edit, FolderOpen, MoreVertical } from "lucide-react"
+import { Edit, FolderOpen, MoreVertical, Trash2 } from "lucide-react"
 import { GemstoneColor } from "@/redux/services/gemstoneColorService"
 import { getCdnUrl } from "@/utils/cdn"
 
 interface GemstoneColorTableProps {
   items: GemstoneColor[]
   onEdit: (item: GemstoneColor) => void
+  onDelete: (item: GemstoneColor) => void
   canUpdate: boolean
+  canDelete: boolean
 }
 
 // Format date for display
@@ -39,7 +42,9 @@ function truncate(text: string | null, maxLength: number): string {
 // Create columns
 function createColumns(
   onEdit: (item: GemstoneColor) => void,
-  canUpdate: boolean
+  onDelete: (item: GemstoneColor) => void,
+  canUpdate: boolean,
+  canDelete: boolean
 ): ColumnDef<GemstoneColor>[] {
   return [
     {
@@ -124,6 +129,16 @@ function createColumns(
                   Edit
                 </DropdownMenuItem>
               )}
+              {canDelete && canUpdate && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -138,12 +153,14 @@ function createColumns(
 export function GemstoneColorTable({
   items,
   onEdit,
+  onDelete,
   canUpdate,
+  canDelete,
 }: GemstoneColorTableProps) {
   // Memoize columns
   const columns = useMemo(
-    () => createColumns(onEdit, canUpdate),
-    [onEdit, canUpdate]
+    () => createColumns(onEdit, onDelete, canUpdate, canDelete),
+    [onEdit, onDelete, canUpdate, canDelete]
   )
 
   // Empty state

@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // SEO interface
 export interface TagGroupSeo {
@@ -131,6 +132,18 @@ const tagGroupService = {
   // Update tag group SEO
   updateSeo: async (id: string, data: UpdateTagGroupSeoData): Promise<TagGroupResponse> => {
     const response = await apiService.put(API_ENDPOINTS.TAG_GROUP.UPDATE_SEO(id), data)
+    return response.data
+  },
+
+  // Check dependency before delete
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.TAG_GROUP.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete tag group
+  delete: async (id: string): Promise<TagGroupResponse> => {
+    const response = await apiService.delete(API_ENDPOINTS.TAG_GROUP.DELETE(id))
     return response.data
   },
 }
