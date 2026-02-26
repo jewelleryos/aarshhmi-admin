@@ -8,11 +8,14 @@ import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchTags } from "@/redux/slices/tagSlice"
 import { fetchTagGroups } from "@/redux/slices/tagGroupSlice"
 import { TagsTable } from "./tags-table"
+import { toast } from "sonner"
 import { TagAddDrawer } from "./tag-add-drawer"
 import { TagEditDrawer } from "./tag-edit-drawer"
 import { TagSeoDrawer } from "./tag-seo-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import tagService from "@/redux/services/tagService"
 import type { Tag } from "@/redux/services/tagService"
 
 export function TagsContent() {
@@ -26,10 +29,15 @@ export function TagsContent() {
   const [isSeoDrawerOpen, setIsSeoDrawerOpen] = useState(false)
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.TAG.CREATE)
   const canUpdate = has(PERMISSIONS.TAG.UPDATE)
+  const canDelete = has(PERMISSIONS.TAG.DELETE)
 
   // Fetch tags and tag groups on mount
   useEffect(() => {
@@ -49,6 +57,31 @@ export function TagsContent() {
     if (!canUpdate) return
     setSelectedTag(item)
     setIsSeoDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: Tag) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return tagService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await tagService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchTags())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -81,7 +114,9 @@ export function TagsContent() {
               items={items}
               onEdit={handleEdit}
               onEditSeo={handleEditSeo}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -112,6 +147,18 @@ export function TagsContent() {
           tag={selectedTag}
           open={isSeoDrawerOpen}
           onOpenChange={setIsSeoDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Tag"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

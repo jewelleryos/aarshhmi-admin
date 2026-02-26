@@ -72,6 +72,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/stone-shapes/${id}`,
     CREATE: '/api/stone-shapes',
     UPDATE: (id: string) => `/api/stone-shapes/${id}`,
+    DELETE: (id: string) => `/api/stone-shapes/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/stone-shapes/${id}/check-dependency`,
   },
 
   // Gemstone Type endpoints
@@ -90,7 +92,7 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-qualities/${id}`,
     CREATE: '/api/gemstone-qualities',
     UPDATE: (id: string) => `/api/gemstone-qualities/${id}`,
-        DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
+    DELETE: (id: string) => `/api/gemstone-qualities/${id}`,
     CHECK_DEPENDENCY: (id: string) => `/api/gemstone-qualities/${id}/check-dependency`,
   },
 
@@ -100,6 +102,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-colors/${id}`,
     CREATE: '/api/gemstone-colors',
     UPDATE: (id: string) => `/api/gemstone-colors/${id}`,
+    DELETE: (id: string) => `/api/gemstone-colors/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-colors/${id}/check-dependency`,
   },
 
   // Diamond Clarity/Color endpoints
@@ -143,6 +147,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/gemstone-prices/${id}`,
     CREATE: '/api/gemstone-prices',
     UPDATE: (id: string) => `/api/gemstone-prices/${id}`,
+    DELETE: (id: string) => `/api/gemstone-prices/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/gemstone-prices/${id}/check-dependency`,
     // Bulk operations
     TEMPLATE: '/api/gemstone-prices/template',
     REFERENCE: '/api/gemstone-prices/reference',
@@ -174,6 +180,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/pearl-types/${id}`,
     CREATE: '/api/pearl-types',
     UPDATE: (id: string) => `/api/pearl-types/${id}`,
+    DELETE: (id: string) => `/api/pearl-types/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/pearl-types/${id}/check-dependency`,
   },
 
   // Pearl Quality endpoints
@@ -182,6 +190,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/pearl-qualities/${id}`,
     CREATE: '/api/pearl-qualities',
     UPDATE: (id: string) => `/api/pearl-qualities/${id}`,
+    DELETE: (id: string) => `/api/pearl-qualities/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/pearl-qualities/${id}/check-dependency`,
   },
 
   // MRP Markup endpoints
@@ -197,6 +207,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/tag-groups',
     UPDATE: (id: string) => `/api/tag-groups/${id}`,
     UPDATE_SEO: (id: string) => `/api/tag-groups/${id}/seo`,
+    DELETE: (id: string) => `/api/tag-groups/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/tag-groups/${id}/check-dependency`,
   },
 
   // Tag endpoints
@@ -206,6 +218,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/tags',
     UPDATE: (id: string) => `/api/tags/${id}`,
     UPDATE_SEO: (id: string) => `/api/tags/${id}/seo`,
+    DELETE: (id: string) => `/api/tags/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/tags/${id}/check-dependency`,
   },
 
   // Category endpoints
@@ -216,6 +230,8 @@ const API_ENDPOINTS = {
     CREATE: '/api/categories',
     UPDATE: (id: string) => `/api/categories/${id}`,
     UPDATE_SEO: (id: string) => `/api/categories/${id}/seo`,
+    DELETE: (id: string) => `/api/categories/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/categories/${id}/check-dependency`,
   },
 
   // Badge endpoints
@@ -224,6 +240,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/badges/${id}`,
     CREATE: '/api/badges',
     UPDATE: (id: string) => `/api/badges/${id}`,
+    DELETE: (id: string) => `/api/badges/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/badges/${id}/check-dependency`,
   },
 
   // Size Chart Group endpoints
@@ -232,6 +250,8 @@ const API_ENDPOINTS = {
     GET: (id: string) => `/api/size-chart-groups/${id}`,
     CREATE: '/api/size-chart-groups',
     UPDATE: (id: string) => `/api/size-chart-groups/${id}`,
+    DELETE: (id: string) => `/api/size-chart-groups/${id}`,
+    CHECK_DEPENDENCY: (id: string) => `/api/size-chart-groups/${id}/check-dependency`,
     DROPDOWN: '/api/size-chart-groups/dropdown',
   },
 

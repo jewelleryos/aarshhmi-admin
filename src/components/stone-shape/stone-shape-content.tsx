@@ -7,10 +7,13 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchStoneShapes } from "@/redux/slices/stoneShapeSlice"
 import { StoneShapeTable } from "./stone-shape-table"
+import { toast } from "sonner"
 import { StoneShapeAddDrawer } from "./stone-shape-add-drawer"
 import { StoneShapeEditDrawer } from "./stone-shape-edit-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import stoneShapeService from "@/redux/services/stoneShapeService"
 import type { StoneShape } from "@/redux/services/stoneShapeService"
 
 export function StoneShapeContent() {
@@ -24,10 +27,15 @@ export function StoneShapeContent() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
   const [selectedStoneShape, setSelectedStoneShape] = useState<StoneShape | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<StoneShape | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.STONE_SHAPE.CREATE)
   const canUpdate = has(PERMISSIONS.STONE_SHAPE.UPDATE)
+  const canDelete = has(PERMISSIONS.STONE_SHAPE.DELETE)
 
   // Fetch stone shapes on mount
   useEffect(() => {
@@ -39,6 +47,31 @@ export function StoneShapeContent() {
     if (!canUpdate) return
     setSelectedStoneShape(item)
     setIsEditDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: StoneShape) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return stoneShapeService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await stoneShapeService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchStoneShapes())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -70,7 +103,9 @@ export function StoneShapeContent() {
             <StoneShapeTable
               items={items}
               onEdit={handleEdit}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -90,6 +125,18 @@ export function StoneShapeContent() {
           stoneShape={selectedStoneShape}
           open={isEditDrawerOpen}
           onOpenChange={setIsEditDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Diamond Shape"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

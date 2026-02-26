@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Gemstone Price interface - matches backend response
 export interface GemstonePrice {
@@ -214,6 +215,18 @@ const gemstonePricingService = {
   // Update gemstone price
   update: async (id: string, data: UpdateGemstonePriceData): Promise<GemstonePriceResponse> => {
     const response = await apiService.put(API_ENDPOINTS.GEMSTONE_PRICING.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.GEMSTONE_PRICING.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete gemstone price
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.GEMSTONE_PRICING.DELETE(id))
     return response.data
   },
 

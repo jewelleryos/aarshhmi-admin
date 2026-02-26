@@ -1,5 +1,6 @@
 import apiService from '@/configs/axios'
 import API_ENDPOINTS from '@/redux/api/endpoints'
+import type { DependencyCheckResult } from '@/components/ui/delete-dependency-dialog'
 
 // Gemstone Color interface - matches backend response
 export interface GemstoneColor {
@@ -74,6 +75,18 @@ const gemstoneColorService = {
   // Update gemstone color
   update: async (id: string, data: UpdateGemstoneColorData): Promise<GemstoneColorResponse> => {
     const response = await apiService.put(API_ENDPOINTS.GEMSTONE_COLOR.UPDATE(id), data)
+    return response.data
+  },
+
+  // Check dependencies before deletion
+  checkDependency: async (id: string): Promise<DependencyCheckResult> => {
+    const response = await apiService.get(API_ENDPOINTS.GEMSTONE_COLOR.CHECK_DEPENDENCY(id))
+    return response.data.data
+  },
+
+  // Delete gemstone color
+  delete: async (id: string): Promise<{ message: string }> => {
+    const response = await apiService.delete(API_ENDPOINTS.GEMSTONE_COLOR.DELETE(id))
     return response.data
   },
 }

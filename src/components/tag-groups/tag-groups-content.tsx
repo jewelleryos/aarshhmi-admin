@@ -7,11 +7,14 @@ import { Loader2, Plus } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchTagGroups } from "@/redux/slices/tagGroupSlice"
 import { TagGroupsTable } from "./tag-groups-table"
+import { toast } from "sonner"
 import { TagGroupAddDrawer } from "./tag-group-add-drawer"
 import { TagGroupEditDrawer } from "./tag-group-edit-drawer"
 import { TagGroupSeoDrawer } from "./tag-group-seo-drawer"
+import { DeleteDependencyDialog } from "@/components/ui/delete-dependency-dialog"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
+import tagGroupService from "@/redux/services/tagGroupService"
 import type { TagGroup } from "@/redux/services/tagGroupService"
 
 export function TagGroupsContent() {
@@ -26,10 +29,15 @@ export function TagGroupsContent() {
   const [isSeoDrawerOpen, setIsSeoDrawerOpen] = useState(false)
   const [selectedTagGroup, setSelectedTagGroup] = useState<TagGroup | null>(null)
 
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<TagGroup | null>(null)
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.TAG_GROUP.CREATE)
   const canUpdate = has(PERMISSIONS.TAG_GROUP.UPDATE)
+  const canDelete = has(PERMISSIONS.TAG_GROUP.DELETE)
 
   // Fetch tag groups on mount
   useEffect(() => {
@@ -48,6 +56,31 @@ export function TagGroupsContent() {
     if (!canUpdate) return
     setSelectedTagGroup(item)
     setIsSeoDrawerOpen(true)
+  }
+
+  // Handle delete click
+  const handleDeleteClick = (item: TagGroup) => {
+    setDeleteTarget(item)
+    setIsDeleteDialogOpen(true)
+  }
+
+  // Check dependency
+  const handleCheckDependency = () => {
+    return tagGroupService.checkDependency(deleteTarget!.id)
+  }
+
+  // Delete confirm
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    try {
+      const result = await tagGroupService.delete(deleteTarget.id)
+      toast.success(result.message)
+      dispatch(fetchTagGroups())
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || "Something went wrong")
+      throw err
+    }
   }
 
   return (
@@ -80,7 +113,9 @@ export function TagGroupsContent() {
               items={items}
               onEdit={handleEdit}
               onEditSeo={handleEditSeo}
+              onDelete={handleDeleteClick}
               canUpdate={canUpdate}
+              canDelete={canDelete}
             />
           )}
         </CardContent>
@@ -109,6 +144,18 @@ export function TagGroupsContent() {
           tagGroup={selectedTagGroup}
           open={isSeoDrawerOpen}
           onOpenChange={setIsSeoDrawerOpen}
+        />
+      )}
+
+      {/* Delete Dependency Dialog */}
+      {canDelete && deleteTarget && (
+        <DeleteDependencyDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          entityType="Tag Group"
+          entityName={deleteTarget.name}
+          checkDependency={handleCheckDependency}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>
