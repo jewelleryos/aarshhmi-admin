@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create axios instance with base configuration
 const apiService = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787',
-  timeout: 30000,
+  timeout: 300000,
   withCredentials: true, // This ensures cookies are sent with requests
 });
 
