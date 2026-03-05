@@ -299,6 +299,22 @@
           "icon": "Filter",
           "href": "/storefront-filters",
           "permissions": ["STOREFRONT_FILTER.READ"]
+        },
+         {
+          "id": "coupons",
+          "type": "item",
+          "label": "Coupons",
+          "icon": "Ticket",
+          "href": "/coupons",
+          "permissions": ["COUPON.READ"]
+        },
+        {
+          "id": "customers",
+          "type": "item",
+          "label": "Customers",
+          "icon": "Users",
+          "href": "/customers",
+          "permissions": ["CUSTOMER.READ"]
         }
       ]
     },

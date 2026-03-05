@@ -268,6 +268,23 @@
       "permissions": {
         "manage": { "code": 2801, "label": "Manage CMS", "requires": [] }
       }
+    },
+    "coupon": {
+      "id": 30,
+      "label": "Coupon",
+      "permissions": {
+        "create": { "code": 3001, "label": "Create Coupon", "requires": [3002] },
+        "read": { "code": 3002, "label": "View Coupons", "requires": [] },
+        "update": { "code": 3003, "label": "Update Coupon", "requires": [3002] },
+        "delete": { "code": 3004, "label": "Delete Coupon", "requires": [3002] }
+      }
+    },
+    "customer": {
+      "id": 31,
+      "label": "Customer",
+      "permissions": {
+        "read": { "code": 3101, "label": "View Customers", "requires": [] }
+      }
     }
   },
   "byCode": {
@@ -371,6 +388,11 @@
     "2604": { "module": "pricing_rule", "action": "delete", "label": "Delete Pricing Rule", "requires": [2602] },
     "2701": { "module": "storefront_filter", "action": "read", "label": "View Storefront Filters", "requires": [] },
     "2702": { "module": "storefront_filter", "action": "update", "label": "Update Storefront Filter", "requires": [2701] },
-    "2801": { "module": "cms", "action": "manage", "label": "Manage CMS", "requires": [] }
+    "2801": { "module": "cms", "action": "manage", "label": "Manage CMS", "requires": [] },
+    "3001": { "module": "coupon", "action": "create", "label": "Create Coupon", "requires": [3002] },
+    "3002": { "module": "coupon", "action": "read", "label": "View Coupons", "requires": [] },
+    "3003": { "module": "coupon", "action": "update", "label": "Update Coupon", "requires": [3002] },
+    "3004": { "module": "coupon", "action": "delete", "label": "Delete Coupon", "requires": [3002] },
+    "3101": { "module": "customer", "action": "read", "label": "View Customers", "requires": [] }
   }
 }

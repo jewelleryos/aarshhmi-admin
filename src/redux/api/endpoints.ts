@@ -356,6 +356,42 @@ const API_ENDPOINTS = {
   },
 
   // CMS endpoints
+
+  // Coupon endpoints
+  COUPON: {
+    LIST: '/api/coupons',
+    GET: (id: string) => `/api/coupons/${id}`,
+    CREATE: '/api/coupons',
+    UPDATE: (id: string) => `/api/coupons/${id}`,
+    DELETE: (id: string) => `/api/coupons/${id}`,
+    TYPES: '/api/coupons/types',
+    CHECK_DEPENDENCY: (id: string) => `/api/coupons/${id}/check-dependency`,
+    // Dropdown data for condition builder (create)
+    CATEGORIES: '/api/categories/for-coupon',
+    METAL_TYPES: '/api/metal-types/for-coupon',
+    METAL_COLORS: '/api/metal-colors/for-coupon',
+    METAL_PURITIES: '/api/metal-purities/for-coupon',
+    DIAMOND_CLARITY_COLORS: '/api/diamond-clarity-color/for-coupon',
+    GEMSTONE_COLORS: '/api/gemstone-colors/for-coupon',
+    TAGS: '/api/tags/for-coupon',
+    // Dropdown data for condition builder (edit)
+    CATEGORIES_EDIT: '/api/categories/for-coupon-edit',
+    METAL_TYPES_EDIT: '/api/metal-types/for-coupon-edit',
+    METAL_COLORS_EDIT: '/api/metal-colors/for-coupon-edit',
+    METAL_PURITIES_EDIT: '/api/metal-purities/for-coupon-edit',
+    DIAMOND_CLARITY_COLORS_EDIT: '/api/diamond-clarity-color/for-coupon-edit',
+    GEMSTONE_COLORS_EDIT: '/api/gemstone-colors/for-coupon-edit',
+    TAGS_EDIT: '/api/tags/for-coupon-edit',
+    // Customer dropdown data
+    CUSTOMERS: '/api/customers/for-coupon',
+    CUSTOMERS_EDIT: '/api/customers/for-coupon-edit',
+  },
+
+  // Customer endpoints
+  CUSTOMER: {
+    LIST: '/api/customers',
+  },
+
   // Price Recalculation endpoints
   PRICE_RECALCULATION: {
     JOBS: '/api/price-recalculation/jobs',
