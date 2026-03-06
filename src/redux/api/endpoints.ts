@@ -397,6 +397,19 @@ const API_ENDPOINTS = {
     JOBS: '/api/price-recalculation/jobs',
     TRIGGER: '/api/price-recalculation/trigger',
   },
+
+  // Similar Products endpoints
+  SIMILAR_PRODUCTS: {
+    LIST: '/api/similar-products',
+    PRODUCTS_FOR_SELECTION: '/api/similar-products/products-for-selection',
+    GET: (productId: string) => `/api/similar-products/${productId}`,
+    UPDATE: (productId: string) => `/api/similar-products/${productId}`,
+    SYNC: '/api/similar-products/sync',
+    // Developer-only
+    CONFIG: '/api/similar-products/config',
+    CONFIG_UPDATE: (id: string) => `/api/similar-products/config/${id}`,
+    SYNC_JOBS: '/api/similar-products/sync/jobs',
+  },
 }
 
 export default API_ENDPOINTS

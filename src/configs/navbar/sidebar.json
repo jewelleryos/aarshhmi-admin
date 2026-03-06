@@ -41,6 +41,14 @@
           "icon": "Plus",
           "href": "/add-product/jewellery-default",
           "permissions": ["PRODUCT.CREATE"]
+        },
+        {
+          "id": "similar-products",
+          "type": "item",
+          "label": "Similar Products",
+          "icon": "GitCompareArrows",
+          "href": "/similar-products",
+          "permissions": ["SIMILAR_PRODUCTS.READ"]
         }
       ]
     },

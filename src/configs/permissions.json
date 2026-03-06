@@ -167,5 +167,9 @@
   },
   "CUSTOMER": {
     "READ": 3101
+   },
+  "SIMILAR_PRODUCTS": {
+    "READ": 3201,
+    "UPDATE": 3202
   }
 }

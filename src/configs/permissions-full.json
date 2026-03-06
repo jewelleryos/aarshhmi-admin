@@ -285,6 +285,14 @@
       "permissions": {
         "read": { "code": 3101, "label": "View Customers", "requires": [] }
       }
+    },
+    "similar_products": {
+      "id": 32,
+      "label": "Similar Products",
+      "permissions": {
+        "read": { "code": 3201, "label": "View Similar Products", "requires": [] },
+        "update": { "code": 3202, "label": "Manage Similar Products", "requires": [3201] }
+      }
     }
   },
   "byCode": {
@@ -393,6 +401,8 @@
     "3002": { "module": "coupon", "action": "read", "label": "View Coupons", "requires": [] },
     "3003": { "module": "coupon", "action": "update", "label": "Update Coupon", "requires": [3002] },
     "3004": { "module": "coupon", "action": "delete", "label": "Delete Coupon", "requires": [3002] },
-    "3101": { "module": "customer", "action": "read", "label": "View Customers", "requires": [] }
+    "3101": { "module": "customer", "action": "read", "label": "View Customers", "requires": [] },
+    "3201": { "module": "similar_products", "action": "read", "label": "View Similar Products", "requires": [] },
+    "3202": { "module": "similar_products", "action": "update", "label": "Manage Similar Products", "requires": [3201] }
   }
 }
