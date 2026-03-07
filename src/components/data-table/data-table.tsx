@@ -59,6 +59,9 @@ export interface DataTableProps<TData, TValue> {
 
   // Layout options
   maxHeight?: string
+
+  // Pagination left label (e.g., "Total: 50 reviews")
+  totalLabel?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -77,6 +80,7 @@ export function DataTable<TData, TValue>({
   showToolbar = true,
   showColumnVisibility = true,
   maxHeight,
+  totalLabel,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -239,7 +243,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       {showPagination && (
-        <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} />
+        <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} totalLabel={totalLabel} />
       )}
     </div>
   )

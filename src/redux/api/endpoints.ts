@@ -410,6 +410,17 @@ const API_ENDPOINTS = {
     CONFIG_UPDATE: (id: string) => `/api/similar-products/config/${id}`,
     SYNC_JOBS: '/api/similar-products/sync/jobs',
   },
+  // Product Review endpoints
+  PRODUCT_REVIEW: {
+    LIST: '/api/product-reviews',
+    GET: (id: string) => `/api/product-reviews/${id}`,
+    CREATE: '/api/product-reviews',
+    UPDATE: (id: string) => `/api/product-reviews/${id}`,
+    DELETE: (id: string) => `/api/product-reviews/${id}`,
+    APPROVAL: (id: string) => `/api/product-reviews/${id}/approval`,
+    STATUS: (id: string) => `/api/product-reviews/${id}/status`,
+    PRODUCTS_DROPDOWN: '/api/product-reviews/products-dropdown',
+  },
 }
 
 export default API_ENDPOINTS

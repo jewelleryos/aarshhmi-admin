@@ -43,6 +43,14 @@
           "permissions": ["PRODUCT.CREATE"]
         },
         {
+          "id": "product-reviews",
+          "type": "item",
+          "label": "Product Reviews",
+          "icon": "Star",
+          "href": "/product-reviews",
+          "permissions": ["PRODUCT_REVIEW.READ"]
+        },
+        {
           "id": "similar-products",
           "type": "item",
           "label": "Similar Products",

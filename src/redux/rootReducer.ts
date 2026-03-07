@@ -27,6 +27,7 @@ import pricingRuleSlice from './slices/pricingRuleSlice'
 import priceRecalculationSlice from './slices/priceRecalculationSlice'
 import couponSlice from './slices/couponSlice'
 import customerSlice from './slices/customerSlice'
+import productReviewSlice from './slices/productReviewSlice'
 
 const rootReducer = combineReducers({
   auth: authSlice,
@@ -57,6 +58,7 @@ const rootReducer = combineReducers({
   priceRecalculation: priceRecalculationSlice,
   coupon: couponSlice,
   customer: customerSlice,
+  productReview: productReviewSlice,
 })
 
 export default rootReducer
