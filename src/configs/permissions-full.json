@@ -285,6 +285,35 @@
       "permissions": {
         "read": { "code": 3101, "label": "View Customers", "requires": [] }
       }
+    },
+    "similar_products": {
+      "id": 32,
+      "label": "Similar Products",
+      "permissions": {
+        "read": { "code": 3201, "label": "View Similar Products", "requires": [] },
+        "update": { "code": 3202, "label": "Manage Similar Products", "requires": [3201] }
+      }
+    },
+    "product_review": {
+      "id": 34,
+      "label": "Product Review",
+      "permissions": {
+        "read": { "code": 3401, "label": "View Product Reviews", "requires": [] },
+        "create": { "code": 3402, "label": "Create System Review", "requires": [3401] },
+        "update": { "code": 3403, "label": "Edit System Review", "requires": [3401] },
+        "user_status_update": { "code": 3404, "label": "Approve/Reject User Reviews", "requires": [3401] },
+        "delete": { "code": 3405, "label": "Delete System Review", "requires": [3401] },
+        "user_delete": { "code": 3406, "label": "Delete User Review", "requires": [3401] }
+      }
+    },
+    "order": {
+      "id": 35,
+      "label": "Orders",
+      "group": "Order Management",
+      "permissions": {
+        "read": { "code": 3501, "label": "View Orders", "requires": [] },
+        "update": { "code": 3502, "label": "Update Order", "requires": [3501] }
+      }
     }
   },
   "byCode": {
@@ -393,6 +422,16 @@
     "3002": { "module": "coupon", "action": "read", "label": "View Coupons", "requires": [] },
     "3003": { "module": "coupon", "action": "update", "label": "Update Coupon", "requires": [3002] },
     "3004": { "module": "coupon", "action": "delete", "label": "Delete Coupon", "requires": [3002] },
-    "3101": { "module": "customer", "action": "read", "label": "View Customers", "requires": [] }
+    "3101": { "module": "customer", "action": "read", "label": "View Customers", "requires": [] },
+    "3201": { "module": "similar_products", "action": "read", "label": "View Similar Products", "requires": [] },
+    "3202": { "module": "similar_products", "action": "update", "label": "Manage Similar Products", "requires": [3201] },
+    "3401": { "module": "product_review", "action": "read", "label": "View Product Reviews", "requires": [] },
+    "3402": { "module": "product_review", "action": "create", "label": "Create System Review", "requires": [3401] },
+    "3403": { "module": "product_review", "action": "update", "label": "Edit System Review", "requires": [3401] },
+    "3404": { "module": "product_review", "action": "user_status_update", "label": "Approve/Reject User Reviews", "requires": [3401] },
+    "3405": { "module": "product_review", "action": "delete", "label": "Delete System Review", "requires": [3401] },
+    "3406": { "module": "product_review", "action": "user_delete", "label": "Delete User Review", "requires": [3401] },
+    "3501": { "module": "order", "action": "read", "label": "View Orders", "requires": [] },
+    "3502": { "module": "order", "action": "update", "label": "Update Order", "requires": [3501] }
   }
 }

@@ -397,6 +397,36 @@ const API_ENDPOINTS = {
     JOBS: '/api/price-recalculation/jobs',
     TRIGGER: '/api/price-recalculation/trigger',
   },
+
+  // Similar Products endpoints
+  SIMILAR_PRODUCTS: {
+    LIST: '/api/similar-products',
+    PRODUCTS_FOR_SELECTION: '/api/similar-products/products-for-selection',
+    GET: (productId: string) => `/api/similar-products/${productId}`,
+    UPDATE: (productId: string) => `/api/similar-products/${productId}`,
+    SYNC: '/api/similar-products/sync',
+    // Developer-only
+    CONFIG: '/api/similar-products/config',
+    CONFIG_UPDATE: (id: string) => `/api/similar-products/config/${id}`,
+    SYNC_JOBS: '/api/similar-products/sync/jobs',
+  },
+  // Product Review endpoints
+  PRODUCT_REVIEW: {
+    LIST: '/api/product-reviews',
+    GET: (id: string) => `/api/product-reviews/${id}`,
+    CREATE: '/api/product-reviews',
+    UPDATE: (id: string) => `/api/product-reviews/${id}`,
+    DELETE: (id: string) => `/api/product-reviews/${id}`,
+    APPROVAL: (id: string) => `/api/product-reviews/${id}/approval`,
+    STATUS: (id: string) => `/api/product-reviews/${id}/status`,
+    PRODUCTS_DROPDOWN: '/api/product-reviews/products-dropdown',
+  },
+    // Order endpoints
+  ORDER: {
+    LIST: '/api/orders',
+    GET: (id: string) => `/api/orders/${id}`,
+    UPDATE_ITEM_STAGE: (orderId: string, itemId: string) => `/api/orders/${orderId}/items/${itemId}/stage`,
+  },
 }
 
 export default API_ENDPOINTS
