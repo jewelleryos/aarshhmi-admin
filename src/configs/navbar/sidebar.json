@@ -306,6 +306,20 @@
     },
     {
       "type": "group",
+      "label": "Order Management",
+      "children": [
+        {
+          "id": "orders",
+          "type": "item",
+          "label": "Orders",
+          "icon": "ShoppingBag",
+          "href": "/orders",
+          "permissions": ["ORDER.READ"]
+        }
+      ]
+    },
+    {
+      "type": "group",
       "label": "Store",
       "children": [
         {

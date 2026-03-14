@@ -421,6 +421,12 @@ const API_ENDPOINTS = {
     STATUS: (id: string) => `/api/product-reviews/${id}/status`,
     PRODUCTS_DROPDOWN: '/api/product-reviews/products-dropdown',
   },
+    // Order endpoints
+  ORDER: {
+    LIST: '/api/orders',
+    GET: (id: string) => `/api/orders/${id}`,
+    UPDATE_ITEM_STAGE: (orderId: string, itemId: string) => `/api/orders/${orderId}/items/${itemId}/stage`,
+  },
 }
 
 export default API_ENDPOINTS

@@ -305,6 +305,15 @@
         "delete": { "code": 3405, "label": "Delete System Review", "requires": [3401] },
         "user_delete": { "code": 3406, "label": "Delete User Review", "requires": [3401] }
       }
+    },
+    "order": {
+      "id": 35,
+      "label": "Orders",
+      "group": "Order Management",
+      "permissions": {
+        "read": { "code": 3501, "label": "View Orders", "requires": [] },
+        "update": { "code": 3502, "label": "Update Order", "requires": [3501] }
+      }
     }
   },
   "byCode": {
@@ -421,6 +430,8 @@
     "3403": { "module": "product_review", "action": "update", "label": "Edit System Review", "requires": [3401] },
     "3404": { "module": "product_review", "action": "user_status_update", "label": "Approve/Reject User Reviews", "requires": [3401] },
     "3405": { "module": "product_review", "action": "delete", "label": "Delete System Review", "requires": [3401] },
-    "3406": { "module": "product_review", "action": "user_delete", "label": "Delete User Review", "requires": [3401] }
+    "3406": { "module": "product_review", "action": "user_delete", "label": "Delete User Review", "requires": [3401] },
+    "3501": { "module": "order", "action": "read", "label": "View Orders", "requires": [] },
+    "3502": { "module": "order", "action": "update", "label": "Update Order", "requires": [3501] }
   }
 }

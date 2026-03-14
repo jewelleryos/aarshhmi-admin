@@ -179,5 +179,9 @@
     "USER_STATUS_UPDATE": 3404,
     "DELETE": 3405,
     "USER_DELETE": 3406
+  },
+  "ORDER": {
+    "READ": 3501,
+    "UPDATE": 3502
   }
 }
