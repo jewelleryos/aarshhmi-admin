@@ -41,6 +41,22 @@
           "icon": "Plus",
           "href": "/add-product/jewellery-default",
           "permissions": ["PRODUCT.CREATE"]
+        },
+        {
+          "id": "product-reviews",
+          "type": "item",
+          "label": "Product Reviews",
+          "icon": "Star",
+          "href": "/product-reviews",
+          "permissions": ["PRODUCT_REVIEW.READ"]
+        },
+        {
+          "id": "similar-products",
+          "type": "item",
+          "label": "Similar Products",
+          "icon": "GitCompareArrows",
+          "href": "/similar-products",
+          "permissions": ["SIMILAR_PRODUCTS.READ"]
         }
       ]
     },
@@ -285,6 +301,20 @@
               "permissions": ["PRICING_RULE.READ"]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Order Management",
+      "children": [
+        {
+          "id": "orders",
+          "type": "item",
+          "label": "Orders",
+          "icon": "ShoppingBag",
+          "href": "/orders",
+          "permissions": ["ORDER.READ"]
         }
       ]
     },
