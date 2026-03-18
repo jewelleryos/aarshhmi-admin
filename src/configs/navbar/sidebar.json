@@ -6,7 +6,9 @@
       "label": "Dashboard",
       "icon": "LayoutDashboard",
       "href": "/dashboard",
-      "permissions": ["DASHBOARD.READ"]
+      "permissions": [
+        "DASHBOARD.READ"
+      ]
     },
     {
       "type": "group",
@@ -18,7 +20,9 @@
           "label": "Media Manager",
           "icon": "Image",
           "href": "/media-manager",
-          "permissions": ["MEDIA_MANAGER.READ"]
+          "permissions": [
+            "MEDIA_MANAGER.READ"
+          ]
         }
       ]
     },
@@ -32,7 +36,9 @@
           "label": "Products",
           "icon": "Package",
           "href": "/products",
-          "permissions": ["PRODUCT.READ"]
+          "permissions": [
+            "PRODUCT.READ"
+          ]
         },
         {
           "id": "add-product",
@@ -40,7 +46,9 @@
           "label": "Add Product",
           "icon": "Plus",
           "href": "/add-product/jewellery-default",
-          "permissions": ["PRODUCT.CREATE"]
+          "permissions": [
+            "PRODUCT.CREATE"
+          ]
         },
         {
           "id": "product-reviews",
@@ -48,7 +56,9 @@
           "label": "Product Reviews",
           "icon": "Star",
           "href": "/product-reviews",
-          "permissions": ["PRODUCT_REVIEW.READ"]
+          "permissions": [
+            "PRODUCT_REVIEW.READ"
+          ]
         },
         {
           "id": "similar-products",
@@ -56,7 +66,9 @@
           "label": "Similar Products",
           "icon": "GitCompareArrows",
           "href": "/similar-products",
-          "permissions": ["SIMILAR_PRODUCTS.READ"]
+          "permissions": [
+            "SIMILAR_PRODUCTS.READ"
+          ]
         }
       ]
     },
@@ -76,7 +88,9 @@
               "label": "Tag Groups",
               "icon": "FolderTree",
               "href": "/attribute-management/tag-groups",
-              "permissions": ["TAG_GROUP.READ"]
+              "permissions": [
+                "TAG_GROUP.READ"
+              ]
             },
             {
               "id": "tags",
@@ -84,7 +98,9 @@
               "label": "Tags",
               "icon": "Tag",
               "href": "/attribute-management/tags",
-              "permissions": ["TAG.READ"]
+              "permissions": [
+                "TAG.READ"
+              ]
             }
           ]
         },
@@ -94,7 +110,9 @@
           "label": "Categories",
           "icon": "FolderTree",
           "href": "/attribute-management/categories",
-          "permissions": ["CATEGORY.READ"]
+          "permissions": [
+            "CATEGORY.READ"
+          ]
         },
         {
           "id": "badges",
@@ -102,7 +120,9 @@
           "label": "Badges",
           "icon": "Award",
           "href": "/attribute-management/badges",
-          "permissions": ["BADGE.READ"]
+          "permissions": [
+            "BADGE.READ"
+          ]
         },
         {
           "id": "size-chart",
@@ -116,7 +136,9 @@
               "label": "Size Chart Groups",
               "icon": "FolderTree",
               "href": "/attribute-management/size-chart-groups",
-              "permissions": ["SIZE_CHART_GROUP.READ"]
+              "permissions": [
+                "SIZE_CHART_GROUP.READ"
+              ]
             },
             {
               "id": "size-chart-values",
@@ -124,7 +146,9 @@
               "label": "Size Chart Values",
               "icon": "List",
               "href": "/attribute-management/size-chart-values",
-              "permissions": ["SIZE_CHART_VALUE.READ"]
+              "permissions": [
+                "SIZE_CHART_VALUE.READ"
+              ]
             }
           ]
         }
@@ -146,7 +170,9 @@
               "label": "Metal Type",
               "icon": "Layers",
               "href": "/masters/metal-type",
-              "permissions": ["METAL_TYPE.READ"]
+              "permissions": [
+                "METAL_TYPE.READ"
+              ]
             },
             {
               "id": "metal-color",
@@ -154,7 +180,9 @@
               "label": "Metal Color",
               "icon": "Palette",
               "href": "/masters/metal-color",
-              "permissions": ["METAL_COLOR.READ"]
+              "permissions": [
+                "METAL_COLOR.READ"
+              ]
             },
             {
               "id": "metal-purity",
@@ -162,7 +190,9 @@
               "label": "Metal Purity",
               "icon": "Gem",
               "href": "/masters/metal-purity",
-              "permissions": ["METAL_PURITY.READ"]
+              "permissions": [
+                "METAL_PURITY.READ"
+              ]
             },
             {
               "id": "making-charges",
@@ -170,7 +200,9 @@
               "label": "Making Charges",
               "icon": "Hammer",
               "href": "/masters/making-charges",
-              "permissions": ["MAKING_CHARGE.READ"]
+              "permissions": [
+                "MAKING_CHARGE.READ"
+              ]
             }
           ]
         },
@@ -186,7 +218,9 @@
               "label": "Diamond Clarity/Color",
               "icon": "Sparkles",
               "href": "/masters/diamond-clarity-color",
-              "permissions": ["DIAMOND_CLARITY_COLOR.READ"]
+              "permissions": [
+                "DIAMOND_CLARITY_COLOR.READ"
+              ]
             },
             {
               "id": "diamond-pricing",
@@ -194,7 +228,9 @@
               "label": "Diamond Pricing",
               "icon": "IndianRupee",
               "href": "/masters/diamond-pricing",
-              "permissions": ["DIAMOND_PRICING.READ"]
+              "permissions": [
+                "DIAMOND_PRICING.READ"
+              ]
             }
           ]
         },
@@ -210,7 +246,9 @@
               "label": "Gemstone Type",
               "icon": "Sparkles",
               "href": "/masters/gemstone-type",
-              "permissions": ["GEMSTONE_TYPE.READ"]
+              "permissions": [
+                "GEMSTONE_TYPE.READ"
+              ]
             },
             {
               "id": "gemstone-quality",
@@ -218,7 +256,9 @@
               "label": "Gemstone Quality",
               "icon": "Award",
               "href": "/masters/gemstone-quality",
-              "permissions": ["GEMSTONE_QUALITY.READ"]
+              "permissions": [
+                "GEMSTONE_QUALITY.READ"
+              ]
             },
             {
               "id": "gemstone-color",
@@ -226,7 +266,9 @@
               "label": "Gemstone Color",
               "icon": "Palette",
               "href": "/masters/gemstone-color",
-              "permissions": ["GEMSTONE_COLOR.READ"]
+              "permissions": [
+                "GEMSTONE_COLOR.READ"
+              ]
             },
             {
               "id": "gemstone-pricing",
@@ -234,7 +276,9 @@
               "label": "Gemstone Pricing",
               "icon": "IndianRupee",
               "href": "/masters/gemstone-pricing",
-              "permissions": ["GEMSTONE_PRICING.READ"]
+              "permissions": [
+                "GEMSTONE_PRICING.READ"
+              ]
             }
           ]
         },
@@ -250,7 +294,9 @@
               "label": "Pearl Type",
               "icon": "Sparkles",
               "href": "/masters/pearl-type",
-              "permissions": ["PEARL_TYPE.READ"]
+              "permissions": [
+                "PEARL_TYPE.READ"
+              ]
             },
             {
               "id": "pearl-quality",
@@ -258,7 +304,9 @@
               "label": "Pearl Quality",
               "icon": "Star",
               "href": "/masters/pearl-quality",
-              "permissions": ["PEARL_QUALITY.READ"]
+              "permissions": [
+                "PEARL_QUALITY.READ"
+              ]
             }
           ]
         },
@@ -274,7 +322,9 @@
               "label": "Diamond Shape",
               "icon": "Diamond",
               "href": "/masters/stone-shape",
-              "permissions": ["STONE_SHAPE.READ"]
+              "permissions": [
+                "STONE_SHAPE.READ"
+              ]
             },
             {
               "id": "other-charges",
@@ -282,7 +332,9 @@
               "label": "Other Charges",
               "icon": "Receipt",
               "href": "/masters/other-charges",
-              "permissions": ["OTHER_CHARGE.READ"]
+              "permissions": [
+                "OTHER_CHARGE.READ"
+              ]
             },
             {
               "id": "mrp-markup",
@@ -290,7 +342,9 @@
               "label": "MRP Markup",
               "icon": "Percent",
               "href": "/masters/mrp-markup",
-              "permissions": ["MRP_MARKUP.READ"]
+              "permissions": [
+                "MRP_MARKUP.READ"
+              ]
             },
             {
               "id": "pricing-rule",
@@ -298,7 +352,9 @@
               "label": "Pricing Rule",
               "icon": "Calculator",
               "href": "/masters/pricing-rule",
-              "permissions": ["PRICING_RULE.READ"]
+              "permissions": [
+                "PRICING_RULE.READ"
+              ]
             }
           ]
         }
@@ -314,7 +370,9 @@
           "label": "Orders",
           "icon": "ShoppingBag",
           "href": "/orders",
-          "permissions": ["ORDER.READ"]
+          "permissions": [
+            "ORDER.READ"
+          ]
         }
       ]
     },
@@ -328,15 +386,19 @@
           "label": "Storefront Filters",
           "icon": "Filter",
           "href": "/storefront-filters",
-          "permissions": ["STOREFRONT_FILTER.READ"]
+          "permissions": [
+            "STOREFRONT_FILTER.READ"
+          ]
         },
-         {
+        {
           "id": "coupons",
           "type": "item",
           "label": "Coupons",
           "icon": "Ticket",
           "href": "/coupons",
-          "permissions": ["COUPON.READ"]
+          "permissions": [
+            "COUPON.READ"
+          ]
         },
         {
           "id": "customers",
@@ -344,7 +406,9 @@
           "label": "Customers",
           "icon": "Users",
           "href": "/customers",
-          "permissions": ["CUSTOMER.READ"]
+          "permissions": [
+            "CUSTOMER.READ"
+          ]
         }
       ]
     },
@@ -364,8 +428,26 @@
               "label": "Users",
               "icon": "Users",
               "href": "/users",
-              "permissions": ["USER.READ"]
+              "permissions": [
+                "USER.READ"
+              ]
             }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": "Pages",
+      "children": [
+        {
+          "id": "seo",
+          "type": "item",
+          "label": "SEO",
+          "icon": "Globe",
+          "href": "/seo",
+          "permissions": [
+            "SEO_PAGES.READ"
           ]
         }
       ]

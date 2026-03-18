@@ -156,10 +156,10 @@
   "CMS": {
     "MANAGE": 2801
   },
-    "PRICE_RECALCULATION": {
+  "PRICE_RECALCULATION": {
     "READ": 2901
   },
-   "COUPON": {
+  "COUPON": {
     "CREATE": 3001,
     "READ": 3002,
     "UPDATE": 3003,
@@ -167,7 +167,7 @@
   },
   "CUSTOMER": {
     "READ": 3101
-   },
+  },
   "SIMILAR_PRODUCTS": {
     "READ": 3201,
     "UPDATE": 3202
@@ -183,5 +183,9 @@
   "ORDER": {
     "READ": 3501,
     "UPDATE": 3502
+  },
+  "SEO_PAGES": {
+    "READ": 3601,
+    "UPDATE": 3602
   }
 }

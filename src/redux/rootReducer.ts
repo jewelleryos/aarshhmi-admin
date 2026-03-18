@@ -29,6 +29,7 @@ import couponSlice from './slices/couponSlice'
 import customerSlice from './slices/customerSlice'
 import productReviewSlice from './slices/productReviewSlice'
 import orderSlice from './slices/orderSlice'
+import seoSlice from "./slices/seoSlice"
 
 
 const rootReducer = combineReducers({
@@ -62,7 +63,7 @@ const rootReducer = combineReducers({
   customer: customerSlice,
   productReview: productReviewSlice,
   order: orderSlice,
-
+  seo: seoSlice,
 })
 
 export default rootReducer
