@@ -23,6 +23,16 @@
           "permissions": [
             "MEDIA_MANAGER.READ"
           ]
+        },
+        {
+          "id": "cms",
+          "type": "item",
+          "label": "CMS",
+          "icon": "FileText",
+          "href": "/cms",
+          "permissions": [
+            "CMS.MANAGE"
+          ]
         }
       ]
     },

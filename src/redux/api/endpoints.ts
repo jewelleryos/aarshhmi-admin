@@ -356,6 +356,12 @@ const API_ENDPOINTS = {
   },
 
   // CMS endpoints
+  CMS: {
+    HOMEPAGE: {
+      HERO_DESKTOP_BANNER: '/api/cms/homepage/hero-desktop-banner',
+      PRODUCT_RANGE: '/api/cms/homepage/product-range',
+    },
+  },
 
   // Coupon endpoints
   COUPON: {

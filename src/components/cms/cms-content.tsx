@@ -1,0 +1,122 @@
+"use client"
+
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { CMSSection } from "./types";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { CMSProductRange } from "./homepage/product-range/cms-product-range";
+import { CMSAssurance } from "./homepage/assurance/cms-assurance";
+import { cmsSections } from "./cms-section-enum";
+import { CMSHeroDesktopBanner } from "./homepage/hero-desktop-banner/cms-hero-desktop-banner";
+import { CMSShopFromBestsellers } from "./homepage/bestsellers/cms-shop-from-bestsellers";
+import { CMSShopByShape } from "./homepage/shop-by-shape/cms-shop-by-shape";
+import { CMSCollections } from "./homepage/collections/cms-collections";
+import { CMSGiftGuide } from "./homepage/gift-guide/cms-gift-guide";
+import { CMSEngagement } from "./homepage/engagement/cms-engagement";
+import { CMSMuse } from "./homepage/muse/cms-muse";
+import { CMSInstagram } from "./homepage/instagram/cms-instagram";
+import { CMSExperience } from "./homepage/experience/cms-experience";
+
+export function CMSContent() {
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+    const [activeSection, setActiveSection] = useState<string>('hero-desktop-banner');
+
+    const hasChildren = (section: CMSSection) => {
+        return section.children && section.children.length > 0;
+    };
+
+    const toggleSection = (sectionId: string) => {
+        setExpandedSections((prev) => {
+            const next = new Set(prev);
+            if (next.has(sectionId)) {
+                next.delete(sectionId);
+            } else {
+                next.add(sectionId);
+            }
+            return next;
+        });
+    };
+
+    const handleSectionClick = (section: CMSSection) => {
+        if (hasChildren(section)) {
+            toggleSection(section.id);
+        } else {
+            setActiveSection(section.id);
+        }
+    };
+
+    const renderSection = (section: CMSSection, depth: number = 0) => {
+        const isExpanded = expandedSections.has(section.id);
+        const isActive = activeSection === section.id;
+
+        return (
+            <div key={section.id}>
+                <button
+                    onClick={() => handleSectionClick(section)}
+                    className={cn(
+                        'flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-medium transition-colors',
+                        depth > 0 && 'pl-6',
+                        isActive && !hasChildren(section)
+                            ? 'bg-primary text-primary-foreground'
+                            : 'hover:bg-muted'
+                    )}
+                >
+                    <span>{section.label}</span>
+                    {hasChildren(section) && (
+                        isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                        ) : (
+                            <ChevronRight className="h-4 w-4" />
+                        )
+                    )}
+                </button>
+                    <div
+                        className={cn(
+                            'overflow-hidden transition-all duration-200 ease-in-out',
+                            hasChildren(section) && isExpanded ? 'mt-1 max-h-160 opacity-100' : 'max-h-0 opacity-0'
+                        )}
+                    >
+                        <div className="space-y-1">
+                            {section.children.map((child) => renderSection(child, depth + 1))}
+                        </div>
+                    </div>
+            </div>
+        );
+    };
+
+    const sectionLabel = cmsSections.flatMap(s => s.children).find(c => c.id === activeSection)?.label ?? activeSection
+
+    return <div className="flex h-full">
+        {/* CMS Sidebar */}
+        <div className="w-64 max-h-225 overflow-y-auto rounded-lg bg-muted/30 p-4">
+            <h2 className="mb-4 text-sm font-semibold text-muted-foreground">CMS Sections</h2>
+            <nav className="space-y-1">
+                {cmsSections.map((section) => renderSection(section))}
+            </nav>
+        </div>
+        {/* Content Area */}
+         <div className="flex-1 p-6">
+        {
+            activeSection === "hero-desktop-banner" ? <CMSHeroDesktopBanner /> :
+            activeSection === "product-range" ? <CMSProductRange /> :
+            activeSection === "shop-from-bestsellers" ? <CMSShopFromBestsellers /> :
+            activeSection === "shop-by-shape" ? <CMSShopByShape /> :
+            activeSection === "collections" ? <CMSCollections /> :
+            activeSection === "gift-guide" ? <CMSGiftGuide /> :
+            activeSection === "engagement" ? <CMSEngagement /> :
+            activeSection === "muse" ? <CMSMuse /> :
+            activeSection === "assurance" ? <CMSAssurance /> :
+            activeSection === "instagram" ? <CMSInstagram /> :
+            activeSection === "experience" ? <CMSExperience /> :          
+            <div className="flex h-full items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-muted-foreground">Coming Soon</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {sectionLabel} section is under development.
+                    </p>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+}
