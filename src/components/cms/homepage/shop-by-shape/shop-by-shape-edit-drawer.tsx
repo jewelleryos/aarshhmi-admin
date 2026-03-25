@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -12,54 +12,51 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ImageIcon, Loader2 } from 'lucide-react'
+import { Diamond, Loader2 } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
-import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
+import type { ShopByShapeItem } from '@/components/cms/services/cmsService'
 
-interface HeroDesktopBannerAddDrawerProps {
+interface ShopByShapeEditDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (banner: Omit<HeroDesktopBannerItem, 'id'>) => Promise<void>
+  shape: ShopByShapeItem | null
+  onSave: (shape: ShopByShapeItem) => Promise<void>
 }
 
-export function HeroDesktopBannerAddDrawer({
+export function ShopByShapeEditDrawer({
   open,
   onOpenChange,
+  shape,
   onSave,
-}: HeroDesktopBannerAddDrawerProps) {
-  // Form state
+}: ShopByShapeEditDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
   const [status, setStatus] = useState(true)
 
-  // Loading and error state
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ image_url?: string; redirect_url?: string }>({})
 
-  // Reset form
-  const resetForm = () => {
-    setImageUrl('')
-    setImageAltText('')
-    setRedirectUrl('')
-    setRank(0)
-    setStatus(true)
-    setErrors({})
-  }
+  useEffect(() => {
+    if (shape) {
+      setImageUrl(shape.image_url || '')
+      setImageAltText(shape.image_alt_text || '')
+      setRedirectUrl(shape.redirect_url || '')
+      setRank(shape.rank || 0)
+      setStatus(shape.status ?? true)
+      setErrors({})
+    }
+  }, [shape])
 
-  // Handle drawer close
   const handleOpenChange = (isOpen: boolean) => {
     if (isLoading) return
-    if (!isOpen) {
-      resetForm()
-    }
     onOpenChange(isOpen)
   }
 
-  // Handle form submission
   const handleSubmit = async () => {
-    // Validate
+    if (!shape) return
+
     const newErrors: { image_url?: string; redirect_url?: string } = {}
     if (!imageUrl) {
       newErrors.image_url = 'Image is required'
@@ -79,13 +76,13 @@ export function HeroDesktopBannerAddDrawer({
 
     try {
       await onSave({
+        id: shape.id,
         image_url: imageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
         status,
       })
-      resetForm()
     } finally {
       setIsLoading(false)
     }
@@ -101,12 +98,12 @@ export function HeroDesktopBannerAddDrawer({
         <SheetHeader className="text-left px-6 py-4 border-b">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <ImageIcon className="h-5 w-5 text-primary" />
+              <Diamond className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <SheetTitle>Add Banner</SheetTitle>
+              <SheetTitle>Edit Shape</SheetTitle>
               <p className="text-sm text-muted-foreground">
-                Add a new hero banner for the homepage
+                Update shape details
               </p>
             </div>
           </div>
@@ -116,23 +113,23 @@ export function HeroDesktopBannerAddDrawer({
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {/* Image Field */}
           <MediaPickerInput
-            label="Banner Image"
+            label="Shape Image"
             value={imageUrl || null}
             onChange={(path) => {
               setImageUrl(path || '')
               if (path) setErrors((prev) => ({ ...prev, image_url: undefined }))
             }}
-            rootPath="cms/homepage/hero-desktop-banner"
+            rootPath="cms/homepage/shop-by-shape"
             required
             error={errors.image_url}
           />
 
           {/* Alt Text Field */}
           <div className="space-y-2">
-            <Label htmlFor="image_alt_text">Image Alt Text</Label>
+            <Label htmlFor="edit_image_alt_text">Image Alt Text</Label>
             <Input
-              id="image_alt_text"
-              placeholder="Describe the banner image"
+              id="edit_image_alt_text"
+              placeholder="Describe the shape image"
               value={imageAltText}
               onChange={(e) => setImageAltText(e.target.value)}
             />
@@ -140,12 +137,12 @@ export function HeroDesktopBannerAddDrawer({
 
           {/* Redirect URL Field */}
           <div className="space-y-2">
-            <Label htmlFor="redirect_url">
+            <Label htmlFor="edit_redirect_url">
               Redirect URL <span className="text-destructive">*</span>
             </Label>
             <Input
-              id="redirect_url"
-              placeholder="https://example.com/collections/summer-sale"
+              id="edit_redirect_url"
+              placeholder="https://example.com/collections/round"
               value={redirectUrl}
               onChange={(e) => {
                 setRedirectUrl(e.target.value)
@@ -163,12 +160,11 @@ export function HeroDesktopBannerAddDrawer({
 
           {/* Rank Field */}
           <div className="space-y-2">
-            <Label htmlFor="rank">Display Order</Label>
+            <Label htmlFor="edit_rank">Display Order</Label>
             <Input
-              id="rank"
+              id="edit_rank"
               type="number"
               min={0}
-              placeholder="0"
               value={rank}
               onChange={(e) => setRank(parseInt(e.target.value) || 0)}
             />
@@ -180,11 +176,11 @@ export function HeroDesktopBannerAddDrawer({
           {/* Status Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="status"
+              id="edit_status"
               checked={status}
               onCheckedChange={(checked) => setStatus(checked === true)}
             />
-            <Label htmlFor="status" className="cursor-pointer">
+            <Label htmlFor="edit_status" className="cursor-pointer">
               Active
             </Label>
           </div>
@@ -208,10 +204,10 @@ export function HeroDesktopBannerAddDrawer({
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                Saving...
               </>
             ) : (
-              "Create Banner"
+              "Save Changes"
             )}
           </Button>
         </SheetFooter>

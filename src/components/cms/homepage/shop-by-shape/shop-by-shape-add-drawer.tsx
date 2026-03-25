@@ -12,33 +12,30 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ImageIcon, Loader2 } from 'lucide-react'
+import { Diamond, Loader2 } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
-import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
+import type { ShopByShapeItem } from '@/components/cms/services/cmsService'
 
-interface HeroDesktopBannerAddDrawerProps {
+interface ShopByShapeAddDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (banner: Omit<HeroDesktopBannerItem, 'id'>) => Promise<void>
+  onSave: (shape: Omit<ShopByShapeItem, 'id'>) => Promise<void>
 }
 
-export function HeroDesktopBannerAddDrawer({
+export function ShopByShapeAddDrawer({
   open,
   onOpenChange,
   onSave,
-}: HeroDesktopBannerAddDrawerProps) {
-  // Form state
+}: ShopByShapeAddDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
   const [status, setStatus] = useState(true)
 
-  // Loading and error state
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ image_url?: string; redirect_url?: string }>({})
 
-  // Reset form
   const resetForm = () => {
     setImageUrl('')
     setImageAltText('')
@@ -48,7 +45,6 @@ export function HeroDesktopBannerAddDrawer({
     setErrors({})
   }
 
-  // Handle drawer close
   const handleOpenChange = (isOpen: boolean) => {
     if (isLoading) return
     if (!isOpen) {
@@ -57,9 +53,7 @@ export function HeroDesktopBannerAddDrawer({
     onOpenChange(isOpen)
   }
 
-  // Handle form submission
   const handleSubmit = async () => {
-    // Validate
     const newErrors: { image_url?: string; redirect_url?: string } = {}
     if (!imageUrl) {
       newErrors.image_url = 'Image is required'
@@ -101,12 +95,12 @@ export function HeroDesktopBannerAddDrawer({
         <SheetHeader className="text-left px-6 py-4 border-b">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <ImageIcon className="h-5 w-5 text-primary" />
+              <Diamond className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <SheetTitle>Add Banner</SheetTitle>
+              <SheetTitle>Add Shape</SheetTitle>
               <p className="text-sm text-muted-foreground">
-                Add a new hero banner for the homepage
+                Add a new shape to the shop by shape section
               </p>
             </div>
           </div>
@@ -116,13 +110,13 @@ export function HeroDesktopBannerAddDrawer({
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {/* Image Field */}
           <MediaPickerInput
-            label="Banner Image"
+            label="Shape Image"
             value={imageUrl || null}
             onChange={(path) => {
               setImageUrl(path || '')
               if (path) setErrors((prev) => ({ ...prev, image_url: undefined }))
             }}
-            rootPath="cms/homepage/hero-desktop-banner"
+            rootPath="cms/homepage/shop-by-shape"
             required
             error={errors.image_url}
           />
@@ -132,7 +126,7 @@ export function HeroDesktopBannerAddDrawer({
             <Label htmlFor="image_alt_text">Image Alt Text</Label>
             <Input
               id="image_alt_text"
-              placeholder="Describe the banner image"
+              placeholder="Describe the shape image"
               value={imageAltText}
               onChange={(e) => setImageAltText(e.target.value)}
             />
@@ -145,7 +139,7 @@ export function HeroDesktopBannerAddDrawer({
             </Label>
             <Input
               id="redirect_url"
-              placeholder="https://example.com/collections/summer-sale"
+              placeholder="https://example.com/collections/round"
               value={redirectUrl}
               onChange={(e) => {
                 setRedirectUrl(e.target.value)
@@ -211,7 +205,7 @@ export function HeroDesktopBannerAddDrawer({
                 Creating...
               </>
             ) : (
-              "Create Banner"
+              "Create Shape"
             )}
           </Button>
         </SheetFooter>

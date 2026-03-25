@@ -16,10 +16,18 @@ import { CMSEngagement } from "./homepage/engagement/cms-engagement";
 import { CMSMuse } from "./homepage/muse/cms-muse";
 import { CMSInstagram } from "./homepage/instagram/cms-instagram";
 import { CMSExperience } from "./homepage/experience/cms-experience";
+import CMSPrivacyPolicy from "./policypage/privacy/cms-privacy-policy";
+import CMSLifetimeExchangeBuybackPolicy from "./policypage/lifetimeExchangeBuyback/cms-lifetime-exchange-buyback-policy";
+import CMSReturnRefundPolicy from "./policypage/returnRefund/return-refund-policy";
+import CMSTermsCondition from "./policypage/termsCondition/terms-condition-policy";
+import CMSShoppingPolicy from "./policypage/shipping/shipping-policy";
+import CMSPartnerWithUs from "./partnerWithUsPage/partner-with-us";
+import CMSAboutUs from "./aboutUsPage/about-us";
+import { NavbarContentComponent } from "./navbar";
 
 export function CMSContent() {
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
-    const [activeSection, setActiveSection] = useState<string>('hero-desktop-banner');
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set([]));
+    const [activeSection, setActiveSection] = useState<string>('navbar');
 
     const hasChildren = (section: CMSSection) => {
         return section.children && section.children.length > 0;
@@ -97,6 +105,7 @@ export function CMSContent() {
         {/* Content Area */}
          <div className="flex-1 p-6">
         {
+            activeSection === "navbar" ? <NavbarContentComponent/> :
             activeSection === "hero-desktop-banner" ? <CMSHeroDesktopBanner /> :
             activeSection === "product-range" ? <CMSProductRange /> :
             activeSection === "shop-from-bestsellers" ? <CMSShopFromBestsellers /> :
@@ -107,7 +116,14 @@ export function CMSContent() {
             activeSection === "muse" ? <CMSMuse /> :
             activeSection === "assurance" ? <CMSAssurance /> :
             activeSection === "instagram" ? <CMSInstagram /> :
-            activeSection === "experience" ? <CMSExperience /> :          
+            activeSection === "experience" ? <CMSExperience /> :      
+            activeSection === "privacy-policy" ? <CMSPrivacyPolicy/> :
+            activeSection === "lifetime-exchange-buyback-policy" ?    <CMSLifetimeExchangeBuybackPolicy/> :
+            activeSection === "return-refund-exchange-policy" ? <CMSReturnRefundPolicy/> :
+            activeSection === "terms-conditions" ? <CMSTermsCondition/>:
+            activeSection === "shipping-policy" ? <CMSShoppingPolicy/> :
+            activeSection === "partner-with-us" ? <CMSPartnerWithUs/> :
+            activeSection === "about-us" ? <CMSAboutUs/> :
             <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-semibold text-muted-foreground">Coming Soon</h1>

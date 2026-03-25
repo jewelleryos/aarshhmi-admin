@@ -2,6 +2,11 @@ import { CMSSection } from "./types";
 
 export const cmsSections: CMSSection[] = [
     {
+        id: "navbar",
+        label:"Navbar",
+        children:[],
+    },
+    {
         id: 'homepage',
         label: 'Homepage',
         children: [
@@ -17,5 +22,27 @@ export const cmsSections: CMSSection[] = [
             { id: 'instagram', label: 'Instagram', children: [] },
             { id: "experience", label:"Experience", children:[]},
         ],
-    }
+    },
+    {
+        id: "policy-pages",
+        label:"Policy Pages",
+        children:[
+            { id: "privacy-policy", label: "Privacy Policy", children:[]},
+            { id: "lifetime-exchange-buyback-policy", label: "Lifetime Exchange & Buy Back Policy", children:[]},
+            { id: "return-refund-exchange-policy", label:"Return, Refund & Exchange Policy", children:[]},
+            { id: "terms-conditions", label: "Terms & Conditions", children:[]},
+            { id: "shipping-policy", label: "Shipping Policy", children:[]},
+        ]
+    }, 
+    {
+        id: "partner-with-us",
+        label: "Partner With Us",
+        children:[]
+    },
+    {
+        id: "about-us",
+        label: "About Us",
+        children:[]
+    },
+    
 ]

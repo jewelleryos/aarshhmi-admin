@@ -22,23 +22,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { FolderOpen, MoreVertical, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
-import { getCdnUrl } from '@/utils/cdn'
-import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
+import { FolderOpen, MoreVertical, Pencil, Trash2, ToggleLeft, ToggleRight, Settings } from 'lucide-react'
+import type { NavItem } from '../services/cmsService'
 
-interface HeroDesktopBannerTableProps {
-  banners: HeroDesktopBannerItem[]
-  onEdit: (banner: HeroDesktopBannerItem) => void
-  onDelete: (bannerId: string) => void
-  onToggleStatus: (bannerId: string) => void
+interface NavbarTableProps {
+  items: NavItem[]
+  onEdit: (item: NavItem) => void
+  onDelete: (itemId: string) => void
+  onToggleStatus: (itemId: string) => void
+  onManageMegaMenu: (item: NavItem) => void
 }
 
-// Create columns
 function createColumns(
-  onEdit: (banner: HeroDesktopBannerItem) => void,
-  onDelete: (bannerId: string) => void,
-  onToggleStatus: (bannerId: string) => void
-): ColumnDef<HeroDesktopBannerItem>[] {
+  onEdit: (item: NavItem) => void,
+  onDelete: (itemId: string) => void,
+  onToggleStatus: (itemId: string) => void,
+  onManageMegaMenu: (item: NavItem) => void
+): ColumnDef<NavItem>[] {
   return [
     {
       accessorKey: 'rank',
@@ -51,52 +51,38 @@ function createColumns(
       size: 70,
     },
     {
-      accessorKey: 'image_url',
-      header: 'Preview',
-      cell: ({ row }) => {
-        const banner = row.original
-        const imageUrl = getCdnUrl(banner.image_url)
-        if (!imageUrl) {
-          return (
-            <div className="flex h-12 w-20 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
-              No image
-            </div>
-          )
-        }
-        return (
-          <img
-            src={imageUrl}
-            alt={banner.image_alt_text || 'Banner'}
-            className="h-12 w-20 rounded object-cover"
-          />
-        )
-      },
-      enableSorting: false,
-      size: 100,
-    },
-    {
-      accessorKey: 'image_alt_text',
+      accessorKey: 'name',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Alt Text" />
+        <DataTableColumnHeader column={column} title="Name" />
       ),
       cell: ({ row }) => (
-        <span className="text-muted-foreground text-sm max-w-48 truncate block">
-          {row.original.image_alt_text || '-'}
-        </span>
+        <span className="font-medium">{row.original.name}</span>
       ),
       size: 150,
     },
     {
-      accessorKey: 'redirect_url',
+      accessorKey: 'link',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Redirect URL" />
+        <DataTableColumnHeader column={column} title="Link" />
       ),
       cell: ({ row }) => (
         <span className="text-muted-foreground text-sm max-w-48 truncate block">
-          {row.original.redirect_url || '-'}
+          {row.original.link || '-'}
         </span>
       ),
       size: 200,
+    },
+    {
+      accessorKey: 'isMegaMenu',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Mega Menu" />
+      ),
+      cell: ({ row }) => (
+        <Badge variant={row.original.isMegaMenu ? 'default' : 'outline'}>
+          {row.original.isMegaMenu ? 'Yes' : 'No'}
+        </Badge>
+      ),
+      size: 100,
     },
     {
       accessorKey: 'status',
@@ -114,7 +100,7 @@ function createColumns(
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const banner = row.original
+        const item = row.original
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -123,12 +109,18 @@ function createColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(banner)}>
+              <DropdownMenuItem onClick={() => onEdit(item)}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onToggleStatus(banner.id)}>
-                {banner.status ? (
+              {item.isMegaMenu && (
+                <DropdownMenuItem onClick={() => onManageMegaMenu(item)}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Manage Mega Menu
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => onToggleStatus(item.id)}>
+                {item.status ? (
                   <>
                     <ToggleLeft className="mr-2 h-4 w-4" />
                     Deactivate
@@ -143,7 +135,7 @@ function createColumns(
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={() => onDelete(banner.id)}
+                onClick={() => onDelete(item.id)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -159,50 +151,48 @@ function createColumns(
   ]
 }
 
-export function HeroDesktopBannerTable({
-  banners,
+export function NavbarTable({
+  items,
   onEdit,
   onDelete,
   onToggleStatus,
-}: HeroDesktopBannerTableProps) {
+  onManageMegaMenu,
+}: NavbarTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [bannerToDelete, setBannerToDelete] = useState<string | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
 
-  const handleDeleteClick = (bannerId: string) => {
-    setBannerToDelete(bannerId)
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId)
     setDeleteDialogOpen(true)
   }
 
   const handleDeleteConfirm = () => {
-    if (bannerToDelete) {
-      onDelete(bannerToDelete)
-      setBannerToDelete(null)
+    if (itemToDelete) {
+      onDelete(itemToDelete)
+      setItemToDelete(null)
       setDeleteDialogOpen(false)
     }
   }
 
-  // Memoize columns with delete handler wrapper
   const columns = useMemo(
-    () => createColumns(onEdit, handleDeleteClick, onToggleStatus),
-    [onEdit, onToggleStatus]
+    () => createColumns(onEdit, handleDeleteClick, onToggleStatus, onManageMegaMenu),
+    [onEdit, onToggleStatus, onManageMegaMenu]
   )
 
-  // Sort banners by rank
-  const sortedBanners = useMemo(
-    () => [...banners].sort((a, b) => a.rank - b.rank),
-    [banners]
+  const sortedItems = useMemo(
+    () => [...items].sort((a, b) => a.rank - b.rank),
+    [items]
   )
 
-  // Empty state
-  if (banners.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
         <h3 className="text-lg font-medium text-muted-foreground">
-          No banners found
+          No nav items found
         </h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Click &quot;Add Banner&quot; to create your first banner
+          Click &quot;Add Nav Link&quot; to create your first navigation item
         </p>
       </div>
     )
@@ -212,18 +202,17 @@ export function HeroDesktopBannerTable({
     <>
       <DataTable
         columns={columns}
-        data={sortedBanners}
+        data={sortedItems}
         showPagination={false}
         showToolbar={false}
       />
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+            <AlertDialogTitle>Delete Nav Item</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this banner? This action cannot be undone.
+              Are you sure you want to delete this navigation item? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

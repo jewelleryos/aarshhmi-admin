@@ -357,10 +357,30 @@ const API_ENDPOINTS = {
 
   // CMS endpoints
   CMS: {
+    NAVBAR: '/api/cms/navbar',
     HOMEPAGE: {
       HERO_DESKTOP_BANNER: '/api/cms/homepage/hero-desktop-banner',
       PRODUCT_RANGE: '/api/cms/homepage/product-range',
+      SHOP_FROM_BESTSELLERS: '/api/cms/homepage/shop-from-bestsellers',
+      PRODUCTS_FOR_SELECTION: '/api/cms/products-for-selection',
+      SHOP_BY_SHAPE: '/api/cms/homepage/shop-by-shape',
+      COLLECTIONS: '/api/cms/homepage/collections',
+      GIFT_GUIDE: '/api/cms/homepage/gift-guide',
+ 	INSTAGRAM: '/api/cms/homepage/instagram',
+      EXPERIENCE: '/api/cms/homepage/experience',
+      ASSURANCE: '/api/cms/homepage/assurance',
+      MUSE: '/api/cms/homepage/muse',
+      ENGAGEMENT: '/api/cms/homepage/engagement',
     },
+    POLICY_PAGES: {
+      PRIVACY_POLICY: '/api/cms/policy-pages/privacy-policy',
+      TERMS_CONDITIONS: '/api/cms/policy-pages/terms-conditions',
+      SHIPPING_POLICY: '/api/cms/policy-pages/shipping-policy',
+      RETURN_REFUND_EXCHANGE: '/api/cms/policy-pages/return-refund-exchange-policy',
+      LIFETIME_EXCHANGE_BUYBACK: '/api/cms/policy-pages/lifetime-exchange-buyback-policy',
+    },
+    PARTNER_WITH_US: '/api/cms/partner-with-us',
+    ABOUT_US: '/api/cms/about-us',
   },
 
   // Coupon endpoints

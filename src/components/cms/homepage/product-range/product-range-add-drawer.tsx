@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LayoutGrid, Loader2 } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
-import type { ProductRangeItem } from '@/redux/services/cmsService'
+import type { ProductRangeItem } from '@/components/cms/services/cmsService'
 
 interface ProductRangeAddDrawerProps {
   open: boolean

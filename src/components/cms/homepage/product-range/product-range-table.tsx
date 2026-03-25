@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { FolderOpen, MoreVertical, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
 import { getCdnUrl } from '@/utils/cdn'
-import type { ProductRangeItem } from '@/redux/services/cmsService'
+import type { ProductRangeItem } from '@/components/cms/services/cmsService'
 
 interface ProductRangeTableProps {
   categories: ProductRangeItem[]

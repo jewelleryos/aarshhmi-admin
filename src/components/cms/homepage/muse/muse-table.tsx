@@ -24,21 +24,20 @@ import {
 } from '@/components/ui/alert-dialog'
 import { FolderOpen, MoreVertical, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
 import { getCdnUrl } from '@/utils/cdn'
-import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
+import type { MuseItem } from '@/components/cms/services/cmsService'
 
-interface HeroDesktopBannerTableProps {
-  banners: HeroDesktopBannerItem[]
-  onEdit: (banner: HeroDesktopBannerItem) => void
-  onDelete: (bannerId: string) => void
-  onToggleStatus: (bannerId: string) => void
+interface MuseTableProps {
+  items: MuseItem[]
+  onEdit: (item: MuseItem) => void
+  onDelete: (itemId: string) => void
+  onToggleStatus: (itemId: string) => void
 }
 
-// Create columns
 function createColumns(
-  onEdit: (banner: HeroDesktopBannerItem) => void,
-  onDelete: (bannerId: string) => void,
-  onToggleStatus: (bannerId: string) => void
-): ColumnDef<HeroDesktopBannerItem>[] {
+  onEdit: (item: MuseItem) => void,
+  onDelete: (itemId: string) => void,
+  onToggleStatus: (itemId: string) => void
+): ColumnDef<MuseItem>[] {
   return [
     {
       accessorKey: 'rank',
@@ -54,8 +53,7 @@ function createColumns(
       accessorKey: 'image_url',
       header: 'Preview',
       cell: ({ row }) => {
-        const banner = row.original
-        const imageUrl = getCdnUrl(banner.image_url)
+        const imageUrl = getCdnUrl(row.original.image_url)
         if (!imageUrl) {
           return (
             <div className="flex h-12 w-20 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
@@ -66,7 +64,7 @@ function createColumns(
         return (
           <img
             src={imageUrl}
-            alt={banner.image_alt_text || 'Banner'}
+            alt={row.original.image_alt_text || 'Muse'}
             className="h-12 w-20 rounded object-cover"
           />
         )
@@ -114,7 +112,7 @@ function createColumns(
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const banner = row.original
+        const item = row.original
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -123,12 +121,12 @@ function createColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(banner)}>
+              <DropdownMenuItem onClick={() => onEdit(item)}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onToggleStatus(banner.id)}>
-                {banner.status ? (
+              <DropdownMenuItem onClick={() => onToggleStatus(item.id)}>
+                {item.status ? (
                   <>
                     <ToggleLeft className="mr-2 h-4 w-4" />
                     Deactivate
@@ -143,7 +141,7 @@ function createColumns(
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={() => onDelete(banner.id)}
+                onClick={() => onDelete(item.id)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -159,50 +157,40 @@ function createColumns(
   ]
 }
 
-export function HeroDesktopBannerTable({
-  banners,
-  onEdit,
-  onDelete,
-  onToggleStatus,
-}: HeroDesktopBannerTableProps) {
+export function MuseTable({ items, onEdit, onDelete, onToggleStatus }: MuseTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [bannerToDelete, setBannerToDelete] = useState<string | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
 
-  const handleDeleteClick = (bannerId: string) => {
-    setBannerToDelete(bannerId)
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId)
     setDeleteDialogOpen(true)
   }
 
   const handleDeleteConfirm = () => {
-    if (bannerToDelete) {
-      onDelete(bannerToDelete)
-      setBannerToDelete(null)
+    if (itemToDelete) {
+      onDelete(itemToDelete)
+      setItemToDelete(null)
       setDeleteDialogOpen(false)
     }
   }
 
-  // Memoize columns with delete handler wrapper
   const columns = useMemo(
     () => createColumns(onEdit, handleDeleteClick, onToggleStatus),
     [onEdit, onToggleStatus]
   )
 
-  // Sort banners by rank
-  const sortedBanners = useMemo(
-    () => [...banners].sort((a, b) => a.rank - b.rank),
-    [banners]
+  const sortedItems = useMemo(
+    () => [...items].sort((a, b) => a.rank - b.rank),
+    [items]
   )
 
-  // Empty state
-  if (banners.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground">
-          No banners found
-        </h3>
+        <h3 className="text-lg font-medium text-muted-foreground">No muse items found</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Click &quot;Add Banner&quot; to create your first banner
+          Click &quot;Add Muse&quot; to create your first item
         </p>
       </div>
     )
@@ -212,18 +200,17 @@ export function HeroDesktopBannerTable({
     <>
       <DataTable
         columns={columns}
-        data={sortedBanners}
+        data={sortedItems}
         showPagination={false}
         showToolbar={false}
       />
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+            <AlertDialogTitle>Delete Muse Item</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this banner? This action cannot be undone.
+              Are you sure you want to delete this item? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

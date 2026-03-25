@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageIcon, Loader2 } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
-import type { HeroDesktopBannerItem } from '@/redux/services/cmsService'
+import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
 
 interface HeroDesktopBannerEditDrawerProps {
   open: boolean

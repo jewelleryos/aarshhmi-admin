@@ -24,21 +24,20 @@ import {
 } from '@/components/ui/alert-dialog'
 import { FolderOpen, MoreVertical, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
 import { getCdnUrl } from '@/utils/cdn'
-import type { HeroDesktopBannerItem } from '@/components/cms/services/cmsService'
+import type { CollectionsItem } from '@/components/cms/services/cmsService'
 
-interface HeroDesktopBannerTableProps {
-  banners: HeroDesktopBannerItem[]
-  onEdit: (banner: HeroDesktopBannerItem) => void
-  onDelete: (bannerId: string) => void
-  onToggleStatus: (bannerId: string) => void
+interface CollectionsTableProps {
+  collections: CollectionsItem[]
+  onEdit: (collection: CollectionsItem) => void
+  onDelete: (collectionId: string) => void
+  onToggleStatus: (collectionId: string) => void
 }
 
-// Create columns
 function createColumns(
-  onEdit: (banner: HeroDesktopBannerItem) => void,
-  onDelete: (bannerId: string) => void,
-  onToggleStatus: (bannerId: string) => void
-): ColumnDef<HeroDesktopBannerItem>[] {
+  onEdit: (collection: CollectionsItem) => void,
+  onDelete: (collectionId: string) => void,
+  onToggleStatus: (collectionId: string) => void
+): ColumnDef<CollectionsItem>[] {
   return [
     {
       accessorKey: 'rank',
@@ -54,11 +53,11 @@ function createColumns(
       accessorKey: 'image_url',
       header: 'Preview',
       cell: ({ row }) => {
-        const banner = row.original
-        const imageUrl = getCdnUrl(banner.image_url)
+        const collection = row.original
+        const imageUrl = getCdnUrl(collection.image_url)
         if (!imageUrl) {
           return (
-            <div className="flex h-12 w-20 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
+            <div className="flex h-12 w-12 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
               No image
             </div>
           )
@@ -66,13 +65,13 @@ function createColumns(
         return (
           <img
             src={imageUrl}
-            alt={banner.image_alt_text || 'Banner'}
-            className="h-12 w-20 rounded object-cover"
+            alt={collection.image_alt_text || 'Collection'}
+            className="h-12 w-12 rounded object-cover"
           />
         )
       },
       enableSorting: false,
-      size: 100,
+      size: 80,
     },
     {
       accessorKey: 'image_alt_text',
@@ -80,9 +79,7 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Alt Text" />
       ),
       cell: ({ row }) => (
-        <span className="text-muted-foreground text-sm max-w-48 truncate block">
-          {row.original.image_alt_text || '-'}
-        </span>
+        <span className="text-sm">{row.original.image_alt_text || '-'}</span>
       ),
       size: 150,
     },
@@ -114,7 +111,7 @@ function createColumns(
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const banner = row.original
+        const collection = row.original
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -123,12 +120,12 @@ function createColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(banner)}>
+              <DropdownMenuItem onClick={() => onEdit(collection)}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onToggleStatus(banner.id)}>
-                {banner.status ? (
+              <DropdownMenuItem onClick={() => onToggleStatus(collection.id)}>
+                {collection.status ? (
                   <>
                     <ToggleLeft className="mr-2 h-4 w-4" />
                     Deactivate
@@ -143,7 +140,7 @@ function createColumns(
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={() => onDelete(banner.id)}
+                onClick={() => onDelete(collection.id)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -159,50 +156,47 @@ function createColumns(
   ]
 }
 
-export function HeroDesktopBannerTable({
-  banners,
+export function CollectionsTable({
+  collections,
   onEdit,
   onDelete,
   onToggleStatus,
-}: HeroDesktopBannerTableProps) {
+}: CollectionsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [bannerToDelete, setBannerToDelete] = useState<string | null>(null)
+  const [collectionToDelete, setCollectionToDelete] = useState<string | null>(null)
 
-  const handleDeleteClick = (bannerId: string) => {
-    setBannerToDelete(bannerId)
+  const handleDeleteClick = (collectionId: string) => {
+    setCollectionToDelete(collectionId)
     setDeleteDialogOpen(true)
   }
 
   const handleDeleteConfirm = () => {
-    if (bannerToDelete) {
-      onDelete(bannerToDelete)
-      setBannerToDelete(null)
+    if (collectionToDelete) {
+      onDelete(collectionToDelete)
+      setCollectionToDelete(null)
       setDeleteDialogOpen(false)
     }
   }
 
-  // Memoize columns with delete handler wrapper
   const columns = useMemo(
     () => createColumns(onEdit, handleDeleteClick, onToggleStatus),
     [onEdit, onToggleStatus]
   )
 
-  // Sort banners by rank
-  const sortedBanners = useMemo(
-    () => [...banners].sort((a, b) => a.rank - b.rank),
-    [banners]
+  const sortedCollections = useMemo(
+    () => [...collections].sort((a, b) => a.rank - b.rank),
+    [collections]
   )
 
-  // Empty state
-  if (banners.length === 0) {
+  if (collections.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
         <h3 className="text-lg font-medium text-muted-foreground">
-          No banners found
+          No collections found
         </h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Click &quot;Add Banner&quot; to create your first banner
+          Click &quot;Add Collection&quot; to create your first entry
         </p>
       </div>
     )
@@ -212,18 +206,17 @@ export function HeroDesktopBannerTable({
     <>
       <DataTable
         columns={columns}
-        data={sortedBanners}
+        data={sortedCollections}
         showPagination={false}
         showToolbar={false}
       />
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+            <AlertDialogTitle>Delete Collection</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this banner? This action cannot be undone.
+              Are you sure you want to delete this collection? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

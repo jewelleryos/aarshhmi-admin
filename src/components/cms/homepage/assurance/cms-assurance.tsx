@@ -1,29 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { AssuranceContentComponent } from './assurance-content'
 
 export function CMSAssurance() {
-    return (
-          <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Assurance</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage homepage assurance section
-          </p>
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Assurance
-        </Button>
-      </div>
-
-      {/* Table */}
-      <Card>
-        <CardContent className="pt-6">
-        </CardContent>
-      </Card>
-    </div>
-    )
+  return <AssuranceContentComponent />
 }
