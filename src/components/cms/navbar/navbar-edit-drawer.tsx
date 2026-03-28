@@ -73,9 +73,10 @@ export function NavbarEditDrawer({
     }
     if (!link.trim()) {
       newErrors.link = 'Link is required'
-    } else if (!link.startsWith('https://')) {
-      newErrors.link = 'Link must start with https://'
-    }
+    } 
+    // else if (!link.startsWith('https://')) {
+    //   newErrors.link = 'Link must start with https://'
+    // }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
