@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { type PromotionalBannerItem, type PromotionalBannerContent, type CmsSection, type ApiResponse } from '../services/cmsService'
+import { type PromotionalBannerItem, type PromotionalBannerContent, type CmsSectionResponse, type ApiResponse } from '../services/cmsService'
 import { PromotionalBannerTable } from './promotional-banner-table'
 import { PromotionalBannerAddDrawer } from './promotional-banner-add-drawer'
 import { PromotionalBannerEditDrawer } from './promotional-banner-edit-drawer'
@@ -13,8 +13,8 @@ import { PromotionalBannerEditDrawer } from './promotional-banner-edit-drawer'
 interface PromotionalBannerContentComponentProps {
   title: string
   description: string
-  getContent: () => Promise<ApiResponse<CmsSection | null>>
-  updateContent: (content: PromotionalBannerContent) => Promise<ApiResponse<CmsSection>>
+  getContent: () => Promise<ApiResponse<CmsSectionResponse | null>>
+  updateContent: (content: PromotionalBannerContent) => Promise<ApiResponse<CmsSectionResponse>>
 }
 
 export function PromotionalBannerContentComponent({
