@@ -24,6 +24,14 @@ import CMSShoppingPolicy from "./policypage/shipping/shipping-policy";
 import CMSPartnerWithUs from "./partnerWithUsPage/partner-with-us";
 import CMSAboutUs from "./aboutUsPage/about-us";
 import { NavbarContentComponent } from "./navbar";
+import CMSJewelleryCareGuide from "./jewelleryCareGuide/jewellery-care-guide";
+import { Banner1 } from "./promotional-banner/Banner1/banner1";
+import { Banner2 } from "./promotional-banner/Banner2/banner2";
+import { Banner3 } from "./promotional-banner/Banner3/banner3";
+import { Banner4 } from "./promotional-banner/Banner4/banner4";
+import { Banner5 } from "./promotional-banner/Banner5/banner5";
+import { ProductListDetailsComponent } from "./product-list-details/product-list-details";
+import { cmsService } from "./services/cmsService";
 
 export function CMSContent() {
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set([]));
@@ -116,7 +124,7 @@ export function CMSContent() {
             activeSection === "muse" ? <CMSMuse /> :
             activeSection === "assurance" ? <CMSAssurance /> :
             activeSection === "instagram" ? <CMSInstagram /> :
-            activeSection === "experience" ? <CMSExperience /> :      
+            activeSection === "experience" ? <CMSExperience /> :
             activeSection === "privacy-policy" ? <CMSPrivacyPolicy/> :
             activeSection === "lifetime-exchange-buyback-policy" ?    <CMSLifetimeExchangeBuybackPolicy/> :
             activeSection === "return-refund-exchange-policy" ? <CMSReturnRefundPolicy/> :
@@ -124,6 +132,13 @@ export function CMSContent() {
             activeSection === "shipping-policy" ? <CMSShoppingPolicy/> :
             activeSection === "partner-with-us" ? <CMSPartnerWithUs/> :
             activeSection === "about-us" ? <CMSAboutUs/> :
+            activeSection === "jewellery-care-guide" ? <CMSJewelleryCareGuide/> :
+            activeSection === "promotional-banner-1" ? <Banner1/> :
+            activeSection === "promotional-banner-2" ? <Banner2/> :
+            activeSection === "promotional-banner-3" ? <Banner3/> :
+            activeSection === "promotional-banner-4" ? <Banner4/> :
+            activeSection === "promotional-banner-5" ? <Banner5/> :
+            activeSection === "product-list-details" ? <ProductListDetailsComponent title="Product List Details" description="Manage product list details content" getContent={() => cmsService.getProductListDetails()} updateContent={(content) => cmsService.updateProductListDetails(content)}/> :
             <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-semibold text-muted-foreground">Coming Soon</h1>

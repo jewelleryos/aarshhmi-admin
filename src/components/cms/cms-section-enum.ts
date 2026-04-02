@@ -24,6 +24,22 @@ export const cmsSections: CMSSection[] = [
         ],
     },
     {
+        id: "promotional-banners",
+        label: "Promotional Banners",
+        children: [
+            { id: "promotional-banner-1", label: "Banner 1", children: [] },
+            { id: "promotional-banner-2", label: "Banner 2", children: [] },
+            { id: "promotional-banner-3", label: "Banner 3", children: [] },
+            { id: "promotional-banner-4", label: "Banner 4", children: [] },
+            { id: "promotional-banner-5", label: "Banner 5", children: [] },
+        ],
+    },
+    {
+        id: "product-list-details",
+        label: "Product List Details",
+        children: [],
+    },
+    {
         id: "policy-pages",
         label:"Policy Pages",
         children:[
@@ -33,7 +49,7 @@ export const cmsSections: CMSSection[] = [
             { id: "terms-conditions", label: "Terms & Conditions", children:[]},
             { id: "shipping-policy", label: "Shipping Policy", children:[]},
         ]
-    }, 
+    },
     {
         id: "partner-with-us",
         label: "Partner With Us",
@@ -44,5 +60,10 @@ export const cmsSections: CMSSection[] = [
         label: "About Us",
         children:[]
     },
-    
+    {
+        id: "jewellery-care-guide",
+        label: "Jewellery Care Guide",
+        children:[]
+    },
+
 ]

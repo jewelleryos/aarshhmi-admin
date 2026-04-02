@@ -248,6 +248,54 @@ export interface AboutUsContent {
   section6: AboutUsSection6
 }
 
+// Types - Jewellery Care Guide
+export interface JewelleryCareGuideSection2To5Item {
+  image_url: string
+  image_alt_text: string
+  title: string
+  description: string[]
+}
+
+export interface JewelleryCareGuideSection6Item {
+  image_url: string
+  image_alt_text: string
+  title: string
+  description: string[]
+  sub_title: string
+}
+
+export interface JewelleryCareGuideSection7Item {
+  image_url: string
+  image_alt_text: string
+  redirect_url: string
+}
+
+export interface JewelleryCareGuideSection9Item {
+  image_url: string
+  image_alt_text: string
+  title: string
+  description: string[]
+  sub_title: string
+}
+
+export interface JewelleryCareGuideContent {
+  section1: {
+    title: string
+    description: string
+  }
+  section2: JewelleryCareGuideSection2To5Item[]
+  section3: JewelleryCareGuideSection2To5Item[]
+  section4: JewelleryCareGuideSection2To5Item[]
+  section5: JewelleryCareGuideSection2To5Item[]
+  section6: JewelleryCareGuideSection6Item[]
+  section7: JewelleryCareGuideSection7Item[]
+  section8: {
+    title: string
+    description: string
+  }
+  section9: JewelleryCareGuideSection9Item[]
+}
+
 // Types - Navbar
 export interface FilterChild {
   id: string
@@ -569,4 +617,127 @@ export const cmsService = {
     const response = await apiService.put(API_ENDPOINTS.CMS.ABOUT_US, { content })
     return response.data
   },
+
+  // Jewellery Care Guide
+  getJewelleryCareGuide: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.JEWELLERY_CARE_GUIDE)
+    return response.data
+  },
+
+  updateJewelleryCareGuide: async (
+    content: JewelleryCareGuideContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.JEWELLERY_CARE_GUIDE, { content })
+    return response.data
+  },
+
+  // Promotional Banner 1
+  getBanner1: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_1)
+    return response.data
+  },
+
+  updateBanner1: async (
+    content: PromotionalBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_1, { content })
+    return response.data
+  },
+
+  // Promotional Banner 2
+  getBanner2: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_2)
+    return response.data
+  },
+
+  updateBanner2: async (
+    content: PromotionalBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_2, { content })
+    return response.data
+  },
+
+  // Promotional Banner 3
+  getBanner3: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_3)
+    return response.data
+  },
+
+  updateBanner3: async (
+    content: PromotionalBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_3, { content })
+    return response.data
+  },
+
+  // Promotional Banner 4
+  getBanner4: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_4)
+    return response.data
+  },
+
+  updateBanner4: async (
+    content: PromotionalBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_4, { content })
+    return response.data
+  },
+
+  // Promotional Banner 5
+  getBanner5: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_5)
+    return response.data
+  },
+
+  updateBanner5: async (
+    content: PromotionalBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_5, { content })
+    return response.data
+  },
+
+  // Product List Details
+  getProductListDetails: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_LIST_DETAILS)
+    return response.data
+  },
+
+  updateProductListDetails: async (
+    content: ProductListDetailsContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_DETAILS, { content })
+    return response.data
+  },
+}
+
+// Types - Promotional Banner
+export interface PromotionalBannerItem {
+  id: string
+  image_url: string
+  image_alt_text: string
+  redirect_url: string
+  // title: string
+  // subtitle: string
+  // button_text: string
+  // button_redirect_url: string
+  rank: number
+  status: boolean
+}
+
+export interface PromotionalBannerContent {
+  items: PromotionalBannerItem[]
+}
+
+// Types - Product List Details
+export interface ProductListImage {
+  image_url: string
+  image_alt_text: string
+}
+
+export interface ProductListDetailsContent {
+  title1: string
+  description1: string
+  title2: string
+  description2: string
+  images: ProductListImage[]
 }

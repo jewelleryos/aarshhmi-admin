@@ -381,6 +381,15 @@ const API_ENDPOINTS = {
     },
     PARTNER_WITH_US: '/api/cms/partner-with-us',
     ABOUT_US: '/api/cms/about-us',
+    JEWELLERY_CARE_GUIDE: '/api/cms/jewellery-care-guide',
+    PROMOTIONAL_BANNERS: {
+      BANNER_1: '/api/cms/promotional-banners/banner-1',
+      BANNER_2: '/api/cms/promotional-banners/banner-2',
+      BANNER_3: '/api/cms/promotional-banners/banner-3',
+      BANNER_4: '/api/cms/promotional-banners/banner-4',
+      BANNER_5: '/api/cms/promotional-banners/banner-5',
+    },
+    PRODUCT_LIST_DETAILS: '/api/cms/product-list-details',
   },
 
   // Coupon endpoints
