@@ -114,6 +114,14 @@ export interface CategoryDropdownItem {
   parent_id: string | null
 }
 
+// Category for filter (includes product count)
+export interface CategoryForFilter {
+  id: string
+  name: string
+  parent_id: string | null
+  product_count: number
+}
+
 // Tag Group dropdown item for product
 export interface TagGroupDropdownItem {
   id: string
@@ -249,6 +257,15 @@ interface DropdownResponse<T> {
   message: string
   data: {
     items: T[]
+  }
+}
+
+// Categories for filter response
+interface CategoriesForFilterResponse {
+  success: boolean
+  message: string
+  data: {
+    items: CategoryForFilter[]
   }
 }
 
@@ -497,8 +514,17 @@ interface UpdateVariantStockResponse {
 // Product service with API calls
 const productService = {
   // Get all products for listing
-  getList: async (): Promise<ProductListResponse> => {
-    const response = await apiService.get(API_ENDPOINTS.PRODUCT.LIST)
+  getList: async (categoryIds?: string[]): Promise<ProductListResponse> => {
+    const params = categoryIds && categoryIds.length > 0 
+      ? { categoryIds: categoryIds.join(',') } 
+      : {}
+    const response = await apiService.get(API_ENDPOINTS.PRODUCT.LIST, { params })
+    return response.data
+  },
+
+  // Get categories for admin products filter with product counts
+  getForProductsFilter: async (): Promise<CategoriesForFilterResponse> => {
+    const response = await apiService.get(API_ENDPOINTS.PRODUCT.CATEGORIES_FOR_FILTER)
     return response.data
   },
 

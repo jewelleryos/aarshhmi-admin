@@ -62,6 +62,18 @@ export interface DataTableProps<TData, TValue> {
 
   // Pagination left label (e.g., "Total: 50 reviews")
   totalLabel?: string
+
+  // Custom filter component (e.g., category filter)
+  filterComponent?: React.ReactNode
+
+  // Callback for resetting custom filters
+  onResetFilters?: () => void
+
+  // Whether a custom filter is active (e.g., category filter has a value)
+  hasCustomFilter?: boolean
+
+  // Callback for filtered row count
+  onFilteredCountChange?: (count: number) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -81,6 +93,10 @@ export function DataTable<TData, TValue>({
   showColumnVisibility = true,
   maxHeight,
   totalLabel,
+  filterComponent,
+  onResetFilters,
+  hasCustomFilter = false,
+  onFilteredCountChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -154,6 +170,15 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  // Track filtered row count and emit to parent
+  const filteredRowCount = table.getFilteredRowModel().rows.length
+
+  React.useEffect(() => {
+    if (onFilteredCountChange) {
+      onFilteredCountChange(filteredRowCount)
+    }
+  }, [filteredRowCount, onFilteredCountChange])
+
   return (
     <div className="w-full space-y-4">
       {showToolbar && (
@@ -162,6 +187,9 @@ export function DataTable<TData, TValue>({
           searchKey={searchKey}
           searchPlaceholder={searchPlaceholder}
           showColumnVisibility={showColumnVisibility}
+          filterComponent={filterComponent}
+          onResetFilters={onResetFilters}
+          hasCustomFilter={hasCustomFilter}
         />
       )}
       <div

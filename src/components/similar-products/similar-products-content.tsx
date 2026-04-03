@@ -93,6 +93,7 @@ export function SimilarProductsContent() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [drawerProduct, setDrawerProduct] = useState<SimilarProductListItem | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [filteredCount, setFilteredCount] = useState<number>(0)
 
   const { has } = usePermissions()
   const canView = has(PERMISSIONS.SIMILAR_PRODUCTS.READ)
@@ -103,6 +104,7 @@ export function SimilarProductsContent() {
       setIsLoading(true)
       const response = await similarProductsService.listProducts({ limit: 1000 })
       setProducts(response.data.items)
+      setFilteredCount(response.data.items.length)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to fetch products')
@@ -180,6 +182,10 @@ export function SimilarProductsContent() {
               data={products}
               searchKey="name"
               searchPlaceholder="Search by name or SKU..."
+              showPagination={true}
+              maxHeight="400px"
+              totalLabel={`Showing: ${filteredCount} product${filteredCount !== 1 ? 's' : ''}`}
+              onFilteredCountChange={setFilteredCount}
             />
           )}
         </CardContent>

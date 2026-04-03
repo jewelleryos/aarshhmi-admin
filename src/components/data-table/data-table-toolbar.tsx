@@ -19,6 +19,9 @@ interface DataTableToolbarProps<TData> {
   searchKey?: string
   searchPlaceholder?: string
   showColumnVisibility?: boolean
+  filterComponent?: React.ReactNode
+  onResetFilters?: () => void
+  hasCustomFilter?: boolean
 }
 
 export function DataTableToolbar<TData>({
@@ -26,12 +29,24 @@ export function DataTableToolbar<TData>({
   searchKey,
   searchPlaceholder = "Search...",
   showColumnVisibility = true,
+  filterComponent,
+  onResetFilters,
+  hasCustomFilter = false,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+  const showReset = isFiltered || hasCustomFilter
+
+  const handleReset = () => {
+    if (onResetFilters) {
+      onResetFilters()
+    }
+    table.resetColumnFilters()
+  }
 
   return (
-    <div className="flex items-center justify-between py-4">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex items-center justify-between py-4 gap-4">
+      <div className="flex flex-1 items-center space-x-2 flex-wrap gap-2">
+
         {searchKey && (
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -47,10 +62,11 @@ export function DataTableToolbar<TData>({
             />
           </div>
         )}
-        {isFiltered && (
+        {filterComponent}
+        {showReset && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={handleReset}
             className="h-8 px-2 lg:px-3"
           >
             Reset

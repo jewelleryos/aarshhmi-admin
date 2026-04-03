@@ -276,6 +276,7 @@ const API_ENDPOINTS = {
     UPDATE_MEDIA: (id: string) => `/api/products/${id}/media`,
     UPDATE_OPTIONS: (id: string) => `/api/products/${id}/options`,
     FOR_PRICING_RULE: '/api/products/for-pricing-rule',
+    CATEGORIES_FOR_FILTER: '/api/products/categories-for-filter',
     SIZE_CHART_GROUPS: '/api/size-chart-groups/for-product',
     SIZE_CHART_GROUPS_FOR_EDIT: '/api/size-chart-groups/for-product-edit',
     METAL_TYPES: '/api/metal-types/for-product',

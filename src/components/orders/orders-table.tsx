@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
@@ -27,6 +27,12 @@ interface OrdersTableProps {
 
 export function OrdersTable({ items }: OrdersTableProps) {
   const router = useRouter()
+  const [filteredCount, setFilteredCount] = useState<number>(0)
+
+  // Update filtered count when items change
+  useEffect(() => {
+    setFilteredCount(items.length)
+  }, [items])
 
   const columns = useMemo<ColumnDef<OrderListItem>[]>(() => [
     {
@@ -185,6 +191,9 @@ export function OrdersTable({ items }: OrdersTableProps) {
       searchPlaceholder="Search by order number..."
       showPagination={true}
       showToolbar={true}
+      maxHeight="400px"
+      totalLabel={`Showing: ${filteredCount} order${filteredCount !== 1 ? 's' : ''}`}
+      onFilteredCountChange={setFilteredCount}
     />
   )
 }
