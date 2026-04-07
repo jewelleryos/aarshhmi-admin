@@ -7,7 +7,8 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { CMSProductRange } from "./homepage/product-range/cms-product-range";
 import { CMSAssurance } from "./homepage/assurance/cms-assurance";
 import { cmsSections } from "./cms-section-enum";
-import { CMSHeroDesktopBanner } from "./homepage/hero-desktop-banner/cms-hero-desktop-banner";
+import { CMSHeroDesktopBanner } from "./homepage/hero-desktop-banner/cms-hero-desktop-banner"
+import { CMSHeroMobileBanner } from "./homepage/hero-mobile-banner/cms-hero-mobile-banner";
 import { CMSShopFromBestsellers } from "./homepage/bestsellers/cms-shop-from-bestsellers";
 import { CMSShopByShape } from "./homepage/shop-by-shape/cms-shop-by-shape";
 import { CMSCollections } from "./homepage/collections/cms-collections";
@@ -115,6 +116,7 @@ export function CMSContent() {
         {
             activeSection === "navbar" ? <NavbarContentComponent/> :
             activeSection === "hero-desktop-banner" ? <CMSHeroDesktopBanner /> :
+            activeSection === "hero-mobile-banner" ? <CMSHeroMobileBanner /> :
             activeSection === "product-range" ? <CMSProductRange /> :
             activeSection === "shop-from-bestsellers" ? <CMSShopFromBestsellers /> :
             activeSection === "shop-by-shape" ? <CMSShopByShape /> :

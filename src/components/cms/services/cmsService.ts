@@ -15,6 +15,20 @@ export interface HeroDesktopBannerContent {
   banners: HeroDesktopBannerItem[]
 }
 
+// Types - Hero Mobile Banner
+export interface HeroMobileBannerItem {
+  id: string
+  image_url: string
+  image_alt_text: string
+  redirect_url: string
+  rank: number
+  status: boolean
+}
+
+export interface HeroMobileBannerContent {
+  banners: HeroMobileBannerItem[]
+}
+
 // Types - Product Range (Shop by Category)
 export interface ProductRangeItem {
   id: string
@@ -388,6 +402,19 @@ export const cmsService = {
     content: HeroDesktopBannerContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
     const response = await apiService.put(API_ENDPOINTS.CMS.HOMEPAGE.HERO_DESKTOP_BANNER, { content })
+    return response.data
+  },
+
+  // Hero Mobile Banner
+  getHeroMobileBanners: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.HOMEPAGE.HERO_MOBILE_BANNER)
+    return response.data
+  },
+
+  updateHeroMobileBanners: async (
+    content: HeroMobileBannerContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.HOMEPAGE.HERO_MOBILE_BANNER, { content })
     return response.data
   },
 

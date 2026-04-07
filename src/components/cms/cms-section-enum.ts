@@ -11,6 +11,7 @@ export const cmsSections: CMSSection[] = [
         label: 'Homepage',
         children: [
             { id: 'hero-desktop-banner', label: 'Hero Desktop Banner', children: [] },
+            { id: 'hero-mobile-banner', label: 'Hero Mobile Banner', children: [] },
             { id: 'product-range', label: 'Product Range', children: [] },
             { id: "shop-from-bestsellers", label:"Shop From Our Bestsellers", children:[]},
             { id: "shop-by-shape", label:"Shop by Shape", children:[]},

@@ -361,6 +361,7 @@ const API_ENDPOINTS = {
     NAVBAR: '/api/cms/navbar',
     HOMEPAGE: {
       HERO_DESKTOP_BANNER: '/api/cms/homepage/hero-desktop-banner',
+      HERO_MOBILE_BANNER: '/api/cms/homepage/hero-mobile-banner',
       PRODUCT_RANGE: '/api/cms/homepage/product-range',
       SHOP_FROM_BESTSELLERS: '/api/cms/homepage/shop-from-bestsellers',
       PRODUCTS_FOR_SELECTION: '/api/cms/products-for-selection',
