@@ -15,6 +15,7 @@ const createDefaultSectionOne = (): GiftSectionItem[] =>
     id: `gift_1_${i + 1}`,
     image_url: '',
     image_alt_text: '',
+    redirect_url: '',
   }))
 
 const createDefaultSectionTwo = (): GiftSectionItem[] =>
@@ -22,10 +23,11 @@ const createDefaultSectionTwo = (): GiftSectionItem[] =>
     id: `gift_2_${i + 1}`,
     image_url: '',
     image_alt_text: '',
+    redirect_url: '',
   }))
 
 interface GiftSectionErrors {
-  [key: number]: { image_url?: string; image_alt_text?: string }
+  [key: number]: { image_url?: string; image_alt_text?: string; redirect_url?: string }
 }
 
 export function CMSGiftGuide() {
@@ -100,12 +102,14 @@ export function CMSGiftGuide() {
   const validateSectionItems = (items: GiftSectionItem[]): GiftSectionErrors => {
     const sectionErrors: GiftSectionErrors = {}
     items.forEach((item, index) => {
-      const itemErrors: { image_url?: string; image_alt_text?: string } = {}
+      const itemErrors: { image_url?: string; image_alt_text?: string; redirect_url?: string } = {}
       if (!item.image_url) {
         itemErrors.image_url = 'Image is required'
       }
-      if (!item.image_alt_text) {
-        itemErrors.image_alt_text = 'Alt text is required'
+      if (!item.redirect_url) {
+        itemErrors.redirect_url = 'Redirect URL is required'
+      } else if (!/^https?:\/\/.+/.test(item.redirect_url)) {
+        itemErrors.redirect_url = 'Must be a valid URL starting with http:// or https://'
       }
       if (Object.keys(itemErrors).length > 0) {
         sectionErrors[index] = itemErrors
@@ -293,18 +297,30 @@ export function CMSGiftGuide() {
                 />
 
                 <div className="space-y-2">
-                  <Label htmlFor={`s1_alt_${index}`}>
-                    Alt Text <span className="text-destructive">*</span>
+                  <Label htmlFor={`s1_redirect_${index}`}>
+                    Redirect URL <span className="text-destructive">*</span>
                   </Label>
+                  <Input
+                    id={`s1_redirect_${index}`}
+                    placeholder="https://example.com/gift"
+                    value={item.redirect_url}
+                    onChange={(e) => updateSectionItem('one', index, 'redirect_url', e.target.value)}
+                  />
+                  {errors.gift_section_one?.[index]?.redirect_url ? (
+                    <p className="text-sm text-destructive">{errors.gift_section_one[index].redirect_url}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Full URL with https</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`s1_alt_${index}`}>Alt Text</Label>
                   <Input
                     id={`s1_alt_${index}`}
                     placeholder="Image description"
                     value={item.image_alt_text}
                     onChange={(e) => updateSectionItem('one', index, 'image_alt_text', e.target.value)}
                   />
-                  {errors.gift_section_one?.[index]?.image_alt_text && (
-                    <p className="text-sm text-destructive">{errors.gift_section_one[index].image_alt_text}</p>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -333,18 +349,30 @@ export function CMSGiftGuide() {
                 />
 
                 <div className="space-y-2">
-                  <Label htmlFor={`s2_alt_${index}`}>
-                    Alt Text <span className="text-destructive">*</span>
+                  <Label htmlFor={`s2_redirect_${index}`}>
+                    Redirect URL <span className="text-destructive">*</span>
                   </Label>
+                  <Input
+                    id={`s2_redirect_${index}`}
+                    placeholder="https://example.com/gift"
+                    value={item.redirect_url}
+                    onChange={(e) => updateSectionItem('two', index, 'redirect_url', e.target.value)}
+                  />
+                  {errors.gift_section_two?.[index]?.redirect_url ? (
+                    <p className="text-sm text-destructive">{errors.gift_section_two[index].redirect_url}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Full URL with https</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`s2_alt_${index}`}>Alt Text</Label>
                   <Input
                     id={`s2_alt_${index}`}
                     placeholder="Image description"
                     value={item.image_alt_text}
                     onChange={(e) => updateSectionItem('two', index, 'image_alt_text', e.target.value)}
                   />
-                  {errors.gift_section_two?.[index]?.image_alt_text && (
-                    <p className="text-sm text-destructive">{errors.gift_section_two[index].image_alt_text}</p>
-                  )}
                 </div>
               </CardContent>
             </Card>

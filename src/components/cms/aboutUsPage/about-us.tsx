@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Plus, Save, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     cmsService,
@@ -70,7 +70,7 @@ const defaultSection6: AboutUsSection6 = {
 }
 
 const createDefaultSection2 = (): AboutUsSection2Item[] =>
-    Array.from({ length: 3 }, () => ({ ...defaultSection2Item }))
+    Array.from({ length: 1 }, () => ({ ...defaultSection2Item }))
 
 const createDefaultSection3 = (): AboutUsSection3 => ({
     title: '',
@@ -108,7 +108,7 @@ export default function CMSAboutUs() {
             const content = response.data?.content as AboutUsContent | undefined
             if (content) {
                 if (content.section1) setSection1({ ...defaultSection1, ...content.section1 })
-                if (content.section2 && content.section2.length === 3) {
+                if (content.section2 && content.section2.length > 0) {
                     setSection2(content.section2.map((item) => ({ ...defaultSection2Item, ...item })))
                 }
                 if (content.section3 && content.section3.sub_sections?.length === 2) {
@@ -146,14 +146,12 @@ export default function CMSAboutUs() {
         if (!section1.name) newErrors['s1_name'] = 'Name is required'
         if (!section1.designation) newErrors['s1_designation'] = 'Designation is required'
         if (!section1.image_url) newErrors['s1_image_url'] = 'Image is required'
-        if (!section1.image_alt_text) newErrors['s1_image_alt_text'] = 'Image alt text is required'
 
         // Section 2 validation
         section2.forEach((item, i) => {
             if (!item.title) newErrors[`s2_${i}_title`] = 'Title is required'
             if (!item.description) newErrors[`s2_${i}_description`] = 'Description is required'
             if (!item.image_url) newErrors[`s2_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s2_${i}_image_alt_text`] = 'Image alt text is required'
         })
 
         // Section 3 validation
@@ -162,7 +160,6 @@ export default function CMSAboutUs() {
             if (!item.sub_title) newErrors[`s3_sub_${i}_sub_title`] = 'Sub title is required'
             if (!item.description) newErrors[`s3_sub_${i}_description`] = 'Description is required'
             if (!item.image_url) newErrors[`s3_sub_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s3_sub_${i}_image_alt_text`] = 'Image alt text is required'
         })
 
         // Section 4 validation
@@ -171,7 +168,6 @@ export default function CMSAboutUs() {
             if (!item.sub_title) newErrors[`s4_sub_${i}_sub_title`] = 'Sub title is required'
             if (!item.description) newErrors[`s4_sub_${i}_description`] = 'Description is required'
             if (!item.image_url) newErrors[`s4_sub_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s4_sub_${i}_image_alt_text`] = 'Image alt text is required'
         })
 
         // Section 5 validation
@@ -180,7 +176,6 @@ export default function CMSAboutUs() {
             if (!item.description1) newErrors[`s5_${i}_description1`] = 'Description 1 is required'
             if (!item.description2) newErrors[`s5_${i}_description2`] = 'Description 2 is required'
             if (!item.image_url) newErrors[`s5_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s5_${i}_image_alt_text`] = 'Image alt text is required'
         })
 
         // Section 6 validation
@@ -188,10 +183,13 @@ export default function CMSAboutUs() {
         if (!section6.description1) newErrors['s6_description1'] = 'Description 1 is required'
         if (!section6.description2) newErrors['s6_description2'] = 'Description 2 is required'
         if (!section6.image_url) newErrors['s6_image_url'] = 'Image is required'
-        if (!section6.image_alt_text) newErrors['s6_image_alt_text'] = 'Image alt text is required'
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors)
+            setTimeout(() => {
+                const firstError = document.querySelector('p.text-destructive')
+                firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }, 0)
             return
         }
 
@@ -219,6 +217,14 @@ export default function CMSAboutUs() {
     // Helper to update section2 array items
     const updateSection2 = (index: number, field: keyof AboutUsSection2Item, value: string) => {
         setSection2((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+    }
+
+    const addSection2Item = () => {
+        setSection2((prev) => [...prev, { ...defaultSection2Item }])
+    }
+
+    const removeSection2Item = (index: number) => {
+        setSection2((prev) => prev.filter((_, i) => i !== index))
     }
 
     // Helper to update section3 sub_sections
@@ -357,19 +363,13 @@ export default function CMSAboutUs() {
                         />
 
                         <div className="space-y-2">
-                            <Label htmlFor="s1_image_alt_text">
-                                Image Alt Text <span className="text-destructive">*</span>
-                            </Label>
+                            <Label htmlFor="s1_image_alt_text">Image Alt Text</Label>
                             <Input
                                 id="s1_image_alt_text"
                                 placeholder="Describe the founder image"
                                 value={section1.image_alt_text}
-                                onChange={(e) => {
-                                    setSection1((prev) => ({ ...prev, image_alt_text: e.target.value }))
-                                    clearError('s1_image_alt_text')
-                                }}
+                                onChange={(e) => setSection1((prev) => ({ ...prev, image_alt_text: e.target.value }))}
                             />
-                            {errors.s1_image_alt_text && <p className="text-sm text-destructive">{errors.s1_image_alt_text}</p>}
                         </div>
 
                         <div className="space-y-2">
@@ -407,14 +407,33 @@ export default function CMSAboutUs() {
                 </Card>
             </div>
 
-            {/* Section 2 - Timeline (3 Fixed) */}
+            {/* Section 2 - Timeline (Dynamic) */}
             <div>
-                <h2 className="text-lg font-semibold mb-4">Section 2 - Timeline (3 Fixed)</h2>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold">Section 2 - Timeline</h2>
+                    <Button type="button" variant="outline" size="sm" onClick={addSection2Item}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Timeline Item
+                    </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {section2.map((item, index) => (
                         <Card key={index}>
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-base">Timeline Item {index + 1}</CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-base">Timeline Item {index + 1}</CardTitle>
+                                    {section2.length > 1 && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive hover:text-destructive"
+                                            onClick={() => removeSection2Item(index)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
@@ -462,18 +481,14 @@ export default function CMSAboutUs() {
                                 />
 
                                 <div className="space-y-2">
-                                    <Label>
-                                        Image Alt Text <span className="text-destructive">*</span>
-                                    </Label>
+                                    <Label>Image Alt Text</Label>
                                     <Input
                                         placeholder="Describe the image"
                                         value={item.image_alt_text}
                                         onChange={(e) => {
                                             updateSection2(index, 'image_alt_text', e.target.value)
-                                            clearError(`s2_${index}_image_alt_text`)
                                         }}
                                     />
-                                    {errors[`s2_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s2_${index}_image_alt_text`]}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -555,18 +570,12 @@ export default function CMSAboutUs() {
                                 />
 
                                 <div className="space-y-2">
-                                    <Label>
-                                        Image Alt Text <span className="text-destructive">*</span>
-                                    </Label>
+                                    <Label>Image Alt Text</Label>
                                     <Input
                                         placeholder="Describe the image"
                                         value={item.image_alt_text}
-                                        onChange={(e) => {
-                                            updateSection3SubSection(index, 'image_alt_text', e.target.value)
-                                            clearError(`s3_sub_${index}_image_alt_text`)
-                                        }}
+                                        onChange={(e) => updateSection3SubSection(index, 'image_alt_text', e.target.value)}
                                     />
-                                    {errors[`s3_sub_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s3_sub_${index}_image_alt_text`]}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -648,18 +657,12 @@ export default function CMSAboutUs() {
                                 />
 
                                 <div className="space-y-2">
-                                    <Label>
-                                        Image Alt Text <span className="text-destructive">*</span>
-                                    </Label>
+                                    <Label>Image Alt Text</Label>
                                     <Input
                                         placeholder="Describe the image"
                                         value={item.image_alt_text}
-                                        onChange={(e) => {
-                                            updateSection4SubSection(index, 'image_alt_text', e.target.value)
-                                            clearError(`s4_sub_${index}_image_alt_text`)
-                                        }}
+                                        onChange={(e) => updateSection4SubSection(index, 'image_alt_text', e.target.value)}
                                     />
-                                    {errors[`s4_sub_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s4_sub_${index}_image_alt_text`]}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -738,18 +741,12 @@ export default function CMSAboutUs() {
                                 />
 
                                 <div className="space-y-2">
-                                    <Label>
-                                        Image Alt Text <span className="text-destructive">*</span>
-                                    </Label>
+                                    <Label>Image Alt Text</Label>
                                     <Input
                                         placeholder="Describe the image"
                                         value={item.image_alt_text}
-                                        onChange={(e) => {
-                                            updateSection5(index, 'image_alt_text', e.target.value)
-                                            clearError(`s5_${index}_image_alt_text`)
-                                        }}
+                                        onChange={(e) => updateSection5(index, 'image_alt_text', e.target.value)}
                                     />
-                                    {errors[`s5_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s5_${index}_image_alt_text`]}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -827,19 +824,13 @@ export default function CMSAboutUs() {
                     />
 
                     <div className="space-y-2">
-                        <Label htmlFor="s6_image_alt_text">
-                            Image Alt Text <span className="text-destructive">*</span>
-                        </Label>
+                        <Label htmlFor="s6_image_alt_text">Image Alt Text</Label>
                         <Input
                             id="s6_image_alt_text"
                             placeholder="Describe the image"
                             value={section6.image_alt_text}
-                            onChange={(e) => {
-                                setSection6((prev) => ({ ...prev, image_alt_text: e.target.value }))
-                                clearError('s6_image_alt_text')
-                            }}
+                            onChange={(e) => setSection6((prev) => ({ ...prev, image_alt_text: e.target.value }))}
                         />
-                        {errors.s6_image_alt_text && <p className="text-sm text-destructive">{errors.s6_image_alt_text}</p>}
                     </div>
                 </CardContent>
             </Card>

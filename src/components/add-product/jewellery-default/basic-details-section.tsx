@@ -173,9 +173,7 @@ export function BasicDetailsSection({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Width */}
           <div className="space-y-2">
-            <Label htmlFor="width">
-              Width (mm) <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="width">Width (mm)</Label>
             <Input
               id="width"
               type="number"
@@ -185,16 +183,11 @@ export function BasicDetailsSection({
               min="0"
               step="0.01"
             />
-            {errors.width && (
-              <p className="text-sm text-destructive">{errors.width}</p>
-            )}
           </div>
 
           {/* Height */}
           <div className="space-y-2">
-            <Label htmlFor="height">
-              Height (mm) <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="height">Height (mm)</Label>
             <Input
               id="height"
               type="number"
@@ -204,16 +197,11 @@ export function BasicDetailsSection({
               min="0"
               step="0.01"
             />
-            {errors.height && (
-              <p className="text-sm text-destructive">{errors.height}</p>
-            )}
           </div>
 
           {/* Length */}
           <div className="space-y-2">
-            <Label htmlFor="length">
-              Length (mm) <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="length">Length (mm)</Label>
             <Input
               id="length"
               type="number"
@@ -223,9 +211,6 @@ export function BasicDetailsSection({
               min="0"
               step="0.01"
             />
-            {errors.length && (
-              <p className="text-sm text-destructive">{errors.length}</p>
-            )}
           </div>
         </div>
 

@@ -213,10 +213,13 @@ export function VariantsSection({
     gemstoneColors,
   ])
 
-  // Set first variant as default when variants change and no default is set
+  // Set first variant as default when variants change or current default is no longer valid
   useEffect(() => {
-    if (variants.length > 0 && defaultVariantId === null) {
-      onDefaultVariantChange(variants[0].id)
+    if (variants.length > 0) {
+      const isCurrentDefaultValid = variants.some((v) => v.id === defaultVariantId)
+      if (!isCurrentDefaultValid) {
+        onDefaultVariantChange(variants[0].id)
+      }
     }
   }, [variants, defaultVariantId, onDefaultVariantChange])
 

@@ -161,7 +161,6 @@ export default function CMSJewelleryCareGuide() {
             if (!section) return
             section.forEach((item:any, i:number) => {
                 if (!item.image_url) newErrors[`s${sIdx + 2}_${i}_image_url`] = 'Image is required'
-                if (!item.image_alt_text) newErrors[`s${sIdx + 2}_${i}_image_alt_text`] = 'Image alt text is required'
                 if (!item.title) newErrors[`s${sIdx + 2}_${i}_title`] = 'Title is required'
                 if (!item.description || item.description.length === 0 || !item.description[0]) {
                     newErrors[`s${sIdx + 2}_${i}_description`] = 'At least one description item is required'
@@ -172,7 +171,6 @@ export default function CMSJewelleryCareGuide() {
         // Section 6 validation
         section6.forEach((item, i) => {
             if (!item.image_url) newErrors[`s6_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s6_${i}_image_alt_text`] = 'Image alt text is required'
             if (!item.title) newErrors[`s6_${i}_title`] = 'Title is required'
             if (!item.sub_title) newErrors[`s6_${i}_sub_title`] = 'Sub title is required'
             if (!item.description || item.description.length === 0 || !item.description[0]) {
@@ -183,7 +181,6 @@ export default function CMSJewelleryCareGuide() {
         // Section 7 validation
         section7.forEach((item, i) => {
             if (!item.image_url) newErrors[`s7_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s7_${i}_image_alt_text`] = 'Image alt text is required'
             if (!item.redirect_url) newErrors[`s7_${i}_redirect_url`] = 'Redirect URL is required'
         })
 
@@ -194,7 +191,6 @@ export default function CMSJewelleryCareGuide() {
         // Section 9 validation
         section9.forEach((item, i) => {
             if (!item.image_url) newErrors[`s9_${i}_image_url`] = 'Image is required'
-            if (!item.image_alt_text) newErrors[`s9_${i}_image_alt_text`] = 'Image alt text is required'
             if (!item.title) newErrors[`s9_${i}_title`] = 'Title is required'
             if (!item.sub_title) newErrors[`s9_${i}_sub_title`] = 'Sub title is required'
             if (!item.description || item.description.length === 0 || !item.description[0]) {
@@ -204,6 +200,10 @@ export default function CMSJewelleryCareGuide() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors)
+            setTimeout(() => {
+                const firstError = document.querySelector('p.text-destructive')
+                firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }, 0)
             return
         }
 
@@ -358,7 +358,7 @@ export default function CMSJewelleryCareGuide() {
                           
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>Title</Label>
+                                    <Label>Title <span className="text-destructive">*</span></Label>
                                     <Input
                                         value={item.title}
                                         onChange={(e) => updateSection2To5Item(sectionNum, index, 'title', e.target.value)}
@@ -368,7 +368,7 @@ export default function CMSJewelleryCareGuide() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Description</Label>
+                                    <Label>Description <span className="text-destructive">*</span></Label>
                                     {item.description.map((desc, descIndex) => (
                                         <div key={descIndex} className="flex gap-2">
                                             <Input
@@ -413,9 +413,7 @@ export default function CMSJewelleryCareGuide() {
                                     <Input
                                         value={item.image_alt_text}
                                         onChange={(e) => updateSection2To5Item(sectionNum, index, 'image_alt_text', e.target.value)}
-                                        onBlur={() => clearError(`s${sectionNum}_${index}_image_alt_text`)}
                                     />
-                                    {errors[`s${sectionNum}_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s${sectionNum}_${index}_image_alt_text`]}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -541,7 +539,7 @@ export default function CMSJewelleryCareGuide() {
                                
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label>Title</Label>
+                                        <Label>Title <span className="text-destructive">*</span></Label>
                                         <Input
                                             value={item.title}
                                             onChange={(e) => updateSection6Item(index, 'title', e.target.value)}
@@ -551,7 +549,7 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Sub-title</Label>
+                                        <Label>Sub-title <span className="text-destructive">*</span></Label>
                                         <Input
                                             value={item.sub_title}
                                             onChange={(e) => updateSection6Item(index, 'sub_title', e.target.value)}
@@ -561,7 +559,7 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Description</Label>
+                                        <Label>Description <span className="text-destructive">*</span></Label>
                                         {item.description.map((desc, descIndex) => (
                                             <div key={descIndex} className="flex gap-2">
                                                 <Input
@@ -606,9 +604,7 @@ export default function CMSJewelleryCareGuide() {
                                         <Input
                                             value={item.image_alt_text}
                                             onChange={(e) => updateSection6Item(index, 'image_alt_text', e.target.value)}
-                                            onBlur={() => clearError(`s6_${index}_image_alt_text`)}
                                         />
-                                        {errors[`s6_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s6_${index}_image_alt_text`]}</p>}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -645,13 +641,11 @@ export default function CMSJewelleryCareGuide() {
                                         <Input
                                             value={item.image_alt_text}
                                             onChange={(e) => updateSection7Item(index, 'image_alt_text', e.target.value)}
-                                            onBlur={() => clearError(`s7_${index}_image_alt_text`)}
                                         />
-                                        {errors[`s7_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s7_${index}_image_alt_text`]}</p>}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Redirect URL</Label>
+                                        <Label>Redirect URL <span className="text-destructive">*</span></Label>
                                         <Input
                                             value={item.redirect_url}
                                             onChange={(e) => updateSection7Item(index, 'redirect_url', e.target.value)}
@@ -717,7 +711,7 @@ export default function CMSJewelleryCareGuide() {
                                
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label>Title</Label>
+                                        <Label>Title <span className="text-destructive">*</span></Label>
                                         <Input
                                             value={item.title}
                                             onChange={(e) => updateSection9Item(index, 'title', e.target.value)}
@@ -727,7 +721,7 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Sub-title</Label>
+                                        <Label>Sub-title <span className="text-destructive">*</span></Label>
                                         <Input
                                             value={item.sub_title}
                                             onChange={(e) => updateSection9Item(index, 'sub_title', e.target.value)}
@@ -737,7 +731,7 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Description</Label>
+                                        <Label>Description <span className="text-destructive">*</span></Label>
                                         {item.description.map((desc, descIndex) => (
                                             <div key={descIndex} className="flex gap-2">
                                                 <Input
@@ -782,9 +776,7 @@ export default function CMSJewelleryCareGuide() {
                                         <Input
                                             value={item.image_alt_text}
                                             onChange={(e) => updateSection9Item(index, 'image_alt_text', e.target.value)}
-                                            onBlur={() => clearError(`s9_${index}_image_alt_text`)}
                                         />
-                                        {errors[`s9_${index}_image_alt_text`] && <p className="text-sm text-destructive">{errors[`s9_${index}_image_alt_text`]}</p>}
                                     </div>
                                 </CardContent>
                             </Card>

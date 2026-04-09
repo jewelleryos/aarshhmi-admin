@@ -271,10 +271,7 @@ export function JewelleryDefaultContent() {
       case "basic":
         return !!(
           basicDetails.title.trim() &&
-          basicDetails.productSku.trim() &&
-          basicDetails.width &&
-          basicDetails.height &&
-          basicDetails.length
+          basicDetails.productSku.trim()
         )
       case "metal":
         // Check if at least one color selected and at least one metal with purity and weight
@@ -328,8 +325,7 @@ export function JewelleryDefaultContent() {
             ))
         return hasDiamondConfigured && hasGemstoneConfigured && hasPearlConfigured
       case "variants":
-        // TODO: Add variants validation - optional for now
-        return true
+        return defaultVariantId !== null
       case "attributes":
         // At least one category must be selected
         return attributesDetails.categoryIds.length > 0
@@ -353,15 +349,6 @@ export function JewelleryDefaultContent() {
     }
     if (!basicDetails.productSku.trim()) {
       fieldErrors.productSku = "Product SKU is required"
-    }
-    if (!basicDetails.width) {
-      fieldErrors.width = "Width is required"
-    }
-    if (!basicDetails.height) {
-      fieldErrors.height = "Height is required"
-    }
-    if (!basicDetails.length) {
-      fieldErrors.length = "Length is required"
     }
     if (basicDetails.hasEngraving && !basicDetails.engravingMaxChars) {
       fieldErrors.engravingMaxChars = "Maximum characters is required"
@@ -686,9 +673,9 @@ export function JewelleryDefaultContent() {
         shortDescription: basicDetails.shortDescription || null,
         description: basicDetails.htmlDescription || null,
         dimensions: {
-          width: basicDetails.width ? parseFloat(basicDetails.width) : null,
-          height: basicDetails.height ? parseFloat(basicDetails.height) : null,
-          length: basicDetails.length ? parseFloat(basicDetails.length) : null,
+          width: basicDetails.width ? parseFloat(basicDetails.width) : undefined,
+          height: basicDetails.height ? parseFloat(basicDetails.height) : undefined,
+          length: basicDetails.length ? parseFloat(basicDetails.length) : undefined,
         },
         engraving: {
           hasEngraving: basicDetails.hasEngraving,
@@ -802,7 +789,7 @@ export function JewelleryDefaultContent() {
 
       // Variants
       variants: {
-        defaultVariantId,
+        defaultVariantId: defaultVariantId ?? '',
         // Generate full variant list for reference
         generatedVariants: (() => {
           const variants: Array<{

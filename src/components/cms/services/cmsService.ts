@@ -81,6 +81,7 @@ export interface GiftSectionItem {
   id: string
   image_url: string
   image_alt_text: string
+  redirect_url: string
 }
 
 export interface GiftGuideContent {

@@ -105,12 +105,12 @@ export default function CMSPartnerWithUs() {
 
     // Section 1 validation
     if (!section1ImageUrl) newErrors.section1_image_url = 'Banner image is required'
-    if (!section1ImageAltText) newErrors.section1_image_alt_text = 'Image alt text is required'
 
     // Section 2 validation
     if (!section2ImageUrl) newErrors.section2_image_url = 'Image is required'
-    if (!section2ImageAltText) newErrors.section2_image_alt_text = 'Image alt text is required'
     if (!section2Title) newErrors.section2_title = 'Title is required'
+    if (!section2Description1) newErrors.section2_description1 = 'Description 1 is required'
+    if (!section2Description2) newErrors.section2_description2 = 'Description 2 is required'
     if (!section2ButtonText) newErrors.section2_button_text = 'Button text is required'
     if (!section2RedirectUrl) {
       newErrors.section2_redirect_url = 'Redirect URL is required'
@@ -120,8 +120,10 @@ export default function CMSPartnerWithUs() {
 
     // Section 3 validation
     if (!section3ImageUrl) newErrors.section3_image_url = 'Image is required'
-    if (!section3ImageAltText) newErrors.section3_image_alt_text = 'Image alt text is required'
     if (!section3Title) newErrors.section3_title = 'Title is required'
+    if (!section3Description1) newErrors.section3_description1 = 'Description 1 is required'
+    if (!section3Description2) newErrors.section3_description2 = 'Description 2 is required'
+    if (!section3Description3) newErrors.section3_description3 = 'Description 3 is required'
     if (!section3ButtonText) newErrors.section3_button_text = 'Button text is required'
     if (!section3RedirectUrl) {
       newErrors.section3_redirect_url = 'Redirect URL is required'
@@ -131,8 +133,10 @@ export default function CMSPartnerWithUs() {
 
     // Section 4 validation
     if (!section4ImageUrl) newErrors.section4_image_url = 'Image is required'
-    if (!section4ImageAltText) newErrors.section4_image_alt_text = 'Image alt text is required'
     if (!section4Title) newErrors.section4_title = 'Title is required'
+    if (!section4Description1) newErrors.section4_description1 = 'Description 1 is required'
+    if (!section4Description2) newErrors.section4_description2 = 'Description 2 is required'
+    if (!section4Description3) newErrors.section4_description3 = 'Description 3 is required'
     if (!section4ButtonText) newErrors.section4_button_text = 'Button text is required'
     if (!section4RedirectUrl) {
       newErrors.section4_redirect_url = 'Redirect URL is required'
@@ -142,6 +146,10 @@ export default function CMSPartnerWithUs() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      setTimeout(() => {
+        const firstError = document.querySelector('p.text-destructive')
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 0)
       return
     }
 
@@ -241,21 +249,13 @@ export default function CMSPartnerWithUs() {
           />
 
           <div className="space-y-2">
-            <Label htmlFor="section1_image_alt_text">
-              Image Alt Text <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="section1_image_alt_text">Image Alt Text</Label>
             <Input
               id="section1_image_alt_text"
               placeholder="Describe the banner image"
               value={section1ImageAltText}
-              onChange={(e) => {
-                setSection1ImageAltText(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, section1_image_alt_text: undefined as unknown as string }))
-              }}
+              onChange={(e) => setSection1ImageAltText(e.target.value)}
             />
-            {errors.section1_image_alt_text && (
-              <p className="text-sm text-destructive">{errors.section1_image_alt_text}</p>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -285,25 +285,41 @@ export default function CMSPartnerWithUs() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section2_description1">Description 1</Label>
+            <Label htmlFor="section2_description1">
+              Description 1 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section2_description1"
               placeholder="Enter description..."
               value={section2Description1}
-              onChange={(e) => setSection2Description1(e.target.value)}
+              onChange={(e) => {
+                setSection2Description1(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section2_description1: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section2_description1 && (
+              <p className="text-sm text-destructive">{errors.section2_description1}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section2_description2">Description 2</Label>
+            <Label htmlFor="section2_description2">
+              Description 2 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section2_description2"
               placeholder="Enter description..."
               value={section2Description2}
-              onChange={(e) => setSection2Description2(e.target.value)}
+              onChange={(e) => {
+                setSection2Description2(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section2_description2: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section2_description2 && (
+              <p className="text-sm text-destructive">{errors.section2_description2}</p>
+            )}
           </div>
 
           <MediaPickerInput
@@ -320,21 +336,13 @@ export default function CMSPartnerWithUs() {
           />
 
           <div className="space-y-2">
-            <Label htmlFor="section2_image_alt_text">
-              Image Alt Text <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="section2_image_alt_text">Image Alt Text</Label>
             <Input
               id="section2_image_alt_text"
               placeholder="Describe the image"
               value={section2ImageAltText}
-              onChange={(e) => {
-                setSection2ImageAltText(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, section2_image_alt_text: undefined as unknown as string }))
-              }}
+              onChange={(e) => setSection2ImageAltText(e.target.value)}
             />
-            {errors.section2_image_alt_text && (
-              <p className="text-sm text-destructive">{errors.section2_image_alt_text}</p>
-            )}
           </div>
 
           <div className="space-y-2">
@@ -404,36 +412,60 @@ export default function CMSPartnerWithUs() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section3_description1">Description 1</Label>
+            <Label htmlFor="section3_description1">
+              Description 1 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section3_description1"
               placeholder="Enter description..."
               value={section3Description1}
-              onChange={(e) => setSection3Description1(e.target.value)}
+              onChange={(e) => {
+                setSection3Description1(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section3_description1: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section3_description1 && (
+              <p className="text-sm text-destructive">{errors.section3_description1}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section3_description2">Description 2</Label>
+            <Label htmlFor="section3_description2">
+              Description 2 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section3_description2"
               placeholder="Enter description..."
               value={section3Description2}
-              onChange={(e) => setSection3Description2(e.target.value)}
+              onChange={(e) => {
+                setSection3Description2(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section3_description2: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section3_description2 && (
+              <p className="text-sm text-destructive">{errors.section3_description2}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section3_description3">Description 3</Label>
+            <Label htmlFor="section3_description3">
+              Description 3 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section3_description3"
               placeholder="Enter description..."
               value={section3Description3}
-              onChange={(e) => setSection3Description3(e.target.value)}
+              onChange={(e) => {
+                setSection3Description3(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section3_description3: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section3_description3 && (
+              <p className="text-sm text-destructive">{errors.section3_description3}</p>
+            )}
           </div>
 
           <MediaPickerInput
@@ -450,21 +482,13 @@ export default function CMSPartnerWithUs() {
           />
 
           <div className="space-y-2">
-            <Label htmlFor="section3_image_alt_text">
-              Image Alt Text <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="section3_image_alt_text">Image Alt Text</Label>
             <Input
               id="section3_image_alt_text"
               placeholder="Describe the image"
               value={section3ImageAltText}
-              onChange={(e) => {
-                setSection3ImageAltText(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, section3_image_alt_text: undefined as unknown as string }))
-              }}
+              onChange={(e) => setSection3ImageAltText(e.target.value)}
             />
-            {errors.section3_image_alt_text && (
-              <p className="text-sm text-destructive">{errors.section3_image_alt_text}</p>
-            )}
           </div>
 
           <div className="space-y-2">
@@ -534,36 +558,60 @@ export default function CMSPartnerWithUs() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section4_description1">Description 1</Label>
+            <Label htmlFor="section4_description1">
+              Description 1 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section4_description1"
               placeholder="Enter description..."
               value={section4Description1}
-              onChange={(e) => setSection4Description1(e.target.value)}
+              onChange={(e) => {
+                setSection4Description1(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section4_description1: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section4_description1 && (
+              <p className="text-sm text-destructive">{errors.section4_description1}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section4_description2">Description 2</Label>
+            <Label htmlFor="section4_description2">
+              Description 2 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section4_description2"
               placeholder="Enter description..."
               value={section4Description2}
-              onChange={(e) => setSection4Description2(e.target.value)}
+              onChange={(e) => {
+                setSection4Description2(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section4_description2: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section4_description2 && (
+              <p className="text-sm text-destructive">{errors.section4_description2}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section4_description3">Description 3</Label>
+            <Label htmlFor="section4_description3">
+              Description 3 <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="section4_description3"
               placeholder="Enter description..."
               value={section4Description3}
-              onChange={(e) => setSection4Description3(e.target.value)}
+              onChange={(e) => {
+                setSection4Description3(e.target.value)
+                if (e.target.value) setErrors((prev) => ({ ...prev, section4_description3: undefined as unknown as string }))
+              }}
               rows={3}
             />
+            {errors.section4_description3 && (
+              <p className="text-sm text-destructive">{errors.section4_description3}</p>
+            )}
           </div>
 
           <MediaPickerInput
@@ -580,21 +628,13 @@ export default function CMSPartnerWithUs() {
           />
 
           <div className="space-y-2">
-            <Label htmlFor="section4_image_alt_text">
-              Image Alt Text <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="section4_image_alt_text">Image Alt Text</Label>
             <Input
               id="section4_image_alt_text"
               placeholder="Describe the image"
               value={section4ImageAltText}
-              onChange={(e) => {
-                setSection4ImageAltText(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, section4_image_alt_text: undefined as unknown as string }))
-              }}
+              onChange={(e) => setSection4ImageAltText(e.target.value)}
             />
-            {errors.section4_image_alt_text && (
-              <p className="text-sm text-destructive">{errors.section4_image_alt_text}</p>
-            )}
           </div>
 
           <div className="space-y-2">
