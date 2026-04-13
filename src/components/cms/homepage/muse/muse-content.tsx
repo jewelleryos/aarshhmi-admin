@@ -37,7 +37,7 @@ export function MuseContentComponent() {
 
   const handleAddItem = async (item: Omit<MuseItem, 'id'>) => {
     try {
-      const newItem: MuseItem = { ...item, id: `muse_${Date.now()}` }
+      const newItem: MuseItem = { ...item, sparkle: item.sparkle || [], id: `muse_${Date.now()}` }
       const updatedItems = [...items, newItem]
       const response = await cmsService.updateMuse({ items: updatedItems })
       toast.success(response.message)

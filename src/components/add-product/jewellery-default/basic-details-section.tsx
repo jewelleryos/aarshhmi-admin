@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
@@ -156,17 +157,13 @@ export function BasicDetailsSection({
 
         {/* Row 4: HTML Description */}
         <div className="space-y-2">
-          <Label htmlFor="htmlDescription">Description (HTML)</Label>
-          <Textarea
-            id="htmlDescription"
-            placeholder="Enter detailed description (HTML supported)"
+          <Label>Description</Label>
+          <RichTextEditor
             value={data.htmlDescription}
-            onChange={(e) => onChange("htmlDescription", e.target.value)}
-            rows={5}
+            onChange={(html) => onChange("htmlDescription", html)}
+            placeholder="Enter detailed description..."
+            mediaRootPath="products"
           />
-          <p className="text-xs text-muted-foreground">
-            You can use HTML tags for formatting
-          </p>
         </div>
 
         {/* Row 5: Dimensions */}

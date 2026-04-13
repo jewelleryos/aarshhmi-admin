@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { MediaPickerInput } from '@/components/media'
-import { cmsService, type GiftGuideContent, type GiftSectionItem } from '@/components/cms/services/cmsService'
+import { cmsService, type GiftGuideContent, type GiftSectionItem, type GiftSectionSubItem } from '@/components/cms/services/cmsService'
 
 const createDefaultSectionOne = (): GiftSectionItem[] =>
   Array.from({ length: 4 }, (_, i) => ({
     id: `gift_1_${i + 1}`,
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     redirect_url: '',
   }))
@@ -22,12 +23,13 @@ const createDefaultSectionTwo = (): GiftSectionItem[] =>
   Array.from({ length: 3 }, (_, i) => ({
     id: `gift_2_${i + 1}`,
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     redirect_url: '',
   }))
 
 interface GiftSectionErrors {
-  [key: number]: { image_url?: string; image_alt_text?: string; redirect_url?: string }
+  [key: number]: { image_url?: string; image_alt_text?: string; redirect_url?: string; sub_items?: { [key: number]: { redirect_url?: string; title_1?: string; title_2?: string } } }
 }
 
 export function CMSGiftGuide() {
@@ -99,10 +101,45 @@ export function CMSGiftGuide() {
     }
   }
 
+  const addSubItem = (sectionOneIndex: number) => {
+    setGiftSectionOne((prev) => {
+      const updated = [...prev]
+      const current = updated[sectionOneIndex]
+      updated[sectionOneIndex] = {
+        ...current,
+        sub_items: [...(current.sub_items || []), { image_url: '', image_alt_text: '', redirect_url: '', title_1: '', title_2: '' }],
+      }
+      return updated
+    })
+  }
+
+  const removeSubItem = (sectionOneIndex: number, subIndex: number) => {
+    setGiftSectionOne((prev) => {
+      const updated = [...prev]
+      const current = updated[sectionOneIndex]
+      updated[sectionOneIndex] = {
+        ...current,
+        sub_items: (current.sub_items || []).filter((_, i) => i !== subIndex),
+      }
+      return updated
+    })
+  }
+
+  const updateSubItem = (sectionOneIndex: number, subIndex: number, field: keyof GiftSectionSubItem, value: string) => {
+    setGiftSectionOne((prev) => {
+      const updated = [...prev]
+      const current = updated[sectionOneIndex]
+      const subItems = [...(current.sub_items || [])]
+      subItems[subIndex] = { ...subItems[subIndex], [field]: value }
+      updated[sectionOneIndex] = { ...current, sub_items: subItems }
+      return updated
+    })
+  }
+
   const validateSectionItems = (items: GiftSectionItem[]): GiftSectionErrors => {
     const sectionErrors: GiftSectionErrors = {}
     items.forEach((item, index) => {
-      const itemErrors: { image_url?: string; image_alt_text?: string; redirect_url?: string } = {}
+      const itemErrors: GiftSectionErrors[number] = {}
       if (!item.image_url) {
         itemErrors.image_url = 'Image is required'
       }
@@ -110,6 +147,24 @@ export function CMSGiftGuide() {
         itemErrors.redirect_url = 'Redirect URL is required'
       } else if (!/^https?:\/\/.+/.test(item.redirect_url)) {
         itemErrors.redirect_url = 'Must be a valid URL starting with http:// or https://'
+      }
+      if (item.sub_items && item.sub_items.length > 0) {
+        const subErrors: GiftSectionErrors[number]['sub_items'] = {}
+        item.sub_items.forEach((sub, si) => {
+          const se: { redirect_url?: string; title_1?: string; title_2?: string } = {}
+          if (!sub.title_1) {
+            se.title_1 = 'Title 1 is required'
+          }
+          if (!sub.title_2) {
+            se.title_2 = 'Title 2 is required'
+          }
+          if (Object.keys(se).length > 0) {
+            subErrors![si] = se
+          }
+        })
+        if (Object.keys(subErrors!).length > 0) {
+          itemErrors.sub_items = subErrors
+        }
       }
       if (Object.keys(itemErrors).length > 0) {
         sectionErrors[index] = itemErrors
@@ -296,6 +351,14 @@ export function CMSGiftGuide() {
                   accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                 />
 
+                <MediaPickerInput
+                  label="Mobile View Image"
+                  value={item.mobile_view_image_url || null}
+                  onChange={(path) => updateSectionItem('one', index, 'mobile_view_image_url', path || '')}
+                  rootPath="cms/homepage/gift-guide/section-one/mobile"
+                  accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                />
+
                 <div className="space-y-2">
                   <Label htmlFor={`s1_redirect_${index}`}>
                     Redirect URL <span className="text-destructive">*</span>
@@ -326,6 +389,101 @@ export function CMSGiftGuide() {
             </Card>
           ))}
         </div>
+
+        {/* Gift 4 Sub Items — full width section below the grid */}
+        <Card className="mt-4">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Gift 4 — Sub Items</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addSubItem(3)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Sub Item
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {(giftSectionOne[3]?.sub_items || []).length === 0 ? (
+              <p className="text-sm text-muted-foreground">No sub items added yet</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(giftSectionOne[3]?.sub_items || []).map((sub, si) => (
+                  <div key={si} className="rounded-lg border p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Sub Item {si + 1}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => removeSubItem(3, si)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <MediaPickerInput
+                      label="Image"
+                      value={sub.image_url || null}
+                      onChange={(path) => updateSubItem(3, si, 'image_url', path || '')}
+                      rootPath="cms/homepage/gift-guide/section-one/sub-items"
+                      accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                    />
+                    <div className="space-y-2">
+                      <Label htmlFor={`s1_sub_alt_${si}`}>Alt Text</Label>
+                      <Input
+                        id={`s1_sub_alt_${si}`}
+                        placeholder="Image description"
+                        value={sub.image_alt_text || ''}
+                        onChange={(e) => updateSubItem(3, si, 'image_alt_text', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`s1_sub_redirect_${si}`}>Redirect URL</Label>
+                      <Input
+                        id={`s1_sub_redirect_${si}`}
+                        placeholder="https://example.com"
+                        value={sub.redirect_url}
+                        onChange={(e) => updateSubItem(3, si, 'redirect_url', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`s1_sub_title1_${si}`}>
+                        Title 1 <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id={`s1_sub_title1_${si}`}
+                        placeholder="Title 1"
+                        value={sub.title_1}
+                        onChange={(e) => updateSubItem(3, si, 'title_1', e.target.value)}
+                      />
+                      {errors.gift_section_one?.[3]?.sub_items?.[si]?.title_1 && (
+                        <p className="text-sm text-destructive">{errors.gift_section_one[3].sub_items![si].title_1}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`s1_sub_title2_${si}`}>
+                        Title 2 <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id={`s1_sub_title2_${si}`}
+                        placeholder="Title 2"
+                        value={sub.title_2}
+                        onChange={(e) => updateSubItem(3, si, 'title_2', e.target.value)}
+                      />
+                      {errors.gift_section_one?.[3]?.sub_items?.[si]?.title_2 && (
+                        <p className="text-sm text-destructive">{errors.gift_section_one[3].sub_items![si].title_2}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Gift Section 2 (3 Fixed Items) */}
@@ -345,6 +503,14 @@ export function CMSGiftGuide() {
                   rootPath="cms/homepage/gift-guide/section-two"
                   required
                   error={errors.gift_section_two?.[index]?.image_url}
+                  accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                />
+
+                <MediaPickerInput
+                  label="Mobile View Image"
+                  value={item.mobile_view_image_url || null}
+                  onChange={(path) => updateSectionItem('two', index, 'mobile_view_image_url', path || '')}
+                  rootPath="cms/homepage/gift-guide/section-two/mobile"
                   accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                 />
 

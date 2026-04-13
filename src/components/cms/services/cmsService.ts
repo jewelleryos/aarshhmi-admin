@@ -34,6 +34,7 @@ export interface ProductRangeItem {
   id: string
   title: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
   rank: number
@@ -48,6 +49,7 @@ export interface ProductRangeContent {
 export interface ShopByShapeItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
   rank: number
@@ -63,6 +65,7 @@ export interface ShopByShapeContent {
 export interface CollectionsItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
   rank: number
@@ -77,11 +80,21 @@ export interface CollectionsContent {
 }
 
 // Types - Gift Guide
+export interface GiftSectionSubItem {
+  image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+  title_1: string
+  title_2: string
+}
+
 export interface GiftSectionItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
+  sub_items?: GiftSectionSubItem[]
 }
 
 export interface GiftGuideContent {
@@ -95,19 +108,29 @@ export interface GiftGuideContent {
 // Types - Engagement
 export interface EngagementContent {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   button_text: string
   redirect_url: string
 }
 
 // Types - Muse
+export interface SparkleItem {
+  product_sku: string
+  x_coordinate: number
+  y_coordinate: number
+  is_active: boolean
+}
+
 export interface MuseItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
   rank: number
   status: boolean
+  sparkle: SparkleItem[]
 }
 
 export interface MuseContent {
@@ -118,6 +141,7 @@ export interface MuseContent {
 export interface AssuranceItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   text_one: string
   text_two: string
@@ -128,10 +152,15 @@ export interface AssuranceContent {
 }
 
 // Types - Experience
-export interface ExperienceContent {
+export interface ExperienceImageItem {
   image_url: string
+  mobile_view_image_url?: string
   image_alter_text: string
-  redirect_url: string
+  redirect_url?: string
+}
+
+export interface ExperienceContent {
+  images: ExperienceImageItem[]
   description: string
   second_section_title: string
 }
@@ -165,14 +194,26 @@ export interface PolicyPageContent {
 }
 
 // Types - Partner With Us
+export interface PartnerWithUsAssuranceItem {
+  id: string
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text: string
+  text_one: string
+  text_two?: string
+}
+
 export interface PartnerWithUsContent {
+  assurance: PartnerWithUsAssuranceItem[]
   section1_image_url: string
+  section1_mobile_view_image_url?: string
   section1_image_alt_text: string
 
   section2_title: string
   section2_description1: string
   section2_description2: string
   section2_image_url: string
+  section2_mobile_view_image_url?: string
   section2_image_alt_text: string
   section2_button_text: string
   section2_redirect_url: string
@@ -182,6 +223,7 @@ export interface PartnerWithUsContent {
   section3_description2: string
   section3_description3: string
   section3_image_url: string
+  section3_mobile_view_image_url?: string
   section3_image_alt_text: string
   section3_button_text: string
   section3_redirect_url: string
@@ -191,6 +233,7 @@ export interface PartnerWithUsContent {
   section4_description2: string
   section4_description3: string
   section4_image_url: string
+  section4_mobile_view_image_url?: string
   section4_image_alt_text: string
   section4_button_text: string
   section4_redirect_url: string
@@ -204,6 +247,7 @@ export interface AboutUsSection1 {
   name: string
   designation: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -211,6 +255,7 @@ export interface AboutUsSection2Item {
   title: string
   description: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -218,6 +263,7 @@ export interface AboutUsSection3SubSection {
   sub_title: string
   description: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -230,6 +276,7 @@ export interface AboutUsSection4SubSection {
   sub_title: string
   description: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -243,6 +290,7 @@ export interface AboutUsSection5Item {
   description1: string
   description2: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -251,6 +299,7 @@ export interface AboutUsSection6 {
   description1: string
   description2: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
 }
 
@@ -266,6 +315,7 @@ export interface AboutUsContent {
 // Types - Jewellery Care Guide
 export interface JewelleryCareGuideSection2To5Item {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   title: string
   description: string[]
@@ -273,6 +323,7 @@ export interface JewelleryCareGuideSection2To5Item {
 
 export interface JewelleryCareGuideSection6Item {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   title: string
   description: string[]
@@ -281,12 +332,14 @@ export interface JewelleryCareGuideSection6Item {
 
 export interface JewelleryCareGuideSection7Item {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
 }
 
 export interface JewelleryCareGuideSection9Item {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   title: string
   description: string[]
@@ -317,6 +370,7 @@ export interface FilterChild {
   name: string
   redirectLink: string
   imageUrl: string
+  mobileViewImageUrl?: string
   imageAltText: string
   rank: number
 }
@@ -331,6 +385,7 @@ export interface FilterGroup {
 
 export interface RightSideBanner {
   imageUrl: string
+  mobileViewImageUrl?: string
   imageAltText: string
   mainText: string
 }
@@ -736,12 +791,54 @@ export const cmsService = {
     const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_DETAILS, { content })
     return response.data
   },
+
+  // Product Description Page
+  getProductDescriptionPage: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE)
+    return response.data
+  },
+
+  updateProductDescriptionPage: async (
+    content: ProductDescriptionPageContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE, { content })
+    return response.data
+  },
+
+  getGeneral: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.GENERAL)
+    return response.data
+  },
+
+  updateGeneral: async (
+    content: GeneralContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.GENERAL, { content })
+    return response.data
+  },
+}
+
+// Types - General
+export interface GeneralContent {
+  phone_no: string
+  email: string
+  address: string
+  social_links: {
+    instagram: string
+    facebook: string
+    twitter: string
+    youtube: string
+    pinterest: string
+    linkedin: string
+    reddit: string
+  }
 }
 
 // Types - Promotional Banner
 export interface PromotionalBannerItem {
   id: string
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
   redirect_url: string
   // title: string
@@ -759,13 +856,33 @@ export interface PromotionalBannerContent {
 // Types - Product List Details
 export interface ProductListImage {
   image_url: string
+  mobile_view_image_url?: string
   image_alt_text: string
+  redirect_url: string
 }
 
 export interface ProductListDetailsContent {
-  title1: string
-  description1: string
-  title2: string
-  description2: string
   images: ProductListImage[]
+}
+
+// Types - Product Description Page
+export interface JewelleryCareItem {
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+}
+
+export interface WhatsInBoxItem {
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+}
+
+export interface ProductDescriptionPageContent {
+  jewellery_care: JewelleryCareItem[]
+  button_text: string
+  button_redirect_url: string
+  whats_in_box?: WhatsInBoxItem[]
 }

@@ -9,6 +9,7 @@ export interface SeoData {
     keywords?: string[] | null
     og_title?: string | null
     description?: string | null
+    page_description?: string | null
     twitter_url?: string | null
     og_image?: string | null
     og_site_name?: string | null

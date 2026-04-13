@@ -3,6 +3,7 @@ import seoService, { SEOListItem, SeoPageUpdateRequest } from '@/redux/services/
 
 interface SeoFormData {
     pageName: string
+    pageDescription: string
     metaTitle: string
     metaKeywords: string
     metaDescription: string
@@ -30,6 +31,7 @@ interface SeoState {
 
 const initialFormData: SeoFormData = {
     pageName: '',
+    pageDescription: '',
     metaTitle: '',
     metaKeywords: '',
     metaDescription: '',
@@ -107,6 +109,7 @@ const seoSlice = createSlice({
             const data = action.payload
             state.formData = {
                 pageName: data.name || '',
+                pageDescription: data.seo_data?.page_description || '',
                 metaTitle: data.seo_data?.title || '',
                 metaKeywords: data.seo_data?.keywords?.join(", ") || '',
                 metaDescription: data.seo_data?.description || '',

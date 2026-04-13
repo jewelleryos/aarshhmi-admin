@@ -419,6 +419,26 @@
           "permissions": [
             "CUSTOMER.READ"
           ]
+        },
+        {
+          "id": "seo",
+          "type": "item",
+          "label": "SEO Pages",
+          "icon": "Globe",
+          "href": "/seo",
+          "permissions": [
+            "SEO_PAGES.READ"
+          ]
+        },
+        {
+          "id": "contact-us",
+          "type": "item",
+          "label": "Contact Us",
+          "icon": "Mail",
+          "href": "/contact-us",
+          "permissions": [
+            "CONTACT_US.READ"
+          ]
         }
       ]
     },
@@ -442,22 +462,6 @@
                 "USER.READ"
               ]
             }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "group",
-      "label": "Pages",
-      "children": [
-        {
-          "id": "seo",
-          "type": "item",
-          "label": "SEO",
-          "icon": "Globe",
-          "href": "/seo",
-          "permissions": [
-            "SEO_PAGES.READ"
           ]
         }
       ]

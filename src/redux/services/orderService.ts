@@ -44,6 +44,10 @@ const orderService = {
     const response = await apiService.patch(API_ENDPOINTS.ORDER.UPDATE_ITEM_STAGE(orderId, itemId), data)
     return response.data
   },
+  generateInvoice: async (orderId: string, itemId: string) => {
+    const response = await apiService.post(API_ENDPOINTS.ORDER.GENERATE_INVOICE(orderId, itemId), {})
+    return response.data
+  },
 }
 
 export default orderService

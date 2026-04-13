@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { SEOListItem } from "@/redux/services/seoService";
 import { initializeFormData, resetFormData, setFormData, updateSeoPage } from "@/redux/slices/seoSlice";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface SeoPageDrawerProps {
     data: SEOListItem | null
@@ -25,6 +26,7 @@ export function SeoPageEditDrawer({ data, open, onOpenChange, onSuccess }: SeoPa
     // Destructure formData for easier access
     const {
         pageName,
+        pageDescription,
         metaTitle,
         metaKeywords,
         metaDescription,
@@ -68,6 +70,7 @@ export function SeoPageEditDrawer({ data, open, onOpenChange, onSuccess }: SeoPa
                 title: metaTitle || "",
                 description: metaDescription || "",
                 keywords: keywordsArray.length > 0 ? keywordsArray : [],
+                page_description: pageDescription || "",
                 canonical_url: metaCanonical || "",
                 robots: metaRobots || "",
                 og_title: ogTitle || "",
@@ -127,6 +130,16 @@ export function SeoPageEditDrawer({ data, open, onOpenChange, onSuccess }: SeoPa
                                 value={pageName}
                                 onChange={(e) => handleFormChange("pageName", e.target.value)}
                                 maxLength={200}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Page Description</Label>
+                            <RichTextEditor
+                                value={pageDescription}
+                                onChange={(html) => handleFormChange("pageDescription", html)}
+                                placeholder="Enter page description (HTML supported)..."
+                                mediaRootPath="seo-pages"
                             />
                         </div>
                     </div>

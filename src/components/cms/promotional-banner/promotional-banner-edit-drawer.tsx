@@ -30,6 +30,7 @@ export function PromotionalBannerEditDrawer({
   onSave,
 }: PromotionalBannerEditDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -41,6 +42,7 @@ export function PromotionalBannerEditDrawer({
   useEffect(() => {
     if (banner) {
       setImageUrl(banner.image_url)
+      setMobileViewImageUrl(banner.mobile_view_image_url || '')
       setImageAltText(banner.image_alt_text)
       setRedirectUrl(banner.redirect_url)
       setRank(banner.rank)
@@ -75,6 +77,7 @@ export function PromotionalBannerEditDrawer({
       await onSave({
         ...banner,
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -121,6 +124,13 @@ export function PromotionalBannerEditDrawer({
             rootPath="cms/promotional-banners"
             required
             error={errors.image_url}
+          />
+
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/promotional-banners/mobile"
           />
 
           <div className="space-y-2">

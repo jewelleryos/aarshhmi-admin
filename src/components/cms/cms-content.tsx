@@ -32,6 +32,9 @@ import { Banner3 } from "./promotional-banner/Banner3/banner3";
 import { Banner4 } from "./promotional-banner/Banner4/banner4";
 import { Banner5 } from "./promotional-banner/Banner5/banner5";
 import { ProductListDetailsComponent } from "./product-list-details/product-list-details";
+import { JewelleryCareComponent } from "./product-description-page/jewellery-care";
+import { WhatsInTheBoxComponent } from "./product-description-page/whats-in-the-box";
+import { GeneralContentComponent } from "./general/general-content";
 import { cmsService } from "./services/cmsService";
 
 export function CMSContent() {
@@ -101,7 +104,8 @@ export function CMSContent() {
         );
     };
 
-    const sectionLabel = cmsSections.flatMap(s => s.children).find(c => c.id === activeSection)?.label ?? activeSection
+    const allLeaves = cmsSections.flatMap(s => s.children.length > 0 ? s.children.flatMap(c => c.children.length > 0 ? c.children : [c]) : [s])
+    const sectionLabel = allLeaves.find(c => c.id === activeSection)?.label ?? activeSection
 
     return <div className="flex h-full">
         {/* CMS Sidebar */}
@@ -141,6 +145,9 @@ export function CMSContent() {
             activeSection === "promotional-banner-4" ? <Banner4/> :
             activeSection === "promotional-banner-5" ? <Banner5/> :
             activeSection === "product-list-details" ? <ProductListDetailsComponent title="Product List Details" description="Manage product list details content" getContent={() => cmsService.getProductListDetails()} updateContent={(content) => cmsService.updateProductListDetails(content)}/> :
+            activeSection === "jewellery-care" ? <JewelleryCareComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
+            activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
+            activeSection === "general" ? <GeneralContentComponent /> :
             <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-semibold text-muted-foreground">Coming Soon</h1>

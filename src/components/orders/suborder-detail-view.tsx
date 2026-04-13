@@ -67,6 +67,9 @@ export function SuborderDetailView({ orderId, itemId }: SuborderDetailViewProps)
   const [isFullRefund, setIsFullRefund] = useState(true)
   const [returnRefundAmount, setReturnRefundAmount] = useState("")
 
+  // Invoice generation state
+  const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false)
+
   const fetchOrder = useCallback(async () => {
     try {
       setIsLoading(true)
@@ -141,6 +144,23 @@ export function SuborderDetailView({ orderId, itemId }: SuborderDetailViewProps)
     }
   }
 
+  const handleGenerateInvoice = async () => {
+    try {
+      setIsGeneratingInvoice(true)
+      const response = await orderService.generateInvoice(orderId, itemId)
+      const invoiceUrl = response.data?.invoiceUrl
+      if (invoiceUrl) {
+        setItem((prev: any) => ({ ...prev, invoice_url: invoiceUrl }))
+        window.open(invoiceUrl, '_blank')
+      }
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to generate invoice"
+      setError(message)
+    } finally {
+      setIsGeneratingInvoice(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -208,14 +228,28 @@ export function SuborderDetailView({ orderId, itemId }: SuborderDetailViewProps)
               </a>
             </Button>
           )}
-          {item.invoice_url && (
+          {item.invoice_url ? (
             <Button variant="outline" size="sm" asChild>
               <a href={item.invoice_url} target="_blank" rel="noopener noreferrer">
                 <FileDown className="mr-2 h-4 w-4" />
                 Invoice
               </a>
             </Button>
-          )}
+          ) : item.stage >= 10 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateInvoice}
+              disabled={isGeneratingInvoice}
+            >
+              {isGeneratingInvoice ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileDown className="mr-2 h-4 w-4" />
+              )}
+              {isGeneratingInvoice ? "Generating..." : "Generate Invoice"}
+            </Button>
+          ) : null}
         </div>
       </div>
 

@@ -220,6 +220,17 @@ function VariantDetailModal({
     priceComponents?.sellingPrice?.finalPriceWithoutTax || 0
   )
 
+  // MRP Markup (compareAtPrice - sellingPrice)
+  const makingChargeMrpMarkup = calculateDifference(
+    priceComponents?.sellingPrice?.makingCharge || 0,
+    priceComponents?.compareAtPrice?.makingCharge || 0
+  )
+  const stoneMrpMarkup = calculateDifference(stoneSellingPrice, stoneCompareAtPrice)
+  const subtotalMrpMarkup = calculateDifference(
+    priceComponents?.sellingPrice?.finalPriceWithoutTax || 0,
+    priceComponents?.compareAtPrice?.finalPriceWithoutTax || 0
+  )
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange} >
       <DialogContent className="min-w-6xl max-h-[90vh] overflow-y-auto">
@@ -366,6 +377,7 @@ function VariantDetailModal({
                       <TableHead className="text-right">Cost Price</TableHead>
                       <TableHead className="text-right">Difference</TableHead>
                       <TableHead className="text-right">Sell Price</TableHead>
+                      <TableHead className="text-right">MRP Markup</TableHead>
                       <TableHead className="text-right">MRP</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -380,6 +392,7 @@ function VariantDetailModal({
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.sellingPrice.metalPrice)}
                       </TableCell>
+                      <TableCell className="text-right text-muted-foreground">-</TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.compareAtPrice.metalPrice)}
                       </TableCell>
@@ -402,6 +415,15 @@ function VariantDetailModal({
                       </TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.sellingPrice.makingCharge)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {makingChargeMrpMarkup.amount !== 0 ? (
+                          <span className="text-emerald-600">
+                            {formatCurrency(makingChargeMrpMarkup.amount)} ({makingChargeMrpMarkup.percentage.toFixed(1)}%)
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.compareAtPrice.makingCharge)}
@@ -427,6 +449,15 @@ function VariantDetailModal({
                         {formatCurrency(stoneSellingPrice)}
                       </TableCell>
                       <TableCell className="text-right">
+                        {stoneMrpMarkup.amount !== 0 ? (
+                          <span className="text-emerald-600">
+                            {formatCurrency(stoneMrpMarkup.amount)} ({stoneMrpMarkup.percentage.toFixed(1)}%)
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
                         {formatCurrency(stoneCompareAtPrice)}
                       </TableCell>
                     </TableRow>
@@ -450,6 +481,15 @@ function VariantDetailModal({
                         {formatCurrency(priceComponents.sellingPrice.finalPriceWithoutTax)}
                       </TableCell>
                       <TableCell className="text-right font-medium">
+                        {subtotalMrpMarkup.amount !== 0 ? (
+                          <span className="text-emerald-600">
+                            {formatCurrency(subtotalMrpMarkup.amount)} ({subtotalMrpMarkup.percentage.toFixed(1)}%)
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
                         {formatCurrency(priceComponents.compareAtPrice.finalPriceWithoutTax)}
                       </TableCell>
                     </TableRow>
@@ -463,6 +503,7 @@ function VariantDetailModal({
                         <TableCell className="text-right">
                           {formatCurrency(priceComponents.sellingPrice.taxAmount)}
                         </TableCell>
+                        <TableCell className="text-right text-muted-foreground">-</TableCell>
                         <TableCell className="text-right">
                           {formatCurrency(priceComponents.compareAtPrice.taxAmount)}
                         </TableCell>
@@ -479,6 +520,7 @@ function VariantDetailModal({
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.sellingPrice.finalPrice)}
                       </TableCell>
+                      <TableCell className="text-right text-muted-foreground">-</TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(priceComponents.compareAtPrice.finalPrice)}
                       </TableCell>
@@ -1100,28 +1142,6 @@ export function JewelleryDefaultView({ product, onProductUpdate }: JewelleryDefa
       {/* Media Section */}
       {(() => {
         const media = product.metadata?.media as ProductMedia | undefined
-        const hasMedia = media?.colorMedia && media.colorMedia.length > 0
-
-        if (!hasMedia) {
-          return (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <CardTitle>Media</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditMediaDrawerOpen(true)}
-                >
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">No media added</p>
-              </CardContent>
-            </Card>
-          )
-        }
 
         return (
           <Card>
@@ -1137,26 +1157,24 @@ export function JewelleryDefaultView({ product, onProductUpdate }: JewelleryDefa
               </Button>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue={media.colorMedia[0]?.metalColorId} className="w-full">
-                <TabsList className="mb-4">
-                  {media.colorMedia.map((colorMedia) => {
-                    const metalColor = optionConfig?.metalColors.find(
-                      (mc) => mc.id === colorMedia.metalColorId
-                    )
-                    return (
-                      <TabsTrigger key={colorMedia.metalColorId} value={colorMedia.metalColorId}>
-                        {metalColor?.name || colorMedia.metalColorId}
-                      </TabsTrigger>
-                    )
-                  })}
+              <Tabs defaultValue={optionConfig?.metalColors[0]?.id} className="w-full">
+                <TabsList className="mb-4 flex-wrap h-auto gap-1">
+                  {optionConfig?.metalColors.map((mc) => (
+                    <TabsTrigger key={mc.id} value={mc.id}>
+                      {mc.name}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
 
-                {media.colorMedia.map((colorMedia) => {
-                  const hasGemstoneMedia = colorMedia.gemstoneSubMedia && colorMedia.gemstoneSubMedia.length > 0
+                {optionConfig?.metalColors.map((mc) => {
+                  const colorMedia = media?.colorMedia?.find((cm) => cm.metalColorId === mc.id)
+                  const hasGemstoneMedia = colorMedia?.gemstoneSubMedia && colorMedia.gemstoneSubMedia.length > 0
 
                   return (
-                    <TabsContent key={colorMedia.metalColorId} value={colorMedia.metalColorId}>
-                      {hasGemstoneMedia ? (
+                    <TabsContent key={mc.id} value={mc.id}>
+                      {!colorMedia ? (
+                        <p className="text-sm text-muted-foreground">No media added for {mc.name}</p>
+                      ) : hasGemstoneMedia ? (
                         <Tabs defaultValue="main" className="w-full">
                           <TabsList className="mb-4">
                             <TabsTrigger value="main">Main</TabsTrigger>
@@ -1260,7 +1278,7 @@ export function JewelleryDefaultView({ product, onProductUpdate }: JewelleryDefa
                               ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-muted-foreground">No media added for this color</p>
+                          <p className="text-sm text-muted-foreground">No media added for {mc.name}</p>
                         )
                       )}
                     </TabsContent>

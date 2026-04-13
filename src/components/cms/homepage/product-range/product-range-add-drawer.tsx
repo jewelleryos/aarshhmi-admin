@@ -30,6 +30,7 @@ export function ProductRangeAddDrawer({
   // Form state
   const [title, setTitle] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -43,6 +44,7 @@ export function ProductRangeAddDrawer({
   const resetForm = () => {
     setTitle('')
     setImageUrl('')
+    setMobileViewImageUrl('')
     setImageAltText('')
     setRedirectUrl('')
     setRank(0)
@@ -86,6 +88,7 @@ export function ProductRangeAddDrawer({
       await onSave({
         title: title.trim(),
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -150,6 +153,14 @@ export function ProductRangeAddDrawer({
             rootPath="cms/homepage/product-range"
             required
             error={errors.image_url}
+          />
+
+          {/* Mobile View Image Field */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/product-range/mobile"
           />
 
           {/* Alt Text Field */}

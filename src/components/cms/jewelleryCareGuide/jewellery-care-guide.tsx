@@ -20,6 +20,7 @@ import { MediaPickerInput } from '@/components/media'
 
 const defaultSection2To5Item: JewelleryCareGuideSection2To5Item = {
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
     description: [''],
@@ -27,6 +28,7 @@ const defaultSection2To5Item: JewelleryCareGuideSection2To5Item = {
 
 const defaultSection6Item: JewelleryCareGuideSection6Item = {
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
     description: [''],
@@ -35,12 +37,14 @@ const defaultSection6Item: JewelleryCareGuideSection6Item = {
 
 const defaultSection7Item: JewelleryCareGuideSection7Item = {
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     redirect_url: '',
 }
 
 const defaultSection9Item: JewelleryCareGuideSection9Item = {
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
     description: [''],
@@ -408,6 +412,14 @@ export default function CMSJewelleryCareGuide() {
                                     accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                 />
 
+                                <MediaPickerInput
+                                    label="Mobile View Image"
+                                    value={item.mobile_view_image_url || null}
+                                    onChange={(path) => updateSection2To5Item(sectionNum, index, 'mobile_view_image_url', path || '')}
+                                    rootPath={`cms/jewellery-care-guide/section${sectionNum}/mobile`}
+                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                />
+
                                 <div className="space-y-2">
                                     <Label>Image Alt Text</Label>
                                     <Input
@@ -599,6 +611,14 @@ export default function CMSJewelleryCareGuide() {
                                         accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                     />
 
+                                    <MediaPickerInput
+                                        label="Mobile View Image"
+                                        value={item.mobile_view_image_url || null}
+                                        onChange={(path) => updateSection6Item(index, 'mobile_view_image_url', path || '')}
+                                        rootPath="cms/jewellery-care-guide/section6/mobile"
+                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                    />
+
                                     <div className="space-y-2">
                                         <Label>Image Alt Text</Label>
                                         <Input
@@ -633,6 +653,14 @@ export default function CMSJewelleryCareGuide() {
                                         rootPath="cms/jewellery-care-guide/section7"
                                         required
                                         error={errors[`s7_${index}_image_url`]}
+                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                    />
+
+                                    <MediaPickerInput
+                                        label="Mobile View Image"
+                                        value={item.mobile_view_image_url || null}
+                                        onChange={(path) => updateSection7Item(index, 'mobile_view_image_url', path || '')}
+                                        rootPath="cms/jewellery-care-guide/section7/mobile"
                                         accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                     />
 
@@ -768,6 +796,14 @@ export default function CMSJewelleryCareGuide() {
                                         rootPath="cms/jewellery-care-guide/section9"
                                         required
                                         error={errors[`s9_${index}_image_url`]}
+                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                    />
+
+                                    <MediaPickerInput
+                                        label="Mobile View Image"
+                                        value={item.mobile_view_image_url || null}
+                                        onChange={(path) => updateSection9Item(index, 'mobile_view_image_url', path || '')}
+                                        rootPath="cms/jewellery-care-guide/section9/mobile"
                                         accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                     />
 

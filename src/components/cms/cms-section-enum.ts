@@ -36,9 +36,19 @@ export const cmsSections: CMSSection[] = [
         ],
     },
     {
-        id: "product-list-details",
-        label: "Product List Details",
-        children: [],
+        id: "categories-page",
+        label: "Categories Page",
+        children: [
+            { id: "product-list-details", label: "Product List Details", children: [] },
+        ],
+    },
+    {
+        id: "product-description-page",
+        label: "Product Description Page",
+        children: [
+            { id: "jewellery-care", label: "Jewellery Care", children: [] },
+            { id: "whats-in-the-box", label: "What's in the Box", children: [] },
+        ],
     },
     {
         id: "policy-pages",
@@ -64,6 +74,11 @@ export const cmsSections: CMSSection[] = [
     {
         id: "jewellery-care-guide",
         label: "Jewellery Care Guide",
+        children:[]
+    },
+    {
+        id: "general",
+        label: "General",
         children:[]
     },
 

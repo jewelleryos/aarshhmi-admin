@@ -29,6 +29,7 @@ const defaultSection1: AboutUsSection1 = {
     name: '',
     designation: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -36,6 +37,7 @@ const defaultSection2Item: AboutUsSection2Item = {
     title: '',
     description: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -43,6 +45,7 @@ const defaultSection3SubSection: AboutUsSection3SubSection = {
     sub_title: '',
     description: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -50,6 +53,7 @@ const defaultSection4SubSection: AboutUsSection4SubSection = {
     sub_title: '',
     description: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -58,6 +62,7 @@ const defaultSection5Item: AboutUsSection5Item = {
     description1: '',
     description2: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -66,6 +71,7 @@ const defaultSection6: AboutUsSection6 = {
     description1: '',
     description2: '',
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
 }
 
@@ -362,6 +368,16 @@ export default function CMSAboutUs() {
                             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                         />
 
+                        <MediaPickerInput
+                            label="Mobile View Image"
+                            value={section1.mobile_view_image_url || null}
+                            onChange={(path) => {
+                                setSection1((prev) => ({ ...prev, mobile_view_image_url: path || '' }))
+                            }}
+                            rootPath="cms/about-us/section1/mobile"
+                            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                        />
+
                         <div className="space-y-2">
                             <Label htmlFor="s1_image_alt_text">Image Alt Text</Label>
                             <Input
@@ -480,6 +496,16 @@ export default function CMSAboutUs() {
                                     accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                 />
 
+                                <MediaPickerInput
+                                    label="Mobile View Image"
+                                    value={item.mobile_view_image_url || null}
+                                    onChange={(path) => {
+                                        updateSection2(index, 'mobile_view_image_url', path || '')
+                                    }}
+                                    rootPath="cms/about-us/section2/mobile"
+                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                />
+
                                 <div className="space-y-2">
                                     <Label>Image Alt Text</Label>
                                     <Input
@@ -566,6 +592,16 @@ export default function CMSAboutUs() {
                                     rootPath="cms/about-us/section3"
                                     required
                                     error={errors[`s3_sub_${index}_image_url`]}
+                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                />
+
+                                <MediaPickerInput
+                                    label="Mobile View Image"
+                                    value={item.mobile_view_image_url || null}
+                                    onChange={(path) => {
+                                        updateSection3SubSection(index, 'mobile_view_image_url', path || '')
+                                    }}
+                                    rootPath="cms/about-us/section3/mobile"
                                     accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                 />
 
@@ -656,6 +692,16 @@ export default function CMSAboutUs() {
                                     accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                 />
 
+                                <MediaPickerInput
+                                    label="Mobile View Image"
+                                    value={item.mobile_view_image_url || null}
+                                    onChange={(path) => {
+                                        updateSection4SubSection(index, 'mobile_view_image_url', path || '')
+                                    }}
+                                    rootPath="cms/about-us/section4/mobile"
+                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                />
+
                                 <div className="space-y-2">
                                     <Label>Image Alt Text</Label>
                                     <Input
@@ -740,6 +786,16 @@ export default function CMSAboutUs() {
                                     accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                                 />
 
+                                <MediaPickerInput
+                                    label="Mobile View Image"
+                                    value={item.mobile_view_image_url || null}
+                                    onChange={(path) => {
+                                        updateSection5(index, 'mobile_view_image_url', path || '')
+                                    }}
+                                    rootPath="cms/about-us/section5/mobile"
+                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                />
+
                                 <div className="space-y-2">
                                     <Label>Image Alt Text</Label>
                                     <Input
@@ -820,6 +876,16 @@ export default function CMSAboutUs() {
                         rootPath="cms/about-us/section6"
                         required
                         error={errors.s6_image_url}
+                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                    />
+
+                    <MediaPickerInput
+                        label="Mobile View Image"
+                        value={section6.mobile_view_image_url || null}
+                        onChange={(path) => {
+                            setSection6((prev) => ({ ...prev, mobile_view_image_url: path || '' }))
+                        }}
+                        rootPath="cms/about-us/section6/mobile"
                         accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
                     />
 

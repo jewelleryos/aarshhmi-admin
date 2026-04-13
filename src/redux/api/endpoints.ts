@@ -392,6 +392,8 @@ const API_ENDPOINTS = {
       BANNER_5: '/api/cms/promotional-banners/banner-5',
     },
     PRODUCT_LIST_DETAILS: '/api/cms/product-list-details',
+    PRODUCT_DESCRIPTION_PAGE: '/api/cms/product-description-page',
+    GENERAL: '/api/cms/general',
   },
 
   // Coupon endpoints
@@ -463,12 +465,19 @@ const API_ENDPOINTS = {
     LIST: '/api/orders',
     GET: (id: string) => `/api/orders/${id}`,
     UPDATE_ITEM_STAGE: (orderId: string, itemId: string) => `/api/orders/${orderId}/items/${itemId}/stage`,
+    GENERATE_INVOICE: (orderId: string, itemId: string) => `/api/orders/${orderId}/items/${itemId}/generate-invoice`,
   },
   //SEO Pages
   SEO_PAGES: {
     LIST: '/api/seo-pages',
     UPDATE: (id: string) => `/api/seo-pages/${id}`,
-  }
+  },
+
+  // Contact Us endpoints
+  CONTACT_US: {
+    LIST: '/api/contact-us',
+    GET: (id: string) => `/api/contact-us/${id}`,
+  },
 }
 
 export default API_ENDPOINTS

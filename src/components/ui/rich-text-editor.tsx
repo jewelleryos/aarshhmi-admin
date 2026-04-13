@@ -162,8 +162,8 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          'min-h-[400px]',
-          'prose prose-sm max-w-none focus:outline-none min-h-[500px] max-h-[500px] overflow-y-auto px-4 py-3',
+          'min-h-[200px]',
+          'prose prose-sm max-w-none focus:outline-none min-h-[200px] max-h-[200px] overflow-y-auto px-4 py-3',
           'prose-headings:font-semibold prose-headings:text-foreground',
           'prose-h1:text-3xl prose-h1:mt-6 prose-h1:mb-4',
           'prose-h2:text-2xl prose-h2:mt-5 prose-h2:mb-3',

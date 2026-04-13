@@ -12,6 +12,7 @@ import { MediaPickerInput } from '@/components/media'
 
 export function EngagementContentComponent() {
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [buttonText, setButtonText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
@@ -35,6 +36,7 @@ export function EngagementContentComponent() {
       const content = response.data?.content as EngagementContent | undefined
       if (content) {
         setImageUrl(content.image_url || '')
+        setMobileViewImageUrl(content.mobile_view_image_url || '')
         setImageAltText(content.image_alt_text || '')
         setButtonText(content.button_text || '')
         setRedirectUrl(content.redirect_url || '')
@@ -68,6 +70,7 @@ export function EngagementContentComponent() {
     try {
       const response = await cmsService.updateEngagement({
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         button_text: buttonText,
         redirect_url: redirectUrl,
@@ -128,6 +131,14 @@ export function EngagementContentComponent() {
             rootPath="cms/homepage/engagement"
             required
             error={errors.image_url}
+            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+          />
+
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/engagement/mobile"
             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
           />
 

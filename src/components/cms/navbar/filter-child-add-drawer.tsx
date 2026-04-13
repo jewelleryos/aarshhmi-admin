@@ -31,6 +31,7 @@ export function FilterChildAddDrawer({
   const [name, setName] = useState('')
   const [redirectLink, setRedirectLink] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [rank, setRank] = useState(0)
 
@@ -41,6 +42,7 @@ export function FilterChildAddDrawer({
     setName('')
     setRedirectLink('')
     setImageUrl('')
+    setMobileViewImageUrl('')
     setImageAltText('')
     setRank(0)
     setErrors({})
@@ -69,7 +71,7 @@ export function FilterChildAddDrawer({
     setIsLoading(true)
 
     try {
-      await onSave({ name, redirectLink, imageUrl, imageAltText, rank })
+      await onSave({ name, redirectLink, imageUrl, mobileViewImageUrl, imageAltText, rank })
       resetForm()
     } finally {
       setIsLoading(false)
@@ -143,6 +145,14 @@ export function FilterChildAddDrawer({
             value={imageUrl || null}
             onChange={(path) => setImageUrl(path || '')}
             rootPath="cms/navbar"
+          />
+
+          {/* Mobile View Image */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/navbar/mobile"
           />
 
           {/* Image Alt Text */}

@@ -11,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import {
   Select,
   SelectContent,
@@ -254,13 +254,12 @@ export function CategoryAddDrawer({
 
           {/* Description Field */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Enter description (optional, supports HTML)"
+            <Label>Description</Label>
+            <RichTextEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
+              onChange={(html) => setDescription(html)}
+              placeholder="Enter description (optional)..."
+              mediaRootPath="categories"
             />
           </div>
 

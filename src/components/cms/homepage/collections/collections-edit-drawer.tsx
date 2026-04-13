@@ -30,6 +30,7 @@ export function CollectionsEditDrawer({
   onSave,
 }: CollectionsEditDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -41,6 +42,7 @@ export function CollectionsEditDrawer({
   useEffect(() => {
     if (collection) {
       setImageUrl(collection.image_url || '')
+      setMobileViewImageUrl(collection.mobile_view_image_url || '')
       setImageAltText(collection.image_alt_text || '')
       setRedirectUrl(collection.redirect_url || '')
       setRank(collection.rank || 0)
@@ -78,6 +80,7 @@ export function CollectionsEditDrawer({
       await onSave({
         id: collection.id,
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -122,6 +125,14 @@ export function CollectionsEditDrawer({
             rootPath="cms/homepage/collections"
             required
             error={errors.image_url}
+          />
+
+          {/* Mobile View Image Field */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/collections/mobile"
           />
 
           {/* Alt Text Field */}

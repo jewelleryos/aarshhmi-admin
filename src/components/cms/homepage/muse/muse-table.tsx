@@ -97,6 +97,15 @@ function createColumns(
       size: 200,
     },
     {
+      accessorKey: 'sparkle',
+      header: 'Sparkles',
+      cell: ({ row }) => (
+        <Badge variant="outline">{(row.original.sparkle || []).length}</Badge>
+      ),
+      enableSorting: false,
+      size: 80,
+    },
+    {
       accessorKey: 'status',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Status" />

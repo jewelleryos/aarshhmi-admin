@@ -8,12 +8,28 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
-import { cmsService, type PartnerWithUsContent } from '@/components/cms/services/cmsService'
+import { cmsService, type PartnerWithUsContent, type PartnerWithUsAssuranceItem } from '@/components/cms/services/cmsService'
 import { MediaPickerInput } from '@/components/media'
 
+const ASSURANCE_COUNT = 5
+
+const createDefaultAssuranceItems = (): PartnerWithUsAssuranceItem[] =>
+  Array.from({ length: ASSURANCE_COUNT }, (_, index) => ({
+    id: `partner_assurance_${index + 1}`,
+    image_url: '',
+    image_alt_text: '',
+    text_one: '',
+    text_two: '',
+  }))
+
 export default function CMSPartnerWithUs() {
+  // Assurance items (5 fixed)
+  const [assuranceItems, setAssuranceItems] = useState<PartnerWithUsAssuranceItem[]>(createDefaultAssuranceItems())
+  const [assuranceErrors, setAssuranceErrors] = useState<{ [key: number]: { image_url?: string; text_one?: string } }>({})
+
   // Section 1 - Banner (Image only)
   const [section1ImageUrl, setSection1ImageUrl] = useState('')
+  const [section1MobileViewImageUrl, setSection1MobileViewImageUrl] = useState('')
   const [section1ImageAltText, setSection1ImageAltText] = useState('')
 
   // Section 2
@@ -21,6 +37,7 @@ export default function CMSPartnerWithUs() {
   const [section2Description1, setSection2Description1] = useState('')
   const [section2Description2, setSection2Description2] = useState('')
   const [section2ImageUrl, setSection2ImageUrl] = useState('')
+  const [section2MobileViewImageUrl, setSection2MobileViewImageUrl] = useState('')
   const [section2ImageAltText, setSection2ImageAltText] = useState('')
   const [section2ButtonText, setSection2ButtonText] = useState('')
   const [section2RedirectUrl, setSection2RedirectUrl] = useState('')
@@ -31,6 +48,7 @@ export default function CMSPartnerWithUs() {
   const [section3Description2, setSection3Description2] = useState('')
   const [section3Description3, setSection3Description3] = useState('')
   const [section3ImageUrl, setSection3ImageUrl] = useState('')
+  const [section3MobileViewImageUrl, setSection3MobileViewImageUrl] = useState('')
   const [section3ImageAltText, setSection3ImageAltText] = useState('')
   const [section3ButtonText, setSection3ButtonText] = useState('')
   const [section3RedirectUrl, setSection3RedirectUrl] = useState('')
@@ -41,6 +59,7 @@ export default function CMSPartnerWithUs() {
   const [section4Description2, setSection4Description2] = useState('')
   const [section4Description3, setSection4Description3] = useState('')
   const [section4ImageUrl, setSection4ImageUrl] = useState('')
+  const [section4MobileViewImageUrl, setSection4MobileViewImageUrl] = useState('')
   const [section4ImageAltText, setSection4ImageAltText] = useState('')
   const [section4ButtonText, setSection4ButtonText] = useState('')
   const [section4RedirectUrl, setSection4RedirectUrl] = useState('')
@@ -62,14 +81,20 @@ export default function CMSPartnerWithUs() {
       const response = await cmsService.getPartnerWithUs()
       const content = response.data?.content as PartnerWithUsContent | undefined
       if (content) {
+        // Assurance
+        if (content.assurance?.length === ASSURANCE_COUNT) {
+          setAssuranceItems(content.assurance)
+        }
         // Section 1
         setSection1ImageUrl(content.section1_image_url || '')
+        setSection1MobileViewImageUrl(content.section1_mobile_view_image_url || '')
         setSection1ImageAltText(content.section1_image_alt_text || '')
         // Section 2
         setSection2Title(content.section2_title || '')
         setSection2Description1(content.section2_description1 || '')
         setSection2Description2(content.section2_description2 || '')
         setSection2ImageUrl(content.section2_image_url || '')
+        setSection2MobileViewImageUrl(content.section2_mobile_view_image_url || '')
         setSection2ImageAltText(content.section2_image_alt_text || '')
         setSection2ButtonText(content.section2_button_text || '')
         setSection2RedirectUrl(content.section2_redirect_url || '')
@@ -79,6 +104,7 @@ export default function CMSPartnerWithUs() {
         setSection3Description2(content.section3_description2 || '')
         setSection3Description3(content.section3_description3 || '')
         setSection3ImageUrl(content.section3_image_url || '')
+        setSection3MobileViewImageUrl(content.section3_mobile_view_image_url || '')
         setSection3ImageAltText(content.section3_image_alt_text || '')
         setSection3ButtonText(content.section3_button_text || '')
         setSection3RedirectUrl(content.section3_redirect_url || '')
@@ -88,6 +114,7 @@ export default function CMSPartnerWithUs() {
         setSection4Description2(content.section4_description2 || '')
         setSection4Description3(content.section4_description3 || '')
         setSection4ImageUrl(content.section4_image_url || '')
+        setSection4MobileViewImageUrl(content.section4_mobile_view_image_url || '')
         setSection4ImageAltText(content.section4_image_alt_text || '')
         setSection4ButtonText(content.section4_button_text || '')
         setSection4RedirectUrl(content.section4_redirect_url || '')
@@ -100,8 +127,33 @@ export default function CMSPartnerWithUs() {
     }
   }
 
+  const updateAssuranceItem = (index: number, field: keyof PartnerWithUsAssuranceItem, value: string) => {
+    setAssuranceItems((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+    if (value) {
+      setAssuranceErrors((prev) => {
+        const next = { ...prev }
+        if (next[index]) delete next[index][field as keyof typeof next[number]]
+        return next
+      })
+    }
+  }
+
   const handleSave = async () => {
     const newErrors: Record<string, string> = {}
+
+    // Assurance validation
+    const newAssuranceErrors: typeof assuranceErrors = {}
+    assuranceItems.forEach((item, index) => {
+      const itemErrors: { image_url?: string; text_one?: string } = {}
+      if (!item.image_url) itemErrors.image_url = 'Image is required'
+      if (!item.text_one) itemErrors.text_one = 'Text one is required'
+      if (Object.keys(itemErrors).length > 0) newAssuranceErrors[index] = itemErrors
+    })
+    setAssuranceErrors(newAssuranceErrors)
 
     // Section 1 validation
     if (!section1ImageUrl) newErrors.section1_image_url = 'Banner image is required'
@@ -144,7 +196,7 @@ export default function CMSPartnerWithUs() {
       newErrors.section4_redirect_url = 'Must be a valid URL starting with http:// or https://'
     }
 
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors).length > 0 || Object.keys(newAssuranceErrors).length > 0) {
       setErrors(newErrors)
       setTimeout(() => {
         const firstError = document.querySelector('p.text-destructive')
@@ -158,13 +210,16 @@ export default function CMSPartnerWithUs() {
 
     try {
       const response = await cmsService.updatePartnerWithUs({
+        assurance: assuranceItems,
         section1_image_url: section1ImageUrl,
+        section1_mobile_view_image_url: section1MobileViewImageUrl,
         section1_image_alt_text: section1ImageAltText,
 
         section2_title: section2Title,
         section2_description1: section2Description1,
         section2_description2: section2Description2,
         section2_image_url: section2ImageUrl,
+        section2_mobile_view_image_url: section2MobileViewImageUrl,
         section2_image_alt_text: section2ImageAltText,
         section2_button_text: section2ButtonText,
         section2_redirect_url: section2RedirectUrl,
@@ -174,6 +229,7 @@ export default function CMSPartnerWithUs() {
         section3_description2: section3Description2,
         section3_description3: section3Description3,
         section3_image_url: section3ImageUrl,
+        section3_mobile_view_image_url: section3MobileViewImageUrl,
         section3_image_alt_text: section3ImageAltText,
         section3_button_text: section3ButtonText,
         section3_redirect_url: section3RedirectUrl,
@@ -183,6 +239,7 @@ export default function CMSPartnerWithUs() {
         section4_description2: section4Description2,
         section4_description3: section4Description3,
         section4_image_url: section4ImageUrl,
+        section4_mobile_view_image_url: section4MobileViewImageUrl,
         section4_image_alt_text: section4ImageAltText,
         section4_button_text: section4ButtonText,
         section4_redirect_url: section4RedirectUrl,
@@ -245,6 +302,14 @@ export default function CMSPartnerWithUs() {
             rootPath="cms/partner-with-us/section1"
             required
             error={errors.section1_image_url}
+            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+          />
+
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={section1MobileViewImageUrl || null}
+            onChange={(path) => setSection1MobileViewImageUrl(path || '')}
+            rootPath="cms/partner-with-us/section1/mobile"
             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
           />
 
@@ -332,6 +397,14 @@ export default function CMSPartnerWithUs() {
             rootPath="cms/partner-with-us/section2"
             required
             error={errors.section2_image_url}
+            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+          />
+
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={section2MobileViewImageUrl || null}
+            onChange={(path) => setSection2MobileViewImageUrl(path || '')}
+            rootPath="cms/partner-with-us/section2/mobile"
             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
           />
 
@@ -481,6 +554,14 @@ export default function CMSPartnerWithUs() {
             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
           />
 
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={section3MobileViewImageUrl || null}
+            onChange={(path) => setSection3MobileViewImageUrl(path || '')}
+            rootPath="cms/partner-with-us/section3/mobile"
+            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+          />
+
           <div className="space-y-2">
             <Label htmlFor="section3_image_alt_text">Image Alt Text</Label>
             <Input
@@ -627,6 +708,14 @@ export default function CMSPartnerWithUs() {
             accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
           />
 
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={section4MobileViewImageUrl || null}
+            onChange={(path) => setSection4MobileViewImageUrl(path || '')}
+            rootPath="cms/partner-with-us/section4/mobile"
+            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+          />
+
           <div className="space-y-2">
             <Label htmlFor="section4_image_alt_text">Image Alt Text</Label>
             <Input
@@ -675,6 +764,67 @@ export default function CMSPartnerWithUs() {
                 Full URL with https (e.g., https://example.com)
               </p>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 5 - Assurance */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Section 5 - Assurance (5 fixed items)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {assuranceItems.map((item, index) => (
+              <Card key={item.id}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Assurance {index + 1}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <MediaPickerInput
+                    label="Image"
+                    value={item.image_url || null}
+                    onChange={(path) => updateAssuranceItem(index, 'image_url', path || '')}
+                    rootPath="cms/partner-with-us/assurance"
+                    required
+                    error={assuranceErrors[index]?.image_url}
+                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                  />
+                  <div className="space-y-2">
+                    <Label htmlFor={`assurance_alt_${index}`}>Alt Text</Label>
+                    <Input
+                      id={`assurance_alt_${index}`}
+                      placeholder="Image description"
+                      value={item.image_alt_text}
+                      onChange={(e) => updateAssuranceItem(index, 'image_alt_text', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`assurance_text_one_${index}`}>
+                      Text One <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id={`assurance_text_one_${index}`}
+                      placeholder="Enter text"
+                      value={item.text_one}
+                      onChange={(e) => updateAssuranceItem(index, 'text_one', e.target.value)}
+                    />
+                    {assuranceErrors[index]?.text_one && (
+                      <p className="text-sm text-destructive">{assuranceErrors[index].text_one}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`assurance_text_two_${index}`}>Text Two</Label>
+                    <Input
+                      id={`assurance_text_two_${index}`}
+                      placeholder="Enter text"
+                      value={item.text_two || ''}
+                      onChange={(e) => updateAssuranceItem(index, 'text_two', e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </CardContent>
       </Card>

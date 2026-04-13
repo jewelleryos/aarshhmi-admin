@@ -16,6 +16,7 @@ const createDefaultItems = (): AssuranceItem[] =>
   Array.from({ length: ASSURANCE_COUNT }, (_, index) => ({
     id: `assurance_${index + 1}`,
     image_url: '',
+    mobile_view_image_url: '',
     image_alt_text: '',
     text_one: '',
     text_two: '',
@@ -141,6 +142,14 @@ export function AssuranceContentComponent() {
                 rootPath="cms/homepage/assurance"
                 required
                 error={errors[index]?.image_url}
+                accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+              />
+
+              <MediaPickerInput
+                label="Mobile View Image"
+                value={item.mobile_view_image_url || null}
+                onChange={(path) => updateItem(index, 'mobile_view_image_url', path || '')}
+                rootPath="cms/homepage/assurance/mobile"
                 accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
               />
 

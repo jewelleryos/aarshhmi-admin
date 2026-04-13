@@ -28,6 +28,7 @@ export function ShopByShapeAddDrawer({
   onSave,
 }: ShopByShapeAddDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -38,6 +39,7 @@ export function ShopByShapeAddDrawer({
 
   const resetForm = () => {
     setImageUrl('')
+    setMobileViewImageUrl('')
     setImageAltText('')
     setRedirectUrl('')
     setRank(0)
@@ -74,6 +76,7 @@ export function ShopByShapeAddDrawer({
     try {
       await onSave({
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -119,6 +122,14 @@ export function ShopByShapeAddDrawer({
             rootPath="cms/homepage/shop-by-shape"
             required
             error={errors.image_url}
+          />
+
+          {/* Mobile View Image Field */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/shop-by-shape/mobile"
           />
 
           {/* Alt Text Field */}

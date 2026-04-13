@@ -32,6 +32,7 @@ export function ProductRangeEditDrawer({
   // Form state
   const [title, setTitle] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -46,6 +47,7 @@ export function ProductRangeEditDrawer({
     if (category) {
       setTitle(category.title || '')
       setImageUrl(category.image_url || '')
+      setMobileViewImageUrl(category.mobile_view_image_url || '')
       setImageAltText(category.image_alt_text || '')
       setRedirectUrl(category.redirect_url || '')
       setRank(category.rank || 0)
@@ -90,6 +92,7 @@ export function ProductRangeEditDrawer({
         id: category.id,
         title: title.trim(),
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -153,6 +156,14 @@ export function ProductRangeEditDrawer({
             rootPath="cms/homepage/product-range"
             required
             error={errors.image_url}
+          />
+
+          {/* Mobile View Image Field */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/product-range/mobile"
           />
 
           {/* Alt Text Field */}

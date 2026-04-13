@@ -2,36 +2,33 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { cmsService, type ExperienceContent } from '@/components/cms/services/cmsService'
+import {
+  cmsService,
+  type ExperienceContent,
+  type ExperienceImageItem,
+} from '@/components/cms/services/cmsService'
 import { MediaPickerInput } from '@/components/media'
 
 export function ExperienceContentComponent() {
-  // Form state
-  const [imageUrl, setImageUrl] = useState('')
-  const [imageAlterText, setImageAlterText] = useState('')
-  const [redirectUrl, setRedirectUrl] = useState('')
+  const [images, setImages] = useState<ExperienceImageItem[]>([])
   const [description, setDescription] = useState('')
   const [secondSectionTitle, setSecondSectionTitle] = useState('')
 
-  // Loading states
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
-  // Error state
   const [errors, setErrors] = useState<{
-    image_url?: string
-    redirect_url?: string
     description?: string
     second_section_title?: string
+    images?: string
   }>({})
 
-  // Fetch content on mount
   useEffect(() => {
     fetchContent()
   }, [])
@@ -42,9 +39,7 @@ export function ExperienceContentComponent() {
       const response = await cmsService.getExperience()
       const content = response.data?.content as ExperienceContent | undefined
       if (content) {
-        setImageUrl(content.image_url || '')
-        setImageAlterText(content.image_alter_text || '')
-        setRedirectUrl(content.redirect_url || '')
+        setImages(content.images || [])
         setDescription(content.description || '')
         setSecondSectionTitle(content.second_section_title || '')
       }
@@ -56,16 +51,25 @@ export function ExperienceContentComponent() {
     }
   }
 
+  const handleAddImage = () => {
+    setImages((prev) => [...prev, { image_url: '', mobile_view_image_url: '', image_alter_text: '', redirect_url: undefined }])
+  }
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleImageChange = (index: number, field: keyof ExperienceImageItem, value: string) => {
+    setImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, [field]: value } : img))
+    )
+  }
+
   const handleSave = async () => {
-    // Validate
     const newErrors: typeof errors = {}
-    if (!imageUrl) {
-      newErrors.image_url = 'Image is required'
-    }
-    if (!redirectUrl) {
-      newErrors.redirect_url = 'Redirect URL is required'
-    } else if (!/^https?:\/\/.+/.test(redirectUrl)) {
-      newErrors.redirect_url = 'Must be a valid URL starting with http:// or https://'
+
+    if (images.some((img) => !img.image_url)) {
+      newErrors.images = 'All images must have a file selected'
     }
     if (!description) {
       newErrors.description = 'Description is required'
@@ -84,9 +88,7 @@ export function ExperienceContentComponent() {
 
     try {
       const response = await cmsService.updateExperience({
-        image_url: imageUrl,
-        image_alter_text: imageAlterText,
-        redirect_url: redirectUrl,
+        images,
         description,
         second_section_title: secondSectionTitle,
       })
@@ -132,58 +134,98 @@ export function ExperienceContentComponent() {
         </Button>
       </div>
 
-      {/* Form */}
+      {/* Images */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Images</h2>
+          <Button variant="outline" size="sm" onClick={handleAddImage}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Image
+          </Button>
+        </div>
+
+        {errors.images && (
+          <p className="text-sm text-destructive">{errors.images}</p>
+        )}
+
+        {images.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-muted-foreground text-sm">No images added yet.</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={handleAddImage}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add First Image
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {images.map((img, index) => (
+              <Card key={index}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Image {index + 1}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <MediaPickerInput
+                    label="Image"
+                    value={img.image_url || null}
+                    onChange={(path) => handleImageChange(index, 'image_url', path || '')}
+                    rootPath="cms/homepage/experience"
+                    required
+                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                  />
+                  <MediaPickerInput
+                    label="Mobile View Image"
+                    value={img.mobile_view_image_url || null}
+                    onChange={(path) => handleImageChange(index, 'mobile_view_image_url', path || '')}
+                    rootPath="cms/homepage/experience/mobile"
+                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                  />
+                  <div className="space-y-2">
+                    <Label>Image Alt Text</Label>
+                    <Input
+                      placeholder="Describe the image"
+                      value={img.image_alter_text}
+                      onChange={(e) => handleImageChange(index, 'image_alter_text', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Redirect URL</Label>
+                    <Input
+                      placeholder="https://example.com/experience"
+                      value={img.redirect_url || ''}
+                      onChange={(e) => handleImageChange(index, 'redirect_url', e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Optional. Full URL with https (e.g., https://example.com/page)
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Section Details */}
       <Card>
-        <CardContent className="pt-6 space-y-6">
-          {/* Image Field */}
-          <MediaPickerInput
-            label="Image"
-            value={imageUrl || null}
-            onChange={(path) => {
-              setImageUrl(path || '')
-              if (path) setErrors((prev) => ({ ...prev, image_url: undefined }))
-            }}
-            rootPath="cms/homepage/experience"
-            required
-            error={errors.image_url}
-            accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
-          />
-
-          {/* Alter Text Field */}
-          <div className="space-y-2">
-            <Label htmlFor="image_alt_text">Image Alt Text</Label>
-            <Input
-              id="image_alt_text"
-              placeholder="Describe the image"
-              value={imageAlterText}
-              onChange={(e) => setImageAlterText(e.target.value)}
-            />
-          </div>
-
-          {/* Redirect URL Field */}
-          <div className="space-y-2">
-            <Label htmlFor="redirect_url">
-              Redirect URL <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="redirect_url"
-              placeholder="https://example.com/experience"
-              value={redirectUrl}
-              onChange={(e) => {
-                setRedirectUrl(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, redirect_url: undefined }))
-              }}
-            />
-            {errors.redirect_url ? (
-              <p className="text-sm text-destructive">{errors.redirect_url}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Full URL with https (e.g., https://example.com/experience)
-              </p>
-            )}
-          </div>
-
-          {/* Description Field */}
+        <CardHeader>
+          <CardTitle className="text-lg">Section Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">
               Description <span className="text-destructive">*</span>
@@ -203,7 +245,7 @@ export function ExperienceContentComponent() {
             )}
           </div>
 
-          {/* Second Section Title Field */}
+          {/* Second Section Title */}
           <div className="space-y-2">
             <Label htmlFor="second_section_title">
               Second Section Title <span className="text-destructive">*</span>
@@ -214,7 +256,8 @@ export function ExperienceContentComponent() {
               value={secondSectionTitle}
               onChange={(e) => {
                 setSecondSectionTitle(e.target.value)
-                if (e.target.value) setErrors((prev) => ({ ...prev, second_section_title: undefined }))
+                if (e.target.value)
+                  setErrors((prev) => ({ ...prev, second_section_title: undefined }))
               }}
             />
             {errors.second_section_title && (

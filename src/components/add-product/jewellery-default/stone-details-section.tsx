@@ -255,7 +255,9 @@ export function StoneDetailsSection({
     onChange({
       ...data,
       diamonds: data.diamonds.map((d) =>
-        d.id === diamondId ? { ...d, [field]: value } : d
+        d.id === diamondId
+          ? { ...d, [field]: value, ...(field === "shapeId" ? { pricings: {} } : {}) }
+          : d
       ),
     })
   }
@@ -329,7 +331,9 @@ export function StoneDetailsSection({
     onChange({
       ...data,
       gemstones: data.gemstones.map((g) =>
-        g.id === gemstoneId ? { ...g, [field]: value } : g
+        g.id === gemstoneId
+          ? { ...g, [field]: value, ...(field === "typeId" || field === "shapeId" ? { pricings: {} } : {}) }
+          : g
       ),
     })
   }

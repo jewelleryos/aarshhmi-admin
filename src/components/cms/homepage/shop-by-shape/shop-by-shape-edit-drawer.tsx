@@ -30,6 +30,7 @@ export function ShopByShapeEditDrawer({
   onSave,
 }: ShopByShapeEditDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
@@ -41,6 +42,7 @@ export function ShopByShapeEditDrawer({
   useEffect(() => {
     if (shape) {
       setImageUrl(shape.image_url || '')
+      setMobileViewImageUrl(shape.mobile_view_image_url || '')
       setImageAltText(shape.image_alt_text || '')
       setRedirectUrl(shape.redirect_url || '')
       setRank(shape.rank || 0)
@@ -78,6 +80,7 @@ export function ShopByShapeEditDrawer({
       await onSave({
         id: shape.id,
         image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
         redirect_url: redirectUrl,
         rank,
@@ -122,6 +125,14 @@ export function ShopByShapeEditDrawer({
             rootPath="cms/homepage/shop-by-shape"
             required
             error={errors.image_url}
+          />
+
+          {/* Mobile View Image Field */}
+          <MediaPickerInput
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/homepage/shop-by-shape/mobile"
           />
 
           {/* Alt Text Field */}
