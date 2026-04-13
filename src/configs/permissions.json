@@ -187,5 +187,8 @@
   "SEO_PAGES": {
     "READ": 3601,
     "UPDATE": 3602
+  },
+  "CONTACT_US": {
+    "READ": 3701
   }
 }

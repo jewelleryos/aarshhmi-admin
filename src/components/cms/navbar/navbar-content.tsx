@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Plus, Loader2 } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle ,CardDescription} from '@/components/ui/card'
+import { Plus, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { cmsService, type NavItem, type NavbarContent } from '../services/cmsService'
 import { NavbarTable } from './navbar-table'
 import { NavbarAddDrawer } from './navbar-add-drawer'
 import { NavbarEditDrawer } from './navbar-edit-drawer'
 import { MegaMenuManager } from './mega-menu-manager'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 
 export function NavbarContentComponent() {
   const [items, setItems] = useState<NavItem[]>([])
+  const [headerDescription, setHeaderDescription] = useState<string>('')
+  const [isSavingDescription, setIsSavingDescription] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false)
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
@@ -29,11 +32,25 @@ export function NavbarContentComponent() {
       const response = await cmsService.getNavbar()
       const content = response.data?.content as NavbarContent | undefined
       setItems(content?.items || [])
+      setHeaderDescription(content?.headerDescription || '')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to fetch navbar items')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleSaveHeaderDescription = async () => {
+    try {
+      setIsSavingDescription(true)
+      const response = await cmsService.updateNavbar({ items, headerDescription })
+      toast.success(response.message)
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || 'Failed to save header description')
+    } finally {
+      setIsSavingDescription(false)
     }
   }
 
@@ -44,7 +61,7 @@ export function NavbarContentComponent() {
         id: `nav_${Date.now()}`,
       }
       const updatedItems = [...items, newItem]
-      const response = await cmsService.updateNavbar({ items: updatedItems })
+      const response = await cmsService.updateNavbar({ items: updatedItems, headerDescription })
       toast.success(response.message)
       setItems(updatedItems)
       setIsAddDrawerOpen(false)
@@ -57,7 +74,7 @@ export function NavbarContentComponent() {
   const handleEditItem = async (item: NavItem) => {
     try {
       const updatedItems = items.map((i) => (i.id === item.id ? item : i))
-      const response = await cmsService.updateNavbar({ items: updatedItems })
+      const response = await cmsService.updateNavbar({ items: updatedItems, headerDescription })
       toast.success(response.message)
       setItems(updatedItems)
       setIsEditDrawerOpen(false)
@@ -71,7 +88,7 @@ export function NavbarContentComponent() {
   const handleDeleteItem = async (itemId: string) => {
     try {
       const updatedItems = items.filter((i) => i.id !== itemId)
-      const response = await cmsService.updateNavbar({ items: updatedItems })
+      const response = await cmsService.updateNavbar({ items: updatedItems, headerDescription })
       toast.success(response.message)
       setItems(updatedItems)
     } catch (err: unknown) {
@@ -85,7 +102,7 @@ export function NavbarContentComponent() {
       const updatedItems = items.map((i) =>
         i.id === itemId ? { ...i, status: !i.status } : i
       )
-      const response = await cmsService.updateNavbar({ items: updatedItems })
+      const response = await cmsService.updateNavbar({ items: updatedItems, headerDescription })
       toast.success(response.message)
       setItems(updatedItems)
     } catch (err: unknown) {
@@ -143,6 +160,44 @@ export function NavbarContentComponent() {
           Add Nav Link
         </Button>
       </div>
+
+      {/* Header Description */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Header Description</CardTitle>
+          <CardDescription>
+            
+            Announcement text displayed in the top banner of the storefront. Use the placeholder{' '}
+            <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
+              {'{{metal_price:PURITY_SLUG}}'}
+            </code>{' '}
+            to insert live metal prices — e.g.{' '}
+            <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
+              {"Today's Gold Rate: ₹{{metal_price:gold-24k}} / 1g"}
+            </code>
+            . The slug must match a purity slug in the Metal Purities master data.
+          </CardDescription>
+
+          <div className="flex justify-end">
+            <Button onClick={handleSaveHeaderDescription} disabled={isSavingDescription}>
+              {isSavingDescription ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Description
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <RichTextEditor
+            value={headerDescription}
+            onChange={setHeaderDescription}
+            placeholder="Enter header description... Use 'Insert Variable' to add dynamic metal price values."
+            mediaRootPath="cms/navbar"
+          />
+        </CardContent>
+      </Card>
 
       {/* Table */}
       <Card>

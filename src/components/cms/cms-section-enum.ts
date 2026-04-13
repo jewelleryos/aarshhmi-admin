@@ -81,5 +81,18 @@ export const cmsSections: CMSSection[] = [
         label: "General",
         children:[]
     },
+    {
+        id: "blog",
+        label: "Blog",
+        children:[]
+    },
+    {
+        id: 'guide',
+        label: 'Guide',
+        children: [
+            { id: 'diamond-education', label: 'Diamond Education', children: [] },
+            { id: 'metal-guide', label: 'Metal Guide', children: [] },
+        ],
+    },
 
 ]

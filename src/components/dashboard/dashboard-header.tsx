@@ -38,7 +38,7 @@ export function DashboardHeader() {
       {/* Right Side */}
       <div className="ml-auto flex items-center gap-2">
         {/* Search */}
-        <div className="hidden sm:flex relative w-64 lg:w-72">
+        {/* <div className="hidden sm:flex relative w-64 lg:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search products, orders..."
@@ -47,16 +47,16 @@ export function DashboardHeader() {
           <kbd className="hidden lg:inline-flex absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
             <span className="text-xs">⌘</span>K
           </kbd>
-        </div>
+        </div> */}
 
 
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        {/* <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-4 w-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
           <span className="sr-only">Notifications</span>
-        </Button>
+        </Button> */}
       </div>
     </header>
   )

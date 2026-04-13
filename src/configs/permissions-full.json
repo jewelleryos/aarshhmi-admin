@@ -961,6 +961,18 @@
           ]
         }
       }
+    },
+    "contact_us": {
+      "id": 37,
+      "label": "Contact Us",
+      "group": "Store",
+      "permissions": {
+        "read": {
+          "code": 3701,
+          "label": "View Contact Inquiries",
+          "requires": []
+        }
+      }
     }
   },
   "byCode": {
@@ -1838,6 +1850,12 @@
       "requires": [
         3601
       ]
+    },
+    "3701": {
+      "module": "contact_us",
+      "action": "read",
+      "label": "View Contact Inquiries",
+      "requires": []
     }
   }
 }

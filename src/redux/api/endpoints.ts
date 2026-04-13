@@ -394,6 +394,11 @@ const API_ENDPOINTS = {
     PRODUCT_LIST_DETAILS: '/api/cms/product-list-details',
     PRODUCT_DESCRIPTION_PAGE: '/api/cms/product-description-page',
     GENERAL: '/api/cms/general',
+    BLOG: '/api/cms/blog',
+    GUIDE: {
+      DIAMOND_EDUCATION: '/api/cms/guide/diamond-education',
+      METAL_GUIDE: '/api/cms/guide/metal-guide',
+    },
   },
 
   // Coupon endpoints

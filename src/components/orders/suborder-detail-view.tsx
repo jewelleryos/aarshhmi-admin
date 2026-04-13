@@ -228,14 +228,14 @@ export function SuborderDetailView({ orderId, itemId }: SuborderDetailViewProps)
               </a>
             </Button>
           )}
-          {item.invoice_url ? (
+          {/* {item.invoice_url ? ( */}
             <Button variant="outline" size="sm" asChild>
               <a href={item.invoice_url} target="_blank" rel="noopener noreferrer">
                 <FileDown className="mr-2 h-4 w-4" />
                 Invoice
               </a>
             </Button>
-          ) : item.stage >= 10 ? (
+          {/* ) : item.stage >= 10 ? (
             <Button
               variant="outline"
               size="sm"
@@ -249,7 +249,7 @@ export function SuborderDetailView({ orderId, itemId }: SuborderDetailViewProps)
               )}
               {isGeneratingInvoice ? "Generating..." : "Generate Invoice"}
             </Button>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
 

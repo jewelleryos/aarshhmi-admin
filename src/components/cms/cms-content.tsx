@@ -35,6 +35,9 @@ import { ProductListDetailsComponent } from "./product-list-details/product-list
 import { JewelleryCareComponent } from "./product-description-page/jewellery-care";
 import { WhatsInTheBoxComponent } from "./product-description-page/whats-in-the-box";
 import { GeneralContentComponent } from "./general/general-content";
+import { BlogContentComponent } from "./blog/blog-content";
+import { DiamondEducationContent } from "./guide/diamond-education/diamond-education-content";
+import { MetalGuideContent } from "./guide/metal-guide/metal-guide-content";
 import { cmsService } from "./services/cmsService";
 
 export function CMSContent() {
@@ -148,6 +151,9 @@ export function CMSContent() {
             activeSection === "jewellery-care" ? <JewelleryCareComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
             activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
             activeSection === "general" ? <GeneralContentComponent /> :
+            activeSection === "blog" ? <BlogContentComponent /> :
+            activeSection === "diamond-education" ? <DiamondEducationContent /> :
+            activeSection === "metal-guide" ? <MetalGuideContent /> :
             <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-semibold text-muted-foreground">Coming Soon</h1>

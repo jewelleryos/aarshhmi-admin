@@ -408,6 +408,155 @@ export interface NavItem {
 
 export interface NavbarContent {
   items: NavItem[]
+  headerDescription?: string
+}
+
+// Types - Blog
+export interface BlogButton {
+  id: string
+  button_text: string
+  redirection_url: string
+}
+
+export interface BlogItem {
+  id: string
+  title: string
+  description: string
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+  blog_description: string
+  rank: number
+  status: boolean
+}
+
+export interface BlogContent {
+  title: string
+  description: string
+  button_data: BlogButton[]
+  blogs: BlogItem[]
+}
+
+// Types - Diamond Education
+export interface DiamondEducationSection1Item {
+  id: string
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+  rank: number
+}
+
+export interface DiamondEducationSection2Item {
+  id: string
+  title: string
+  description: string[]
+}
+
+export interface DiamondEducationSection3 {
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+}
+
+export interface DiamondEducationSection4 {
+  title: string
+  content: string
+}
+
+export interface DiamondEducationSection5SubSection {
+  id: string
+  title: string
+  description: string[]
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+}
+
+export interface DiamondEducationSection5 {
+  title: string
+  sub_sections: DiamondEducationSection5SubSection[]
+}
+
+export interface DiamondEducationContent {
+  title: string
+  section1: DiamondEducationSection1Item[]
+  section2: DiamondEducationSection2Item[]
+  section3: DiamondEducationSection3
+  section4: DiamondEducationSection4
+  section5: DiamondEducationSection5
+}
+
+// Types - Metal Guide
+export interface MetalGuideSection1Item {
+  id: string
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+  rank: number
+}
+
+export interface MetalGuideSection2Item {
+  id: string
+  title: string
+  description: string[]
+}
+
+export interface MetalGuideSubSectionItem {
+  id: string
+  title: string
+  description: string[]
+  image_url: string
+  mobile_image_url: string
+  redirect_url: string
+  image_alt_text: string
+}
+
+export interface MetalGuideSection3 {
+  title: string
+  sub_sections: MetalGuideSubSectionItem[]
+}
+
+export interface MetalGuideSection4 {
+  title: string
+  sub_sections: MetalGuideSubSectionItem[]
+}
+
+export interface MetalGuideSection5 {
+  title: string
+  description: string[]
+  content: string
+}
+
+export interface MetalGuideSection6 {
+  title: string
+  description: string[]
+}
+
+export interface MetalGuideSection7 {
+  title: string
+  content: string
+}
+
+export interface MetalGuideSection8 {
+  title: string
+  description: string[]
+}
+
+export interface MetalGuideContent {
+  title: string
+  section1: MetalGuideSection1Item[]
+  section2: MetalGuideSection2Item[]
+  section3: MetalGuideSection3
+  section4: MetalGuideSection4
+  section5: MetalGuideSection5
+  section6: MetalGuideSection6
+  section7: MetalGuideSection7
+  section8: MetalGuideSection8
 }
 
 // Types - Product for CMS selection
@@ -814,6 +963,41 @@ export const cmsService = {
     content: GeneralContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
     const response = await apiService.put(API_ENDPOINTS.CMS.GENERAL, { content })
+    return response.data
+  },
+
+  // Blog
+  getBlog: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.BLOG)
+    return response.data
+  },
+
+  updateBlog: async (
+    content: BlogContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.BLOG, { content })
+    return response.data
+  },
+
+  getDiamondEducation: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.GUIDE.DIAMOND_EDUCATION)
+    return response.data
+  },
+
+  updateDiamondEducation: async (
+    content: DiamondEducationContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.GUIDE.DIAMOND_EDUCATION, { content })
+    return response.data
+  },
+
+  getMetalGuide: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.GUIDE.METAL_GUIDE)
+    return response.data
+  },
+
+  updateMetalGuide: async (content: MetalGuideContent): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.GUIDE.METAL_GUIDE, { content })
     return response.data
   },
 }
