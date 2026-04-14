@@ -14,16 +14,16 @@ import { Label } from '@/components/ui/label'
 import { Loader2, Layers } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
-import type { DiamondEducationSection6SubSection } from '@/components/cms/services/cmsService'
+import type { DiamondEducationSection5SubSection } from '@/components/cms/services/cmsService'
 
 interface Section5SubSectionDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  item: DiamondEducationSection6SubSection | null
+  item: DiamondEducationSection5SubSection | null
   onSave: (
     item:
-      | Omit<DiamondEducationSection6SubSection, 'id'>
-      | DiamondEducationSection6SubSection
+      | Omit<DiamondEducationSection5SubSection, 'id'>
+      | DiamondEducationSection5SubSection
   ) => Promise<void>
 }
 
@@ -141,7 +141,7 @@ export function Section5SubSectionDrawer({
               <SheetTitle>{isEditMode ? 'Edit Sub-section' : 'Add Sub-section'}</SheetTitle>
               <p className="text-sm text-muted-foreground">
                 {isEditMode
-                  ? 'Update the section 6 sub-section'
+                  ? 'Update the section 5 sub-section'
                   : 'Add a new sub-section to section 6'}
               </p>
             </div>

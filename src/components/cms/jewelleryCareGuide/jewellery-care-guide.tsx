@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Save, Trash2 } from 'lucide-react'
+import { Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     cmsService,
@@ -17,13 +16,14 @@ import {
     type JewelleryCareGuideSection9Item,
 } from '@/components/cms/services/cmsService'
 import { MediaPickerInput } from '@/components/media'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 
 const defaultSection2To5Item: JewelleryCareGuideSection2To5Item = {
     image_url: '',
     mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
-    description: [''],
+    description: '',
 }
 
 const defaultSection6Item: JewelleryCareGuideSection6Item = {
@@ -31,7 +31,7 @@ const defaultSection6Item: JewelleryCareGuideSection6Item = {
     mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
-    description: [''],
+    description: '',
     sub_title: '',
 }
 
@@ -47,7 +47,7 @@ const defaultSection9Item: JewelleryCareGuideSection9Item = {
     mobile_view_image_url: '',
     image_alt_text: '',
     title: '',
-    description: [''],
+    description: '',
     sub_title: '',
 }
 
@@ -99,50 +99,26 @@ export default function CMSJewelleryCareGuide() {
             if (content) {
                 if (content.section1) setSection1(content.section1)
                 if (content.section2 && content.section2.length > 0) {
-                    setSection2(content.section2.map((item) => ({ 
-                        ...defaultSection2To5Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection2(content.section2.map((item) => ({ ...defaultSection2To5Item, ...item })))
                 }
                 if (content.section3 && content.section3.length > 0) {
-                    setSection3(content.section3.map((item) => ({ 
-                        ...defaultSection2To5Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection3(content.section3.map((item) => ({ ...defaultSection2To5Item, ...item })))
                 }
                 if (content.section4 && content.section4.length > 0) {
-                    setSection4(content.section4.map((item) => ({ 
-                        ...defaultSection2To5Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection4(content.section4.map((item) => ({ ...defaultSection2To5Item, ...item })))
                 }
                 if (content.section5 && content.section5.length > 0) {
-                    setSection5(content.section5.map((item) => ({ 
-                        ...defaultSection2To5Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection5(content.section5.map((item) => ({ ...defaultSection2To5Item, ...item })))
                 }
                 if (content.section6 && content.section6.length > 0) {
-                    setSection6(content.section6.map((item) => ({ 
-                        ...defaultSection6Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection6(content.section6.map((item) => ({ ...defaultSection6Item, ...item })))
                 }
                 if (content.section7 && content.section7.length > 0) {
                     setSection7(content.section7.map((item) => ({ ...defaultSection7Item, ...item })))
                 }
                 if (content.section8) setSection8(content.section8)
                 if (content.section9 && content.section9.length > 0) {
-                    setSection9(content.section9.map((item) => ({ 
-                        ...defaultSection9Item, 
-                        ...item,
-                        description: item.description.length > 0 ? item.description : ['']
-                    })))
+                    setSection9(content.section9.map((item) => ({ ...defaultSection9Item, ...item })))
                 }
             }
         } catch (err: unknown) {
@@ -158,17 +134,12 @@ export default function CMSJewelleryCareGuide() {
 
         // Section 1 validation
         if (!section1.title) newErrors['s1_title'] = 'Title is required'
-        if (!section1.description) newErrors['s1_description'] = 'Description is required' as string;
 
         // Section 2-5 validation
-        ([section2, section3, section4, section5] as JewelleryCareGuideSection2To5Item[][]).forEach((section:any, sIdx:number) => {
-            if (!section) return
-            section.forEach((item:any, i:number) => {
+        ;([section2, section3, section4, section5] as JewelleryCareGuideSection2To5Item[][]).forEach((section, sIdx) => {
+            section.forEach((item, i) => {
                 if (!item.image_url) newErrors[`s${sIdx + 2}_${i}_image_url`] = 'Image is required'
                 if (!item.title) newErrors[`s${sIdx + 2}_${i}_title`] = 'Title is required'
-                if (!item.description || item.description.length === 0 || !item.description[0]) {
-                    newErrors[`s${sIdx + 2}_${i}_description`] = 'At least one description item is required'
-                }
             })
         })
 
@@ -177,9 +148,6 @@ export default function CMSJewelleryCareGuide() {
             if (!item.image_url) newErrors[`s6_${i}_image_url`] = 'Image is required'
             if (!item.title) newErrors[`s6_${i}_title`] = 'Title is required'
             if (!item.sub_title) newErrors[`s6_${i}_sub_title`] = 'Sub title is required'
-            if (!item.description || item.description.length === 0 || !item.description[0]) {
-                newErrors[`s6_${i}_description`] = 'At least one description item is required'
-            }
         })
 
         // Section 7 validation
@@ -190,16 +158,12 @@ export default function CMSJewelleryCareGuide() {
 
         // Section 8 validation
         if (!section8.title) newErrors['s8_title'] = 'Title is required'
-        if (!section8.description) newErrors['s8_description'] = 'Description is required'
 
         // Section 9 validation
         section9.forEach((item, i) => {
             if (!item.image_url) newErrors[`s9_${i}_image_url`] = 'Image is required'
             if (!item.title) newErrors[`s9_${i}_title`] = 'Title is required'
             if (!item.sub_title) newErrors[`s9_${i}_sub_title`] = 'Sub title is required'
-            if (!item.description || item.description.length === 0 || !item.description[0]) {
-                newErrors[`s9_${i}_description`] = 'At least one description item is required'
-            }
         })
 
         if (Object.keys(newErrors).length > 0) {
@@ -215,7 +179,6 @@ export default function CMSJewelleryCareGuide() {
         setIsSaving(true)
 
         try {
-            console.log("handle save");
             const response = await cmsService.updateJewelleryCareGuide({
                 section1,
                 section2,
@@ -237,7 +200,7 @@ export default function CMSJewelleryCareGuide() {
     }
 
     // Helper functions for sections 2-5
-    const updateSection2To5Item = (sectionNum: number, index: number, field: keyof JewelleryCareGuideSection2To5Item, value: string | string[]) => {
+    const updateSection2To5Item = (sectionNum: number, index: number, field: keyof JewelleryCareGuideSection2To5Item, value: string) => {
         const setters = [setSection2, setSection3, setSection4, setSection5]
         const setter = setters[sectionNum - 2]
         setter((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
@@ -245,100 +208,21 @@ export default function CMSJewelleryCareGuide() {
     }
 
     // Helper functions for section 6
-    const updateSection6Item = (index: number, field: keyof JewelleryCareGuideSection6Item, value: string | string[]) => {
-        setSection6(section6.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+    const updateSection6Item = (index: number, field: keyof JewelleryCareGuideSection6Item, value: string) => {
+        setSection6((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
         clearError(`s6_${index}_${field}`)
     }
 
     // Helper functions for section 7
     const updateSection7Item = (index: number, field: keyof JewelleryCareGuideSection7Item, value: string) => {
-        setSection7(section7.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+        setSection7((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
         clearError(`s7_${index}_${field}`)
     }
 
     // Helper functions for section 9
-    const updateSection9Item = (index: number, field: keyof JewelleryCareGuideSection9Item, value: string | string[]) => {
-        setSection9(section9.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+    const updateSection9Item = (index: number, field: keyof JewelleryCareGuideSection9Item, value: string) => {
+        setSection9((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
         clearError(`s9_${index}_${field}`)
-    }
-
-    // Add description item for sections 2-6, 9
-    const addDescriptionItem = (section: number, index: number) => {
-        const addFunctions: Record<number, () => void> = {
-            2: () => updateSection2To5Item(2, index, 'description', [...section2[index].description, '']),
-            3: () => updateSection2To5Item(3, index, 'description', [...section3[index].description, '']),
-            4: () => updateSection2To5Item(4, index, 'description', [...section4[index].description, '']),
-            5: () => updateSection2To5Item(5, index, 'description', [...section5[index].description, '']),
-            6: () => updateSection6Item(index, 'description', [...section6[index].description, '']),
-            9: () => updateSection9Item(index, 'description', [...section9[index].description, '']),
-        }
-        addFunctions[section]?.()
-    }
-
-    const updateDescriptionItem = (section: number, itemIndex: number, descIndex: number, value: string) => {
-        const updateFunctions: Record<number, () => void> = {
-            2: () => {
-                const newDesc = [...section2[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection2To5Item(2, itemIndex, 'description', newDesc)
-            },
-            3: () => {
-                const newDesc = [...section3[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection2To5Item(3, itemIndex, 'description', newDesc)
-            },
-            4: () => {
-                const newDesc = [...section4[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection2To5Item(4, itemIndex, 'description', newDesc)
-            },
-            5: () => {
-                const newDesc = [...section5[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection2To5Item(5, itemIndex, 'description', newDesc)
-            },
-            6: () => {
-                const newDesc = [...section6[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection6Item(itemIndex, 'description', newDesc)
-            },
-            9: () => {
-                const newDesc = [...section9[itemIndex].description]
-                newDesc[descIndex] = value
-                updateSection9Item(itemIndex, 'description', newDesc)
-            },
-        }
-        updateFunctions[section]?.()
-    }
-
-    const removeDescriptionItem = (section: number, itemIndex: number, descIndex: number) => {
-        const removeFunctions: Record<number, () => void> = {
-            2: () => {
-                const newDesc = section2[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection2To5Item(2, itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-            3: () => {
-                const newDesc = section3[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection2To5Item(3, itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-            4: () => {
-                const newDesc = section4[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection2To5Item(4, itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-            5: () => {
-                const newDesc = section5[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection2To5Item(5, itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-            6: () => {
-                const newDesc = section6[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection6Item(itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-            9: () => {
-                const newDesc = section9[itemIndex].description.filter((_, i) => i !== descIndex)
-                updateSection9Item(itemIndex, 'description', newDesc.length > 0 ? newDesc : [''])
-            },
-        }
-        removeFunctions[section]?.()
     }
 
     const clearError = (key: string) => {
@@ -359,8 +243,7 @@ export default function CMSJewelleryCareGuide() {
                 <div className="space-y-4">
                     {items.map((item, index) => (
                         <Card key={index}>
-                          
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Title <span className="text-destructive">*</span></Label>
                                     <Input
@@ -372,34 +255,13 @@ export default function CMSJewelleryCareGuide() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Description <span className="text-destructive">*</span></Label>
-                                    {item.description.map((desc, descIndex) => (
-                                        <div key={descIndex} className="flex gap-2">
-                                            <Input
-                                                value={desc}
-                                                onChange={(e) => updateDescriptionItem(sectionNum, index, descIndex, e.target.value)}
-                                                placeholder={`Description point ${descIndex + 1}`}
-                                            />
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => removeDescriptionItem(sectionNum, index, descIndex)}
-                                                className="text-destructive"
-                                                disabled={item.description.length === 1}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => addDescriptionItem(sectionNum, index)}
-                                    >
-                                        Add Description Point
-                                    </Button>
-                                    {errors[`s${sectionNum}_${index}_description`] && <p className="text-sm text-destructive">{errors[`s${sectionNum}_${index}_description`]}</p>}
+                                    <Label>Description</Label>
+                                    <RichTextEditor
+                                        value={item.description}
+                                        onChange={(val) => updateSection2To5Item(sectionNum, index, 'description', val)}
+                                        placeholder="Write the description here..."
+                                        mediaRootPath={`cms/jewellery-care-guide/section${sectionNum}`}
+                                    />
                                 </div>
 
                                 <MediaPickerInput
@@ -490,51 +352,41 @@ export default function CMSJewelleryCareGuide() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="s1_description">
-                            Description <span className="text-destructive">*</span>
-                        </Label>
-                        <Textarea
-                            id="s1_description"
+                        <Label>Description</Label>
+                        <RichTextEditor
                             value={section1.description}
-                            onChange={(e) => {
-                                setSection1({ ...section1, description: e.target.value })
-                                clearError('s1_description')
-                            }}
-                            rows={4}
+                            onChange={(val) => setSection1({ ...section1, description: val })}
+                            placeholder="Write the section 1 description here..."
+                            mediaRootPath="cms/jewellery-care-guide/section1"
                         />
-                        {errors.s1_description && <p className="text-sm text-destructive">{errors.s1_description}</p>}
                     </div>
                 </CardContent>
             </Card>
 
             {/* Section 2 */}
             <Card>
-               
-                <CardContent>
+                <CardContent className="pt-4">
                     {renderSection2To5(2, section2)}
                 </CardContent>
             </Card>
 
             {/* Section 3 */}
             <Card>
-               
-                <CardContent>
+                <CardContent className="pt-4">
                     {renderSection2To5(3, section3)}
                 </CardContent>
             </Card>
 
             {/* Section 4 */}
             <Card>
-              
-                <CardContent>
+                <CardContent className="pt-4">
                     {renderSection2To5(4, section4)}
                 </CardContent>
             </Card>
 
             {/* Section 5 */}
             <Card>
-               
-                <CardContent>
+                <CardContent className="pt-4">
                     {renderSection2To5(5, section5)}
                 </CardContent>
             </Card>
@@ -548,8 +400,7 @@ export default function CMSJewelleryCareGuide() {
                     <div className="space-y-4">
                         {section6.map((item, index) => (
                             <Card key={index}>
-                               
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-4 pt-4">
                                     <div className="space-y-2">
                                         <Label>Title <span className="text-destructive">*</span></Label>
                                         <Input
@@ -571,34 +422,13 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Description <span className="text-destructive">*</span></Label>
-                                        {item.description.map((desc, descIndex) => (
-                                            <div key={descIndex} className="flex gap-2">
-                                                <Input
-                                                    value={desc}
-                                                    onChange={(e) => updateDescriptionItem(6, index, descIndex, e.target.value)}
-                                                    placeholder={`Description point ${descIndex + 1}`}
-                                                />
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => removeDescriptionItem(6, index, descIndex)}
-                                                    className="text-destructive"
-                                                    disabled={item.description.length === 1}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => addDescriptionItem(6, index)}
-                                        >
-                                            Add Description Point
-                                        </Button>
-                                        {errors[`s6_${index}_description`] && <p className="text-sm text-destructive">{errors[`s6_${index}_description`]}</p>}
+                                        <Label>Description</Label>
+                                        <RichTextEditor
+                                            value={item.description}
+                                            onChange={(val) => updateSection6Item(index, 'description', val)}
+                                            placeholder="Write the description here..."
+                                            mediaRootPath="cms/jewellery-care-guide/section6"
+                                        />
                                     </div>
 
                                     <MediaPickerInput
@@ -710,19 +540,13 @@ export default function CMSJewelleryCareGuide() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="s8_description">
-                            Description <span className="text-destructive">*</span>
-                        </Label>
-                        <Textarea
-                            id="s8_description"
+                        <Label>Description</Label>
+                        <RichTextEditor
                             value={section8.description}
-                            onChange={(e) => {
-                                setSection8({ ...section8, description: e.target.value })
-                                clearError('s8_description')
-                            }}
-                            rows={4}
+                            onChange={(val) => setSection8({ ...section8, description: val })}
+                            placeholder="Write the section 8 description here..."
+                            mediaRootPath="cms/jewellery-care-guide/section8"
                         />
-                        {errors.s8_description && <p className="text-sm text-destructive">{errors.s8_description}</p>}
                     </div>
                 </CardContent>
             </Card>
@@ -736,8 +560,7 @@ export default function CMSJewelleryCareGuide() {
                     <div className="space-y-4">
                         {section9.map((item, index) => (
                             <Card key={index}>
-                               
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-4 pt-4">
                                     <div className="space-y-2">
                                         <Label>Title <span className="text-destructive">*</span></Label>
                                         <Input
@@ -759,34 +582,13 @@ export default function CMSJewelleryCareGuide() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Description <span className="text-destructive">*</span></Label>
-                                        {item.description.map((desc, descIndex) => (
-                                            <div key={descIndex} className="flex gap-2">
-                                                <Input
-                                                    value={desc}
-                                                    onChange={(e) => updateDescriptionItem(9, index, descIndex, e.target.value)}
-                                                    placeholder={`Description point ${descIndex + 1}`}
-                                                />
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => removeDescriptionItem(9, index, descIndex)}
-                                                    className="text-destructive"
-                                                    disabled={item.description.length === 1}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => addDescriptionItem(9, index)}
-                                        >
-                                            Add Description Point
-                                        </Button>
-                                        {errors[`s9_${index}_description`] && <p className="text-sm text-destructive">{errors[`s9_${index}_description`]}</p>}
+                                        <Label>Description</Label>
+                                        <RichTextEditor
+                                            value={item.description}
+                                            onChange={(val) => updateSection9Item(index, 'description', val)}
+                                            placeholder="Write the description here..."
+                                            mediaRootPath="cms/jewellery-care-guide/section9"
+                                        />
                                     </div>
 
                                     <MediaPickerInput

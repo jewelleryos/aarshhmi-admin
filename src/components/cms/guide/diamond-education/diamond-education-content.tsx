@@ -12,9 +12,8 @@ import {
   type DiamondEducationContent as DiamondEducationContentType,
   type DiamondEducationSection1Item,
   type DiamondEducationSection2Item,
-  type DiamondEducationSection3Item,
-  type DiamondEducationSection4,
-  type DiamondEducationSection6SubSection,
+  type DiamondEducationSection3,
+  type DiamondEducationSection5SubSection,
 } from '@/components/cms/services/cmsService'
 import { MediaPickerInput } from '@/components/media'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
@@ -30,16 +29,15 @@ export function DiamondEducationContent() {
 
   const [section1, setSection1] = useState<DiamondEducationSection1Item[]>([])
   const [section2, setSection2] = useState<DiamondEducationSection2Item[]>([])
-  const [section3, setSection3] = useState<DiamondEducationSection3Item[]>([])
-  const [section4, setSection4] = useState<DiamondEducationSection4>({
+  const [section3, setSection3] = useState<DiamondEducationSection3>({
     image_url: '',
     mobile_image_url: '',
     image_alt_text: '',
   })
+  const [section4Title, setSection4Title] = useState('')
+  const [section4Content, setSection4Content] = useState('')
   const [section5Title, setSection5Title] = useState('')
-  const [section5Content, setSection5Content] = useState('')
-  const [section6Title, setSection6Title] = useState('')
-  const [section6SubSections, setSection6SubSections] = useState<DiamondEducationSection6SubSection[]>([])
+  const [section5SubSections, setSection5SubSections] = useState<DiamondEducationSection5SubSection[]>([])
 
   // Section 1 drawer states
   const [isSection1AddOpen, setIsSection1AddOpen] = useState(false)
@@ -51,15 +49,10 @@ export function DiamondEducationContent() {
   const [isSection2EditOpen, setIsSection2EditOpen] = useState(false)
   const [selectedSection2Item, setSelectedSection2Item] = useState<DiamondEducationSection2Item | null>(null)
 
-  // Section 3 drawer states
-  const [isSection3AddOpen, setIsSection3AddOpen] = useState(false)
-  const [isSection3EditOpen, setIsSection3EditOpen] = useState(false)
-  const [selectedSection3Item, setSelectedSection3Item] = useState<DiamondEducationSection3Item | null>(null)
-
-  // Section 6 drawer states
-  const [isSection6AddOpen, setIsSection6AddOpen] = useState(false)
-  const [isSection6EditOpen, setIsSection6EditOpen] = useState(false)
-  const [selectedSection6Item, setSelectedSection6Item] = useState<DiamondEducationSection6SubSection | null>(null)
+  // Section 5 drawer states
+  const [isSection5AddOpen, setIsSection5AddOpen] = useState(false)
+  const [isSection5EditOpen, setIsSection5EditOpen] = useState(false)
+  const [selectedSection5Item, setSelectedSection5Item] = useState<DiamondEducationSection5SubSection | null>(null)
 
   useEffect(() => {
     fetchContent()
@@ -74,18 +67,17 @@ export function DiamondEducationContent() {
         setTitle(content.title || '')
         setSection1(content.section1 || [])
         setSection2(content.section2 || [])
-        setSection3(content.section3 || [])
-        setSection4(
-          content.section4 || {
+        setSection3(
+          content.section3 || {
             image_url: '',
             mobile_image_url: '',
             image_alt_text: '',
           }
         )
+        setSection4Title(content.section4?.title || '')
+        setSection4Content(content.section4?.content || '')
         setSection5Title(content.section5?.title || '')
-        setSection5Content(content.section5?.content || '')
-        setSection6Title(content.section6?.title || '')
-        setSection6SubSections(content.section6?.sub_sections || [])
+        setSection5SubSections(content.section5?.sub_sections || [])
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
@@ -98,21 +90,19 @@ export function DiamondEducationContent() {
   const saveContent = async (
     s1: DiamondEducationSection1Item[],
     s2: DiamondEducationSection2Item[],
-    s3: DiamondEducationSection3Item[],
-    s4: DiamondEducationSection4,
+    s3: DiamondEducationSection3,
+    s4title: string,
+    s4content: string,
     s5title: string,
-    s5content: string,
-    s6title: string,
-    s6subs: DiamondEducationSection6SubSection[]
+    s5subs: DiamondEducationSection5SubSection[]
   ) => {
     const response = await cmsService.updateDiamondEducation({
       title,
       section1: s1,
       section2: s2,
       section3: s3,
-      section4: s4,
-      section5: { title: s5title, content: s5content },
-      section6: { title: s6title, sub_sections: s6subs },
+      section4: { title: s4title, content: s4content },
+      section5: { title: s5title, sub_sections: s5subs },
     })
     return response
   }
@@ -124,11 +114,10 @@ export function DiamondEducationContent() {
         section1,
         section2,
         section3,
-        section4,
+        section4Title,
+        section4Content,
         section5Title,
-        section5Content,
-        section6Title,
-        section6SubSections
+        section5SubSections
       )
       toast.success(response.message)
     } catch (err: unknown) {
@@ -143,7 +132,7 @@ export function DiamondEducationContent() {
   const handleAddSection1Item = async (item: Omit<DiamondEducationSection1Item, 'id'>) => {
     const newItem: DiamondEducationSection1Item = { ...item, id: `s1_${Date.now()}` }
     const updated = [...section1, newItem]
-    const response = await saveContent(updated, section2, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+    const response = await saveContent(updated, section2, section3, section4Title, section4Content, section5Title, section5SubSections)
     toast.success(response.message)
     setSection1(updated)
     setIsSection1AddOpen(false)
@@ -151,7 +140,7 @@ export function DiamondEducationContent() {
 
   const handleEditSection1Item = async (item: DiamondEducationSection1Item) => {
     const updated = section1.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(updated, section2, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+    const response = await saveContent(updated, section2, section3, section4Title, section4Content, section5Title, section5SubSections)
     toast.success(response.message)
     setSection1(updated)
     setIsSection1EditOpen(false)
@@ -161,7 +150,7 @@ export function DiamondEducationContent() {
   const handleDeleteSection1Item = async (id: string) => {
     const updated = section1.filter((s) => s.id !== id)
     try {
-      const response = await saveContent(updated, section2, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+      const response = await saveContent(updated, section2, section3, section4Title, section4Content, section5Title, section5SubSections)
       toast.success(response.message)
       setSection1(updated)
     } catch (err: unknown) {
@@ -174,7 +163,7 @@ export function DiamondEducationContent() {
   const handleAddSection2Item = async (item: Omit<DiamondEducationSection2Item, 'id'>) => {
     const newItem: DiamondEducationSection2Item = { ...item, id: `s2_${Date.now()}` }
     const updated = [...section2, newItem]
-    const response = await saveContent(section1, updated, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+    const response = await saveContent(section1, updated, section3, section4Title, section4Content, section5Title, section5SubSections)
     toast.success(response.message)
     setSection2(updated)
     setIsSection2AddOpen(false)
@@ -182,7 +171,7 @@ export function DiamondEducationContent() {
 
   const handleEditSection2Item = async (item: DiamondEducationSection2Item) => {
     const updated = section2.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(section1, updated, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+    const response = await saveContent(section1, updated, section3, section4Title, section4Content, section5Title, section5SubSections)
     toast.success(response.message)
     setSection2(updated)
     setIsSection2EditOpen(false)
@@ -192,7 +181,7 @@ export function DiamondEducationContent() {
   const handleDeleteSection2Item = async (id: string) => {
     const updated = section2.filter((s) => s.id !== id)
     try {
-      const response = await saveContent(section1, updated, section3, section4, section5Title, section5Content, section6Title, section6SubSections)
+      const response = await saveContent(section1, updated, section3, section4Title, section4Content, section5Title, section5SubSections)
       toast.success(response.message)
       setSection2(updated)
     } catch (err: unknown) {
@@ -201,62 +190,31 @@ export function DiamondEducationContent() {
     }
   }
 
-  // ── Section 3 CRUD ──────────────────────────────────────────────────────────
-  const handleAddSection3Item = async (item: Omit<DiamondEducationSection3Item, 'id'>) => {
-    const newItem: DiamondEducationSection3Item = { ...item, id: `s3_${Date.now()}` }
-    const updated = [...section3, newItem]
-    const response = await saveContent(section1, section2, updated, section4, section5Title, section5Content, section6Title, section6SubSections)
+  // ── Section 5 CRUD ──────────────────────────────────────────────────────────
+  const handleAddSection5SubSection = async (item: Omit<DiamondEducationSection5SubSection, 'id'>) => {
+    const newItem: DiamondEducationSection5SubSection = { ...item, id: `s5sub_${Date.now()}` }
+    const updated = [...section5SubSections, newItem]
+    const response = await saveContent(section1, section2, section3, section4Title, section4Content, section5Title, updated)
     toast.success(response.message)
-    setSection3(updated)
-    setIsSection3AddOpen(false)
+    setSection5SubSections(updated)
+    setIsSection5AddOpen(false)
   }
 
-  const handleEditSection3Item = async (item: DiamondEducationSection3Item) => {
-    const updated = section3.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(section1, section2, updated, section4, section5Title, section5Content, section6Title, section6SubSections)
+  const handleEditSection5SubSection = async (item: DiamondEducationSection5SubSection) => {
+    const updated = section5SubSections.map((s) => (s.id === item.id ? item : s))
+    const response = await saveContent(section1, section2, section3, section4Title, section4Content, section5Title, updated)
     toast.success(response.message)
-    setSection3(updated)
-    setIsSection3EditOpen(false)
-    setSelectedSection3Item(null)
+    setSection5SubSections(updated)
+    setIsSection5EditOpen(false)
+    setSelectedSection5Item(null)
   }
 
-  const handleDeleteSection3Item = async (id: string) => {
-    const updated = section3.filter((s) => s.id !== id)
+  const handleDeleteSection5SubSection = async (id: string) => {
+    const updated = section5SubSections.filter((s) => s.id !== id)
     try {
-      const response = await saveContent(section1, section2, updated, section4, section5Title, section5Content, section6Title, section6SubSections)
+      const response = await saveContent(section1, section2, section3, section4Title, section4Content, section5Title, updated)
       toast.success(response.message)
-      setSection3(updated)
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to delete item')
-    }
-  }
-
-  // ── Section 6 CRUD ──────────────────────────────────────────────────────────
-  const handleAddSection6SubSection = async (item: Omit<DiamondEducationSection6SubSection, 'id'>) => {
-    const newItem: DiamondEducationSection6SubSection = { ...item, id: `s6sub_${Date.now()}` }
-    const updated = [...section6SubSections, newItem]
-    const response = await saveContent(section1, section2, section3, section4, section5Title, section5Content, section6Title, updated)
-    toast.success(response.message)
-    setSection6SubSections(updated)
-    setIsSection6AddOpen(false)
-  }
-
-  const handleEditSection6SubSection = async (item: DiamondEducationSection6SubSection) => {
-    const updated = section6SubSections.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(section1, section2, section3, section4, section5Title, section5Content, section6Title, updated)
-    toast.success(response.message)
-    setSection6SubSections(updated)
-    setIsSection6EditOpen(false)
-    setSelectedSection6Item(null)
-  }
-
-  const handleDeleteSection6SubSection = async (id: string) => {
-    const updated = section6SubSections.filter((s) => s.id !== id)
-    try {
-      const response = await saveContent(section1, section2, section3, section4, section5Title, section5Content, section6Title, updated)
-      toast.success(response.message)
-      setSection6SubSections(updated)
+      setSection5SubSections(updated)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to delete sub-section')
@@ -398,85 +356,74 @@ export function DiamondEducationContent() {
         </CardContent>
       </Card>
 
-      {/* Section 3 — Text Items (new) */}
+      {/* Section 3 — Feature Image */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Section 3 — Text Items</CardTitle>
-            <Button size="sm" onClick={() => setIsSection3AddOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Item
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {section3.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No items yet. Click &quot;Add Item&quot; to create one.
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {section3.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-md border px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{item.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {item.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
-                    </p>
-                  </div>
-                  <div className="ml-3 flex items-center gap-2 shrink-0">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setSelectedSection3Item(item); setIsSection3EditOpen(true) }}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteSection3Item(item.id)}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Section 4 — Feature Image (was section 3) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Section 4 — Feature Image</CardTitle>
+          <CardTitle className="text-lg">Section 3 — Feature Image</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <MediaPickerInput
             label="Image"
-            value={section4.image_url || null}
-            onChange={(path) => setSection4((prev) => ({ ...prev, image_url: path || '' }))}
-            rootPath="cms/guide/diamond-education/section4"
+            value={section3.image_url || null}
+            onChange={(path) => setSection3((prev) => ({ ...prev, image_url: path || '' }))}
+            rootPath="cms/guide/diamond-education/section3"
           />
           <MediaPickerInput
             label="Mobile Image"
-            value={section4.mobile_image_url || null}
-            onChange={(path) => setSection4((prev) => ({ ...prev, mobile_image_url: path || '' }))}
-            rootPath="cms/guide/diamond-education/section4/mobile"
+            value={section3.mobile_image_url || null}
+            onChange={(path) => setSection3((prev) => ({ ...prev, mobile_image_url: path || '' }))}
+            rootPath="cms/guide/diamond-education/section3/mobile"
           />
           <div className="space-y-2">
-            <Label htmlFor="s4_image_alt_text">Image Alt Text</Label>
+            <Label htmlFor="s3_image_alt_text">Image Alt Text</Label>
             <Input
-              id="s4_image_alt_text"
+              id="s3_image_alt_text"
               placeholder="Describe the image"
-              value={section4.image_alt_text}
-              onChange={(e) => setSection4((prev) => ({ ...prev, image_alt_text: e.target.value }))}
+              value={section3.image_alt_text}
+              onChange={(e) => setSection3((prev) => ({ ...prev, image_alt_text: e.target.value }))}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="s4_redirect_url">Redirect URL</Label>
+            <Label htmlFor="s3_redirect_url">Redirect URL</Label>
             <Input
-              id="s4_redirect_url"
+              id="s3_redirect_url"
               placeholder="https://example.com/page"
-              value={section4.redirect_url || ''}
-              onChange={(e) => setSection4((prev) => ({ ...prev, redirect_url: e.target.value || undefined }))}
+              value={section3.redirect_url || ''}
+              onChange={(e) => setSection3((prev) => ({ ...prev, redirect_url: e.target.value || undefined }))}
             />
             <p className="text-xs text-muted-foreground">
               Full URL with https (e.g., https://example.com/page)
             </p>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Section 3 is saved by the global &quot;Save Changes&quot; button above.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Section 4 — Rich Content */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section 4 — Rich Content</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="s4_title">Section Title</Label>
+            <Input
+              id="s4_title"
+              placeholder="Enter section 4 title"
+              value={section4Title}
+              onChange={(e) => setSection4Title(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Content</Label>
+            <RichTextEditor
+              value={section4Content}
+              onChange={setSection4Content}
+              placeholder="Write the section 4 content here..."
+              mediaRootPath="cms/guide/diamond-education/section4"
+            />
           </div>
           <p className="text-xs text-muted-foreground italic">
             Section 4 is saved by the global &quot;Save Changes&quot; button above.
@@ -484,10 +431,16 @@ export function DiamondEducationContent() {
         </CardContent>
       </Card>
 
-      {/* Section 5 — Rich Content (was section 4) */}
+      {/* Section 5 — Detailed Sub-sections */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section 5 — Rich Content</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Section 5 — Detailed Sub-sections</CardTitle>
+            <Button size="sm" onClick={() => setIsSection5AddOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Sub-section
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -498,54 +451,18 @@ export function DiamondEducationContent() {
               value={section5Title}
               onChange={(e) => setSection5Title(e.target.value)}
             />
-          </div>
-          <div className="space-y-2">
-            <Label>Content</Label>
-            <RichTextEditor
-              value={section5Content}
-              onChange={setSection5Content}
-              placeholder="Write the section 5 content here..."
-              mediaRootPath="cms/guide/diamond-education/section5"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground italic">
-            Section 5 is saved by the global &quot;Save Changes&quot; button above.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Section 6 — Detailed Sub-sections (was section 5) */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Section 6 — Detailed Sub-sections</CardTitle>
-            <Button size="sm" onClick={() => setIsSection6AddOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Sub-section
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="s6_title">Section Title</Label>
-            <Input
-              id="s6_title"
-              placeholder="Enter section 6 title"
-              value={section6Title}
-              onChange={(e) => setSection6Title(e.target.value)}
-            />
             <p className="text-xs text-muted-foreground italic">
-              Section 6 title is saved by the global &quot;Save Changes&quot; button above.
+              Section 5 title is saved by the global &quot;Save Changes&quot; button above.
             </p>
           </div>
 
-          {section6SubSections.length === 0 ? (
+          {section5SubSections.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No sub-sections yet. Click &quot;Add Sub-section&quot; to create one.
             </p>
           ) : (
             <div className="space-y-2">
-              {section6SubSections.map((sub) => (
+              {section5SubSections.map((sub) => (
                 <div key={sub.id} className="flex items-center justify-between rounded-md border px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{sub.title}</p>
@@ -554,10 +471,10 @@ export function DiamondEducationContent() {
                     </p>
                   </div>
                   <div className="ml-3 flex items-center gap-2 shrink-0">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setSelectedSection6Item(sub); setIsSection6EditOpen(true) }}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setSelectedSection5Item(sub); setIsSection5EditOpen(true) }}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteSection6SubSection(sub.id)}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteSection5SubSection(sub.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -596,32 +513,18 @@ export function DiamondEducationContent() {
         onSave={async (item) => { await handleEditSection2Item(item as DiamondEducationSection2Item) }}
       />
 
-      {/* Section 3 Drawers — reuses Section2Drawer (same structure) */}
-      <Section2Drawer
-        open={isSection3AddOpen}
-        onOpenChange={setIsSection3AddOpen}
-        item={null}
-        onSave={async (item) => { await handleAddSection3Item(item as Omit<DiamondEducationSection3Item, 'id'>) }}
-      />
-      <Section2Drawer
-        open={isSection3EditOpen}
-        onOpenChange={(open) => { setIsSection3EditOpen(open); if (!open) setSelectedSection3Item(null) }}
-        item={selectedSection3Item}
-        onSave={async (item) => { await handleEditSection3Item(item as DiamondEducationSection3Item) }}
-      />
-
-      {/* Section 6 Drawers */}
+      {/* Section 5 Drawers */}
       <Section5SubSectionDrawer
-        open={isSection6AddOpen}
-        onOpenChange={setIsSection6AddOpen}
+        open={isSection5AddOpen}
+        onOpenChange={setIsSection5AddOpen}
         item={null}
-        onSave={async (item) => { await handleAddSection6SubSection(item as Omit<DiamondEducationSection6SubSection, 'id'>) }}
+        onSave={async (item) => { await handleAddSection5SubSection(item as Omit<DiamondEducationSection5SubSection, 'id'>) }}
       />
       <Section5SubSectionDrawer
-        open={isSection6EditOpen}
-        onOpenChange={(open) => { setIsSection6EditOpen(open); if (!open) setSelectedSection6Item(null) }}
-        item={selectedSection6Item}
-        onSave={async (item) => { await handleEditSection6SubSection(item as DiamondEducationSection6SubSection) }}
+        open={isSection5EditOpen}
+        onOpenChange={(open) => { setIsSection5EditOpen(open); if (!open) setSelectedSection5Item(null) }}
+        item={selectedSection5Item}
+        onSave={async (item) => { await handleEditSection5SubSection(item as DiamondEducationSection5SubSection) }}
       />
     </div>
   )

@@ -318,7 +318,7 @@ export interface JewelleryCareGuideSection2To5Item {
   mobile_view_image_url?: string
   image_alt_text: string
   title: string
-  description: string[]
+  description: string
 }
 
 export interface JewelleryCareGuideSection6Item {
@@ -326,7 +326,7 @@ export interface JewelleryCareGuideSection6Item {
   mobile_view_image_url?: string
   image_alt_text: string
   title: string
-  description: string[]
+  description: string
   sub_title: string
 }
 
@@ -342,7 +342,7 @@ export interface JewelleryCareGuideSection9Item {
   mobile_view_image_url?: string
   image_alt_text: string
   title: string
-  description: string[]
+  description: string
   sub_title: string
 }
 
@@ -454,25 +454,22 @@ export interface DiamondEducationSection2Item {
   description: string
 }
 
-// Section 3 — same structure as section 2 (text items)
-export type DiamondEducationSection3Item = DiamondEducationSection2Item
-
-// Section 4 — feature image (was section 3)
-export interface DiamondEducationSection4 {
+// Section 3 — feature image
+export interface DiamondEducationSection3 {
   image_url: string
   mobile_image_url: string
   redirect_url?: string
   image_alt_text: string
 }
 
-// Section 5 — rich content (was section 4)
-export interface DiamondEducationSection5 {
+// Section 4 — rich content
+export interface DiamondEducationSection4 {
   title: string
   content: string
 }
 
-// Section 6 — detailed sub-sections (was section 5)
-export interface DiamondEducationSection6SubSection {
+// Section 5 — detailed sub-sections
+export interface DiamondEducationSection5SubSection {
   id: string
   title: string
   description: string
@@ -482,19 +479,18 @@ export interface DiamondEducationSection6SubSection {
   image_alt_text: string
 }
 
-export interface DiamondEducationSection6 {
+export interface DiamondEducationSection5 {
   title: string
-  sub_sections: DiamondEducationSection6SubSection[]
+  sub_sections: DiamondEducationSection5SubSection[]
 }
 
 export interface DiamondEducationContent {
   title: string
   section1: DiamondEducationSection1Item[]
   section2: DiamondEducationSection2Item[]
-  section3: DiamondEducationSection3Item[]
+  section3: DiamondEducationSection3
   section4: DiamondEducationSection4
   section5: DiamondEducationSection5
-  section6: DiamondEducationSection6
 }
 
 // Types - Metal Guide
