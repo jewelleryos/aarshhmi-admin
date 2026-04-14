@@ -25,14 +25,19 @@ export const cmsSections: CMSSection[] = [
         ],
     },
     {
-        id: "promotional-banners",
-        label: "Promotional Banners",
+        id: "product-list-page",
+        label: "Product List Page",
         children: [
-            { id: "promotional-banner-1", label: "Banner 1", children: [] },
-            { id: "promotional-banner-2", label: "Banner 2", children: [] },
-            { id: "promotional-banner-3", label: "Banner 3", children: [] },
-            { id: "promotional-banner-4", label: "Banner 4", children: [] },
-            { id: "promotional-banner-5", label: "Banner 5", children: [] },
+            { id: "product-list-page-hero-banner", label: "Hero Banner", children: [] },
+            { id: "product-list-page-mid-size-banners", label: "Mid Size Banners", children: [] },
+            { id: "product-list-page-large-size-banners", label: "Large Size Banners", children: [] },
+        ],
+    },
+    {
+        id: "wishlist",
+        label: "Wishlist",
+        children: [
+            { id: "wishlist-hero-banner", label: "Hero Banner", children: [] },
         ],
     },
     {
@@ -48,6 +53,7 @@ export const cmsSections: CMSSection[] = [
         children: [
             { id: "jewellery-care", label: "Jewellery Care", children: [] },
             { id: "whats-in-the-box", label: "What's in the Box", children: [] },
+            { id: "more-from-the-collection", label: "More From The Collection", children: [] },
         ],
     },
     {

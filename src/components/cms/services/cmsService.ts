@@ -443,7 +443,7 @@ export interface DiamondEducationSection1Item {
   id: string
   image_url: string
   mobile_image_url: string
-  redirect_url: string
+  redirect_url?: string
   image_alt_text: string
   rank: number
 }
@@ -454,40 +454,47 @@ export interface DiamondEducationSection2Item {
   description: string[]
 }
 
-export interface DiamondEducationSection3 {
+// Section 3 — same structure as section 2 (text items)
+export type DiamondEducationSection3Item = DiamondEducationSection2Item
+
+// Section 4 — feature image (was section 3)
+export interface DiamondEducationSection4 {
   image_url: string
   mobile_image_url: string
-  redirect_url: string
+  redirect_url?: string
   image_alt_text: string
 }
 
-export interface DiamondEducationSection4 {
+// Section 5 — rich content (was section 4)
+export interface DiamondEducationSection5 {
   title: string
   content: string
 }
 
-export interface DiamondEducationSection5SubSection {
+// Section 6 — detailed sub-sections (was section 5)
+export interface DiamondEducationSection6SubSection {
   id: string
   title: string
   description: string[]
   image_url: string
   mobile_image_url: string
-  redirect_url: string
+  redirect_url?: string
   image_alt_text: string
 }
 
-export interface DiamondEducationSection5 {
+export interface DiamondEducationSection6 {
   title: string
-  sub_sections: DiamondEducationSection5SubSection[]
+  sub_sections: DiamondEducationSection6SubSection[]
 }
 
 export interface DiamondEducationContent {
   title: string
   section1: DiamondEducationSection1Item[]
   section2: DiamondEducationSection2Item[]
-  section3: DiamondEducationSection3
+  section3: DiamondEducationSection3Item[]
   section4: DiamondEducationSection4
   section5: DiamondEducationSection5
+  section6: DiamondEducationSection6
 }
 
 // Types - Metal Guide
@@ -863,68 +870,74 @@ export const cmsService = {
     return response.data
   },
 
-  // Promotional Banner 1
-  getBanner1: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_1)
+  // Product List Page - Hero Banner
+  getProductListPageHeroBanner: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.HERO_BANNER)
     return response.data
   },
 
-  updateBanner1: async (
+  updateProductListPageHeroBanner: async (
     content: PromotionalBannerContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_1, { content })
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.HERO_BANNER, { content })
     return response.data
   },
 
-  // Promotional Banner 2
-  getBanner2: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_2)
+  // Product List Page - Mid Size Banners
+  getProductListPageMidSizeBanners: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.MID_SIZE_BANNERS)
     return response.data
   },
 
-  updateBanner2: async (
+  updateProductListPageMidSizeBanners: async (
+    content: MidSizeBannersContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.MID_SIZE_BANNERS, { content })
+    return response.data
+  },
+
+  // Categories tree for banner pickers
+  getCategoriesTree: async (): Promise<ApiResponse<{ items: CategoryWithChildrenForSelect[] }>> => {
+    const response = await apiService.get(API_ENDPOINTS.CATEGORY.LIST)
+    return response.data
+  },
+
+  // Product List Page - Large Size Banners
+  getProductListPageLargeSizeBanners: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.LARGE_SIZE_BANNERS)
+    return response.data
+  },
+
+  updateProductListPageLargeSizeBanners: async (
+    content: LargeSizeBannersContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.LARGE_SIZE_BANNERS, { content })
+    return response.data
+  },
+
+  // Wishlist - Hero Banner
+  getWishlistHeroBanner: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.WISHLIST.HERO_BANNER)
+    return response.data
+  },
+
+  updateWishlistHeroBanner: async (
     content: PromotionalBannerContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_2, { content })
+    const response = await apiService.put(API_ENDPOINTS.CMS.WISHLIST.HERO_BANNER, { content })
     return response.data
   },
 
-  // Promotional Banner 3
-  getBanner3: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_3)
+  // Product Description Page - More From The Collection
+  getMoreFromTheCollection: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.MORE_FROM_THE_COLLECTION)
     return response.data
   },
 
-  updateBanner3: async (
+  updateMoreFromTheCollection: async (
     content: PromotionalBannerContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_3, { content })
-    return response.data
-  },
-
-  // Promotional Banner 4
-  getBanner4: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_4)
-    return response.data
-  },
-
-  updateBanner4: async (
-    content: PromotionalBannerContent
-  ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_4, { content })
-    return response.data
-  },
-
-  // Promotional Banner 5
-  getBanner5: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_5)
-    return response.data
-  },
-
-  updateBanner5: async (
-    content: PromotionalBannerContent
-  ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNERS.BANNER_5, { content })
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.MORE_FROM_THE_COLLECTION, { content })
     return response.data
   },
 
@@ -1037,7 +1050,7 @@ export interface PromotionalBannerItem {
   image_url: string
   mobile_view_image_url?: string
   image_alt_text: string
-  redirect_url: string
+  redirect_url?: string
   // title: string
   // subtitle: string
   // button_text: string
@@ -1048,6 +1061,52 @@ export interface PromotionalBannerItem {
 
 export interface PromotionalBannerContent {
   items: PromotionalBannerItem[]
+}
+
+// Types - Mid Size Banners (Product List Page)
+export interface MidSizeBannersItem {
+  id: string
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+  category_ids?: string[]
+  sub_category_ids?: string[]
+  rank: number
+  status: boolean
+}
+
+export interface MidSizeBannersContent {
+  items: MidSizeBannersItem[]
+}
+
+export interface LargeSizeBannersItem {
+  id: string
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+  category_ids?: string[]
+  sub_category_ids?: string[]
+  rank: number
+  status: boolean
+}
+
+export interface LargeSizeBannersContent {
+  items: LargeSizeBannersItem[]
+}
+
+// Types - Category (for pickers)
+export interface CategoryForSelect {
+  id: string
+  name: string
+  parent_category_id: string | null
+  status: boolean
+  rank: number
+}
+
+export interface CategoryWithChildrenForSelect extends CategoryForSelect {
+  children: CategoryForSelect[]
 }
 
 // Types - Product List Details

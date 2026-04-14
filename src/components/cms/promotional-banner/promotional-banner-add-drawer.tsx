@@ -43,9 +43,7 @@ export function PromotionalBannerAddDrawer({
     if (!imageUrl) {
       newErrors.image_url = 'Image is required'
     }
-    if (!redirectUrl) {
-      newErrors.redirect_url = 'Redirect URL is required'
-    } else if (!/^https?:\/\/.+/.test(redirectUrl)) {
+    if (redirectUrl && !/^https?:\/\/.+/.test(redirectUrl)) {
       newErrors.redirect_url = 'Must be a valid URL starting with http:// or https://'
     }
 
@@ -62,7 +60,7 @@ export function PromotionalBannerAddDrawer({
         image_url: imageUrl,
         mobile_view_image_url: mobileViewImageUrl,
         image_alt_text: imageAltText,
-        redirect_url: redirectUrl,
+        redirect_url: redirectUrl || undefined,
         rank,
         status,
       })
@@ -142,7 +140,7 @@ export function PromotionalBannerAddDrawer({
 
           <div className="space-y-2">
             <Label htmlFor="redirectUrl">
-              Redirect URL <span className="text-destructive">*</span>
+              Redirect URL 
             </Label>
             <Input
               id="redirectUrl"

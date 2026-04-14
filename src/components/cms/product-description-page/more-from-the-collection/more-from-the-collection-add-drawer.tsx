@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -8,70 +8,52 @@ import {
   SheetTitle,
   SheetFooter,
 } from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ImageIcon, Loader2 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 import { MediaPickerInput } from '@/components/media'
-import type { DiamondEducationSection1Item } from '@/components/cms/services/cmsService'
+import { ImageIcon, Loader2 } from 'lucide-react'
+import { type PromotionalBannerItem } from '../../services/cmsService'
 
-interface Section1DrawerProps {
+interface MoreFromTheCollectionAddDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  item: DiamondEducationSection1Item | null
-  onSave: (
-    item: Omit<DiamondEducationSection1Item, 'id'> | DiamondEducationSection1Item
-  ) => Promise<void>
+  onSave: (item: Omit<PromotionalBannerItem, 'id'>) => Promise<void>
 }
 
-export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1DrawerProps) {
-  const isEditMode = item !== null
-
+export function MoreFromTheCollectionAddDrawer({
+  open,
+  onOpenChange,
+  onSave,
+}: MoreFromTheCollectionAddDrawerProps) {
   const [imageUrl, setImageUrl] = useState('')
-  const [mobileImageUrl, setMobileImageUrl] = useState('')
+  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
   const [rank, setRank] = useState(0)
+  const [status, setStatus] = useState(true)
 
   const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{
-    image_url?: string
-    redirect_url?: string
-  }>({})
+  const [errors, setErrors] = useState<{ image_url?: string; redirect_url?: string }>({})
 
   const resetForm = () => {
     setImageUrl('')
-    setMobileImageUrl('')
+    setMobileViewImageUrl('')
     setImageAltText('')
     setRedirectUrl('')
     setRank(0)
+    setStatus(true)
     setErrors({})
   }
 
-  useEffect(() => {
-    if (open) {
-      if (item) {
-        setImageUrl(item.image_url)
-        setMobileImageUrl(item.mobile_image_url)
-        setImageAltText(item.image_alt_text)
-        setRedirectUrl(item.redirect_url || '')
-        setRank(item.rank)
-        setErrors({})
-      } else {
-        resetForm()
-      }
-    }
-  }, [open, item])
-
   const handleOpenChange = (isOpen: boolean) => {
     if (isLoading) return
-    if (!isOpen) {
-      resetForm()
-    }
+    if (!isOpen) resetForm()
     onOpenChange(isOpen)
   }
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     const newErrors: { image_url?: string; redirect_url?: string } = {}
     if (!imageUrl) {
       newErrors.image_url = 'Image is required'
@@ -79,6 +61,7 @@ export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1Dra
     if (redirectUrl && !/^https?:\/\/.+/.test(redirectUrl)) {
       newErrors.redirect_url = 'Must be a valid URL starting with http:// or https://'
     }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
@@ -88,24 +71,14 @@ export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1Dra
     setIsLoading(true)
 
     try {
-      if (isEditMode) {
-        await onSave({
-          id: item.id,
-          image_url: imageUrl,
-          mobile_image_url: mobileImageUrl,
-          image_alt_text: imageAltText,
-          redirect_url: redirectUrl || undefined,
-          rank,
-        })
-      } else {
-        await onSave({
-          image_url: imageUrl,
-          mobile_image_url: mobileImageUrl,
-          image_alt_text: imageAltText,
-          redirect_url: redirectUrl || undefined,
-          rank,
-        })
-      }
+      await onSave({
+        image_url: imageUrl,
+        mobile_view_image_url: mobileViewImageUrl,
+        image_alt_text: imageAltText,
+        redirect_url: redirectUrl || undefined,
+        rank,
+        status,
+      })
       resetForm()
     } finally {
       setIsLoading(false)
@@ -118,68 +91,60 @@ export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1Dra
         className="sm:max-w-xl flex flex-col p-0"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        {/* Header */}
         <SheetHeader className="text-left px-6 py-4 border-b">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
               <ImageIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <SheetTitle>{isEditMode ? 'Edit Item' : 'Add Item'}</SheetTitle>
+              <SheetTitle>Add Item</SheetTitle>
               <p className="text-sm text-muted-foreground">
-                {isEditMode
-                  ? 'Update the section 1 image item'
-                  : 'Add a new image item to section 1'}
+                Add a new item to More From The Collection
               </p>
             </div>
           </div>
         </SheetHeader>
 
-        {/* Form */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-          {/* Image URL */}
           <MediaPickerInput
-            label="Image"
+            label="Item Image"
             value={imageUrl || null}
             onChange={(path) => {
               setImageUrl(path || '')
               if (path) setErrors((prev) => ({ ...prev, image_url: undefined }))
             }}
-            rootPath="cms/guide/diamond-education/section1"
+            rootPath="cms/product-description-page/more-from-the-collection"
             required
             error={errors.image_url}
           />
 
-          {/* Mobile Image URL */}
           <MediaPickerInput
-            label="Mobile Image"
-            value={mobileImageUrl || null}
-            onChange={(path) => setMobileImageUrl(path || '')}
-            rootPath="cms/guide/diamond-education/section1/mobile"
+            label="Mobile View Image"
+            value={mobileViewImageUrl || null}
+            onChange={(path) => setMobileViewImageUrl(path || '')}
+            rootPath="cms/product-description-page/more-from-the-collection/mobile"
           />
 
-          {/* Alt Text */}
           <div className="space-y-2">
-            <Label htmlFor="s1_image_alt_text">Image Alt Text</Label>
+            <Label htmlFor="mftc-add-altText">Image Alt Text</Label>
             <Input
-              id="s1_image_alt_text"
-              placeholder="Describe the image"
+              id="mftc-add-altText"
               value={imageAltText}
               onChange={(e) => setImageAltText(e.target.value)}
+              placeholder="Describe the image"
             />
           </div>
 
-          {/* Redirect URL */}
           <div className="space-y-2">
-            <Label htmlFor="s1_redirect_url">Redirect URL</Label>
+            <Label htmlFor="mftc-add-redirectUrl">Redirect URL</Label>
             <Input
-              id="s1_redirect_url"
-              placeholder="https://example.com/page"
+              id="mftc-add-redirectUrl"
               value={redirectUrl}
               onChange={(e) => {
                 setRedirectUrl(e.target.value)
                 if (e.target.value) setErrors((prev) => ({ ...prev, redirect_url: undefined }))
               }}
+              placeholder="https://example.com/collections/..."
             />
             {errors.redirect_url ? (
               <p className="text-sm text-destructive">{errors.redirect_url}</p>
@@ -190,22 +155,29 @@ export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1Dra
             )}
           </div>
 
-          {/* Rank */}
           <div className="space-y-2">
-            <Label htmlFor="s1_rank">Rank</Label>
+            <Label htmlFor="mftc-add-rank">Display Order</Label>
             <Input
-              id="s1_rank"
+              id="mftc-add-rank"
               type="number"
               min={0}
-              placeholder="0"
               value={rank}
               onChange={(e) => setRank(parseInt(e.target.value) || 0)}
+              placeholder="0"
             />
             <p className="text-xs text-muted-foreground">Lower numbers display first</p>
           </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="mftc-add-status"
+              checked={status}
+              onCheckedChange={(checked) => setStatus(checked === true)}
+            />
+            <Label htmlFor="mftc-add-status" className="cursor-pointer">Active</Label>
+          </div>
         </div>
 
-        {/* Footer */}
         <SheetFooter className="flex-row gap-3 px-6 py-4 border-t">
           <Button
             variant="outline"
@@ -215,14 +187,12 @@ export function Section1Drawer({ open, onOpenChange, item, onSave }: Section1Dra
           >
             Cancel
           </Button>
-          <Button className="flex-1" onClick={handleSubmit} disabled={isLoading}>
+          <Button className="flex-1" onClick={handleSave} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
-            ) : isEditMode ? (
-              'Save Changes'
             ) : (
               'Add Item'
             )}

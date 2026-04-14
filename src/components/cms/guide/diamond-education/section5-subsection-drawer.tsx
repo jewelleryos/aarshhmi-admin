@@ -13,16 +13,16 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Loader2, Plus, X, Layers } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
-import type { DiamondEducationSection5SubSection } from '@/components/cms/services/cmsService'
+import type { DiamondEducationSection6SubSection } from '@/components/cms/services/cmsService'
 
 interface Section5SubSectionDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  item: DiamondEducationSection5SubSection | null
+  item: DiamondEducationSection6SubSection | null
   onSave: (
     item:
-      | Omit<DiamondEducationSection5SubSection, 'id'>
-      | DiamondEducationSection5SubSection
+      | Omit<DiamondEducationSection6SubSection, 'id'>
+      | DiamondEducationSection6SubSection
   ) => Promise<void>
 }
 
@@ -65,7 +65,7 @@ export function Section5SubSectionDrawer({
         setImageUrl(item.image_url)
         setMobileImageUrl(item.mobile_image_url)
         setImageAltText(item.image_alt_text)
-        setRedirectUrl(item.redirect_url)
+        setRedirectUrl(item.redirect_url || '')
         setErrors({})
       } else {
         resetForm()
@@ -120,7 +120,7 @@ export function Section5SubSectionDrawer({
           image_url: imageUrl,
           mobile_image_url: mobileImageUrl,
           image_alt_text: imageAltText,
-          redirect_url: redirectUrl,
+          redirect_url: redirectUrl || undefined,
         })
       } else {
         await onSave({
@@ -129,7 +129,7 @@ export function Section5SubSectionDrawer({
           image_url: imageUrl,
           mobile_image_url: mobileImageUrl,
           image_alt_text: imageAltText,
-          redirect_url: redirectUrl,
+          redirect_url: redirectUrl || undefined,
         })
       }
       resetForm()
@@ -154,8 +154,8 @@ export function Section5SubSectionDrawer({
               <SheetTitle>{isEditMode ? 'Edit Sub-section' : 'Add Sub-section'}</SheetTitle>
               <p className="text-sm text-muted-foreground">
                 {isEditMode
-                  ? 'Update the section 5 sub-section'
-                  : 'Add a new sub-section to section 5'}
+                  ? 'Update the section 6 sub-section'
+                  : 'Add a new sub-section to section 6'}
               </p>
             </div>
           </div>
@@ -216,7 +216,7 @@ export function Section5SubSectionDrawer({
             label="Image"
             value={imageUrl || null}
             onChange={(path) => setImageUrl(path || '')}
-            rootPath="cms/guide/diamond-education/section5"
+            rootPath="cms/guide/diamond-education/section6"
           />
 
           {/* Mobile Image URL */}

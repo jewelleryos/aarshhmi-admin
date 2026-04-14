@@ -384,17 +384,19 @@ const API_ENDPOINTS = {
     PARTNER_WITH_US: '/api/cms/partner-with-us',
     ABOUT_US: '/api/cms/about-us',
     JEWELLERY_CARE_GUIDE: '/api/cms/jewellery-care-guide',
-    PROMOTIONAL_BANNERS: {
-      BANNER_1: '/api/cms/promotional-banners/banner-1',
-      BANNER_2: '/api/cms/promotional-banners/banner-2',
-      BANNER_3: '/api/cms/promotional-banners/banner-3',
-      BANNER_4: '/api/cms/promotional-banners/banner-4',
-      BANNER_5: '/api/cms/promotional-banners/banner-5',
+    PRODUCT_LIST_PAGE_BANNERS: {
+      HERO_BANNER: '/api/cms/product-list-page/hero-banner',
+      MID_SIZE_BANNERS: '/api/cms/product-list-page/mid-size-banners',
+      LARGE_SIZE_BANNERS: '/api/cms/product-list-page/large-size-banners',
+    },
+    WISHLIST: {
+      HERO_BANNER: '/api/cms/wishlist/hero-banner',
     },
     PRODUCT_LIST_DETAILS: '/api/cms/product-list-details',
     PRODUCT_DESCRIPTION_PAGE: {
       JEWELLERY_CARE: '/api/cms/product-description-page/jewellery-care',
       WHATS_IN_THE_BOX: '/api/cms/product-description-page/whats-in-the-box',
+      MORE_FROM_THE_COLLECTION: '/api/cms/product-description-page/more-from-the-collection',
     },
     GENERAL: '/api/cms/general',
     BLOG: '/api/cms/blog',

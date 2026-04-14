@@ -26,14 +26,14 @@ import CMSPartnerWithUs from "./partnerWithUsPage/partner-with-us";
 import CMSAboutUs from "./aboutUsPage/about-us";
 import { NavbarContentComponent } from "./navbar";
 import CMSJewelleryCareGuide from "./jewelleryCareGuide/jewellery-care-guide";
-import { Banner1 } from "./promotional-banner/Banner1/banner1";
-import { Banner2 } from "./promotional-banner/Banner2/banner2";
-import { Banner3 } from "./promotional-banner/Banner3/banner3";
-import { Banner4 } from "./promotional-banner/Banner4/banner4";
-import { Banner5 } from "./promotional-banner/Banner5/banner5";
+import { ProductListPageHeroBanner } from "./product-list-page/hero-banner/hero-banner";
+import { ProductListPageMidSizeBanners } from "./product-list-page/mid-size-banners/mid-size-banners";
+import { ProductListPageLargeSizeBanners } from "./product-list-page/large-size-banners/large-size-banners";
+import { WishlistHeroBanner } from "./wishlist/hero-banner/hero-banner";
 import { ProductListDetailsComponent } from "./product-list-details/product-list-details";
 import { JewelleryCareComponent } from "./product-description-page/jewellery-care";
 import { WhatsInTheBoxComponent } from "./product-description-page/whats-in-the-box";
+import { MoreFromTheCollectionComponent } from "./product-description-page/more-from-the-collection";
 import { GeneralContentComponent } from "./general/general-content";
 import { BlogContentComponent } from "./blog/blog-content";
 import { DiamondEducationContent } from "./guide/diamond-education/diamond-education-content";
@@ -142,14 +142,14 @@ export function CMSContent() {
             activeSection === "partner-with-us" ? <CMSPartnerWithUs/> :
             activeSection === "about-us" ? <CMSAboutUs/> :
             activeSection === "jewellery-care-guide" ? <CMSJewelleryCareGuide/> :
-            activeSection === "promotional-banner-1" ? <Banner1/> :
-            activeSection === "promotional-banner-2" ? <Banner2/> :
-            activeSection === "promotional-banner-3" ? <Banner3/> :
-            activeSection === "promotional-banner-4" ? <Banner4/> :
-            activeSection === "promotional-banner-5" ? <Banner5/> :
+            activeSection === "product-list-page-hero-banner" ? <ProductListPageHeroBanner/> :
+            activeSection === "product-list-page-mid-size-banners" ? <ProductListPageMidSizeBanners/> :
+            activeSection === "product-list-page-large-size-banners" ? <ProductListPageLargeSizeBanners/> :
+            activeSection === "wishlist-hero-banner" ? <WishlistHeroBanner/> :
             activeSection === "product-list-details" ? <ProductListDetailsComponent title="Product List Details" description="Manage product list details content" getContent={() => cmsService.getProductListDetails()} updateContent={(content) => cmsService.updateProductListDetails(content)}/> :
             activeSection === "jewellery-care" ? <JewelleryCareComponent getContent={() => cmsService.getJewelleryCareSection()} updateContent={(content) => cmsService.updateJewelleryCareSection(content)}/> :
             activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getWhatsInTheBoxSection()} updateContent={(content) => cmsService.updateWhatsInTheBoxSection(content)}/> :
+            activeSection === "more-from-the-collection" ? <MoreFromTheCollectionComponent /> :
             activeSection === "general" ? <GeneralContentComponent /> :
             activeSection === "blog" ? <BlogContentComponent /> :
             activeSection === "diamond-education" ? <DiamondEducationContent /> :
