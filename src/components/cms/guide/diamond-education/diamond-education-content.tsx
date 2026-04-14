@@ -380,7 +380,7 @@ export function DiamondEducationContent() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{item.title}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {item.description.slice(0, 2).join(', ')}
+                      {item.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
                     </p>
                   </div>
                   <div className="ml-3 flex items-center gap-2 shrink-0">
@@ -421,7 +421,7 @@ export function DiamondEducationContent() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{item.title}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {item.description.slice(0, 2).join(', ')}
+                      {item.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
                     </p>
                   </div>
                   <div className="ml-3 flex items-center gap-2 shrink-0">
@@ -550,7 +550,7 @@ export function DiamondEducationContent() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{sub.title}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {sub.description.slice(0, 2).join(', ')}
+                      {sub.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
                     </p>
                   </div>
                   <div className="ml-3 flex items-center gap-2 shrink-0">

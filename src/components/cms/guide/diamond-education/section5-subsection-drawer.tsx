@@ -11,8 +11,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Loader2, Plus, X, Layers } from 'lucide-react'
+import { Loader2, Layers } from 'lucide-react'
 import { MediaPickerInput } from '@/components/media'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import type { DiamondEducationSection6SubSection } from '@/components/cms/services/cmsService'
 
 interface Section5SubSectionDrawerProps {
@@ -35,7 +36,7 @@ export function Section5SubSectionDrawer({
   const isEditMode = item !== null
 
   const [title, setTitle] = useState('')
-  const [descriptionLines, setDescriptionLines] = useState<string[]>([''])
+  const [description, setDescription] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [mobileImageUrl, setMobileImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
@@ -49,7 +50,7 @@ export function Section5SubSectionDrawer({
 
   const resetForm = () => {
     setTitle('')
-    setDescriptionLines([''])
+    setDescription('')
     setImageUrl('')
     setMobileImageUrl('')
     setImageAltText('')
@@ -61,7 +62,7 @@ export function Section5SubSectionDrawer({
     if (open) {
       if (item) {
         setTitle(item.title)
-        setDescriptionLines(item.description.length > 0 ? item.description : [''])
+        setDescription(item.description)
         setImageUrl(item.image_url)
         setMobileImageUrl(item.mobile_image_url)
         setImageAltText(item.image_alt_text)
@@ -81,18 +82,6 @@ export function Section5SubSectionDrawer({
     onOpenChange(isOpen)
   }
 
-  const handleAddLine = () => {
-    setDescriptionLines((prev) => [...prev, ''])
-  }
-
-  const handleUpdateLine = (index: number, value: string) => {
-    setDescriptionLines((prev) => prev.map((line, i) => (i === index ? value : line)))
-  }
-
-  const handleRemoveLine = (index: number) => {
-    setDescriptionLines((prev) => prev.filter((_, i) => i !== index))
-  }
-
   const handleSubmit = async () => {
     const newErrors: { title?: string; redirect_url?: string } = {}
     if (!title.trim()) {
@@ -109,14 +98,12 @@ export function Section5SubSectionDrawer({
     setErrors({})
     setIsLoading(true)
 
-    const filteredDescription = descriptionLines.filter((line) => line.trim() !== '')
-
     try {
       if (isEditMode) {
         await onSave({
           id: item.id,
           title: title.trim(),
-          description: filteredDescription,
+          description,
           image_url: imageUrl,
           mobile_image_url: mobileImageUrl,
           image_alt_text: imageAltText,
@@ -125,7 +112,7 @@ export function Section5SubSectionDrawer({
       } else {
         await onSave({
           title: title.trim(),
-          description: filteredDescription,
+          description,
           image_url: imageUrl,
           mobile_image_url: mobileImageUrl,
           image_alt_text: imageAltText,
@@ -182,33 +169,15 @@ export function Section5SubSectionDrawer({
             )}
           </div>
 
-          {/* Description Lines */}
-          <div className="space-y-3">
-            <Label>Description Lines</Label>
-            <div className="space-y-2">
-              {descriptionLines.map((line, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder={`Line ${index + 1}`}
-                    value={line}
-                    onChange={(e) => handleUpdateLine(index, e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
-                    onClick={() => handleRemoveLine(index)}
-                    disabled={descriptionLines.length === 1}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" size="sm" onClick={handleAddLine}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Line
-            </Button>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <RichTextEditor
+              value={description}
+              onChange={setDescription}
+              placeholder="Write the sub-section description here..."
+              mediaRootPath="cms/guide/diamond-education/section6"
+            />
           </div>
 
           {/* Image URL */}

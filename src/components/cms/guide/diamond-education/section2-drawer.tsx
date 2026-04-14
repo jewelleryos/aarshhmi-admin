@@ -11,7 +11,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Loader2, Plus, X, AlignLeft } from 'lucide-react'
+import { Loader2, AlignLeft } from 'lucide-react'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import type { DiamondEducationSection2Item } from '@/components/cms/services/cmsService'
 
 interface Section2DrawerProps {
@@ -27,14 +28,14 @@ export function Section2Drawer({ open, onOpenChange, item, onSave }: Section2Dra
   const isEditMode = item !== null
 
   const [title, setTitle] = useState('')
-  const [descriptionLines, setDescriptionLines] = useState<string[]>([''])
+  const [description, setDescription] = useState('')
 
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ title?: string }>({})
 
   const resetForm = () => {
     setTitle('')
-    setDescriptionLines([''])
+    setDescription('')
     setErrors({})
   }
 
@@ -42,7 +43,7 @@ export function Section2Drawer({ open, onOpenChange, item, onSave }: Section2Dra
     if (open) {
       if (item) {
         setTitle(item.title)
-        setDescriptionLines(item.description.length > 0 ? item.description : [''])
+        setDescription(item.description)
         setErrors({})
       } else {
         resetForm()
@@ -58,18 +59,6 @@ export function Section2Drawer({ open, onOpenChange, item, onSave }: Section2Dra
     onOpenChange(isOpen)
   }
 
-  const handleAddLine = () => {
-    setDescriptionLines((prev) => [...prev, ''])
-  }
-
-  const handleUpdateLine = (index: number, value: string) => {
-    setDescriptionLines((prev) => prev.map((line, i) => (i === index ? value : line)))
-  }
-
-  const handleRemoveLine = (index: number) => {
-    setDescriptionLines((prev) => prev.filter((_, i) => i !== index))
-  }
-
   const handleSubmit = async () => {
     const newErrors: { title?: string } = {}
     if (!title.trim()) {
@@ -83,19 +72,17 @@ export function Section2Drawer({ open, onOpenChange, item, onSave }: Section2Dra
     setErrors({})
     setIsLoading(true)
 
-    const filteredDescription = descriptionLines.filter((line) => line.trim() !== '')
-
     try {
       if (isEditMode) {
         await onSave({
           id: item.id,
           title: title.trim(),
-          description: filteredDescription,
+          description,
         })
       } else {
         await onSave({
           title: title.trim(),
-          description: filteredDescription,
+          description,
         })
       }
       resetForm()
@@ -148,33 +135,15 @@ export function Section2Drawer({ open, onOpenChange, item, onSave }: Section2Dra
             )}
           </div>
 
-          {/* Description Lines */}
-          <div className="space-y-3">
-            <Label>Description Lines</Label>
-            <div className="space-y-2">
-              {descriptionLines.map((line, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder={`Line ${index + 1}`}
-                    value={line}
-                    onChange={(e) => handleUpdateLine(index, e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
-                    onClick={() => handleRemoveLine(index)}
-                    disabled={descriptionLines.length === 1}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" size="sm" onClick={handleAddLine}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Line
-            </Button>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <RichTextEditor
+              value={description}
+              onChange={setDescription}
+              placeholder="Write the item description here..."
+              mediaRootPath="cms/guide/diamond-education/section2"
+            />
           </div>
         </div>
 

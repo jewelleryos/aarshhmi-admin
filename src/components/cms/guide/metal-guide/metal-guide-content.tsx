@@ -13,6 +13,7 @@ import {
   type MetalGuideSection1Item,
   type MetalGuideSection2Item,
   type MetalGuideSubSectionItem,
+  type MetalGuideSection3Item,
 } from '@/components/cms/services/cmsService'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import { getCdnUrl } from '@/utils/cdn'
@@ -28,24 +29,25 @@ export function MetalGuideContent() {
   const [section1, setSection1] = useState<MetalGuideSection1Item[]>([])
   const [section2, setSection2] = useState<MetalGuideSection2Item[]>([])
 
-  const [section3Title, setSection3Title] = useState('')
-  const [section3SubSections, setSection3SubSections] = useState<MetalGuideSubSectionItem[]>([])
+  // Section 3 — Types of Metal We Offer
+  const [section3, setSection3] = useState<MetalGuideSection3Item[]>([])
 
+  // Section 4 — Purity of Gold
   const [section4Title, setSection4Title] = useState('')
-  const [section4SubSections, setSection4SubSections] = useState<MetalGuideSubSectionItem[]>([])
+  const [section4Description, setSection4Description] = useState<string[]>([''])
+  const [section4Content, setSection4Content] = useState('')
 
+  // Section 5 — Text Items
   const [section5Title, setSection5Title] = useState('')
   const [section5Description, setSection5Description] = useState<string[]>([''])
-  const [section5Content, setSection5Content] = useState('')
 
+  // Section 6 — Metal Table
   const [section6Title, setSection6Title] = useState('')
-  const [section6Description, setSection6Description] = useState<string[]>([''])
+  const [section6Content, setSection6Content] = useState('')
 
+  // Section 7 — Text Items
   const [section7Title, setSection7Title] = useState('')
-  const [section7Content, setSection7Content] = useState('')
-
-  const [section8Title, setSection8Title] = useState('')
-  const [section8Description, setSection8Description] = useState<string[]>([''])
+  const [section7Description, setSection7Description] = useState<string[]>([''])
 
   // Section 1 drawer states
   const [isSection1AddOpen, setIsSection1AddOpen] = useState(false)
@@ -57,15 +59,11 @@ export function MetalGuideContent() {
   const [isSection2EditOpen, setIsSection2EditOpen] = useState(false)
   const [selectedSection2Item, setSelectedSection2Item] = useState<MetalGuideSection2Item | null>(null)
 
-  // Section 3 drawer states
-  const [isSection3AddOpen, setIsSection3AddOpen] = useState(false)
-  const [isSection3EditOpen, setIsSection3EditOpen] = useState(false)
-  const [selectedSection3Item, setSelectedSection3Item] = useState<MetalGuideSubSectionItem | null>(null)
-
-  // Section 4 drawer states
-  const [isSection4AddOpen, setIsSection4AddOpen] = useState(false)
-  const [isSection4EditOpen, setIsSection4EditOpen] = useState(false)
-  const [selectedSection4Item, setSelectedSection4Item] = useState<MetalGuideSubSectionItem | null>(null)
+  // Section 3 sub-section drawer states
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(null)
+  const [isSubSectionAddOpen, setIsSubSectionAddOpen] = useState(false)
+  const [isSubSectionEditOpen, setIsSubSectionEditOpen] = useState(false)
+  const [selectedSubSectionItem, setSelectedSubSectionItem] = useState<MetalGuideSubSectionItem | null>(null)
 
   useEffect(() => {
     fetchContent()
@@ -80,30 +78,21 @@ export function MetalGuideContent() {
         setTitle(content.title || '')
         setSection1(content.section1 || [])
         setSection2(content.section2 || [])
-        setSection3Title(content.section3?.title || '')
-        setSection3SubSections(content.section3?.sub_sections || [])
+        setSection3(content.section3 || [])
         setSection4Title(content.section4?.title || '')
-        setSection4SubSections(content.section4?.sub_sections || [])
+        setSection4Description(
+          content.section4?.description?.length ? content.section4.description : ['']
+        )
+        setSection4Content(content.section4?.content || '')
         setSection5Title(content.section5?.title || '')
         setSection5Description(
-          content.section5?.description && content.section5.description.length > 0
-            ? content.section5.description
-            : ['']
+          content.section5?.description?.length ? content.section5.description : ['']
         )
-        setSection5Content(content.section5?.content || '')
         setSection6Title(content.section6?.title || '')
-        setSection6Description(
-          content.section6?.description && content.section6.description.length > 0
-            ? content.section6.description
-            : ['']
-        )
+        setSection6Content(content.section6?.content || '')
         setSection7Title(content.section7?.title || '')
-        setSection7Content(content.section7?.content || '')
-        setSection8Title(content.section8?.title || '')
-        setSection8Description(
-          content.section8?.description && content.section8.description.length > 0
-            ? content.section8.description
-            : ['']
+        setSection7Description(
+          content.section7?.description?.length ? content.section7.description : ['']
         )
       }
     } catch (err: unknown) {
@@ -114,57 +103,37 @@ export function MetalGuideContent() {
     }
   }
 
-  const saveContent = async (
-    s1: MetalGuideSection1Item[],
-    s2: MetalGuideSection2Item[],
-    s3title: string,
-    s3subs: MetalGuideSubSectionItem[],
-    s4title: string,
-    s4subs: MetalGuideSubSectionItem[],
-    s5title: string,
-    s5desc: string[],
-    s5content: string,
-    s6title: string,
-    s6desc: string[],
-    s7title: string,
-    s7content: string,
-    s8title: string,
-    s8desc: string[]
+  const saveAll = async (
+    s1 = section1,
+    s2 = section2,
+    s3 = section3
   ) => {
-    const response = await cmsService.updateMetalGuide({
+    return cmsService.updateMetalGuide({
       title,
       section1: s1,
       section2: s2,
-      section3: { title: s3title, sub_sections: s3subs },
-      section4: { title: s4title, sub_sections: s4subs },
-      section5: { title: s5title, description: s5desc, content: s5content },
-      section6: { title: s6title, description: s6desc },
-      section7: { title: s7title, content: s7content },
-      section8: { title: s8title, description: s8desc },
+      section3: s3,
+      section4: {
+        title: section4Title,
+        description: section4Description.filter((l) => l.trim() !== ''),
+        content: section4Content,
+      },
+      section5: {
+        title: section5Title,
+        description: section5Description.filter((l) => l.trim() !== ''),
+      },
+      section6: { title: section6Title, content: section6Content },
+      section7: {
+        title: section7Title,
+        description: section7Description.filter((l) => l.trim() !== ''),
+      },
     })
-    return response
   }
 
   const handleSaveDetails = async () => {
     setIsSaving(true)
     try {
-      const response = await saveContent(
-        section1,
-        section2,
-        section3Title,
-        section3SubSections,
-        section4Title,
-        section4SubSections,
-        section5Title,
-        section5Description.filter((l) => l.trim() !== ''),
-        section5Content,
-        section6Title,
-        section6Description.filter((l) => l.trim() !== ''),
-        section7Title,
-        section7Content,
-        section8Title,
-        section8Description.filter((l) => l.trim() !== '')
-      )
+      const response = await saveAll()
       toast.success(response.message)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
@@ -174,244 +143,152 @@ export function MetalGuideContent() {
     }
   }
 
-  // Section 1 CRUD
+  // ── Section 1 CRUD ────────────────────────────────────────────────────────
   const handleAddSection1Item = async (item: Omit<MetalGuideSection1Item, 'id'>) => {
     const newItem: MetalGuideSection1Item = { ...item, id: `s1_${Date.now()}` }
-    const updatedSection1 = [...section1, newItem]
-    const response = await saveContent(
-      updatedSection1, section2,
-      section3Title, section3SubSections,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
+    const updated = [...section1, newItem]
+    const response = await saveAll(updated)
     toast.success(response.message)
-    setSection1(updatedSection1)
+    setSection1(updated)
     setIsSection1AddOpen(false)
   }
 
   const handleEditSection1Item = async (item: MetalGuideSection1Item) => {
-    const updatedSection1 = section1.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(
-      updatedSection1, section2,
-      section3Title, section3SubSections,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
+    const updated = section1.map((s) => (s.id === item.id ? item : s))
+    const response = await saveAll(updated)
     toast.success(response.message)
-    setSection1(updatedSection1)
+    setSection1(updated)
     setIsSection1EditOpen(false)
     setSelectedSection1Item(null)
   }
 
   const handleDeleteSection1Item = async (id: string) => {
-    const updatedSection1 = section1.filter((s) => s.id !== id)
+    const updated = section1.filter((s) => s.id !== id)
     try {
-      const response = await saveContent(
-        updatedSection1, section2,
-        section3Title, section3SubSections,
-        section4Title, section4SubSections,
-        section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-        section6Title, section6Description.filter((l) => l.trim() !== ''),
-        section7Title, section7Content,
-        section8Title, section8Description.filter((l) => l.trim() !== '')
-      )
+      const response = await saveAll(updated)
       toast.success(response.message)
-      setSection1(updatedSection1)
+      setSection1(updated)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to delete item')
     }
   }
 
-  const openSection1Edit = (item: MetalGuideSection1Item) => {
-    setSelectedSection1Item(item)
-    setIsSection1EditOpen(true)
-  }
-
-  // Section 2 CRUD
+  // ── Section 2 CRUD ────────────────────────────────────────────────────────
   const handleAddSection2Item = async (item: Omit<MetalGuideSection2Item, 'id'>) => {
     const newItem: MetalGuideSection2Item = { ...item, id: `s2_${Date.now()}` }
-    const updatedSection2 = [...section2, newItem]
-    const response = await saveContent(
-      section1, updatedSection2,
-      section3Title, section3SubSections,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
+    const updated = [...section2, newItem]
+    const response = await saveAll(section1, updated)
     toast.success(response.message)
-    setSection2(updatedSection2)
+    setSection2(updated)
     setIsSection2AddOpen(false)
   }
 
   const handleEditSection2Item = async (item: MetalGuideSection2Item) => {
-    const updatedSection2 = section2.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(
-      section1, updatedSection2,
-      section3Title, section3SubSections,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
+    const updated = section2.map((s) => (s.id === item.id ? item : s))
+    const response = await saveAll(section1, updated)
     toast.success(response.message)
-    setSection2(updatedSection2)
+    setSection2(updated)
     setIsSection2EditOpen(false)
     setSelectedSection2Item(null)
   }
 
   const handleDeleteSection2Item = async (id: string) => {
-    const updatedSection2 = section2.filter((s) => s.id !== id)
+    const updated = section2.filter((s) => s.id !== id)
     try {
-      const response = await saveContent(
-        section1, updatedSection2,
-        section3Title, section3SubSections,
-        section4Title, section4SubSections,
-        section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-        section6Title, section6Description.filter((l) => l.trim() !== ''),
-        section7Title, section7Content,
-        section8Title, section8Description.filter((l) => l.trim() !== '')
-      )
+      const response = await saveAll(section1, updated)
       toast.success(response.message)
-      setSection2(updatedSection2)
+      setSection2(updated)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to delete item')
     }
   }
 
-  const openSection2Edit = (item: MetalGuideSection2Item) => {
-    setSelectedSection2Item(item)
-    setIsSection2EditOpen(true)
+  // ── Section 3 group CRUD ──────────────────────────────────────────────────
+  const handleAddGroup = () => {
+    const newGroup: MetalGuideSection3Item = {
+      id: `s3g_${Date.now()}`,
+      title: '',
+      sub_sections: [],
+    }
+    setSection3((prev) => [...prev, newGroup])
   }
 
-  // Section 3 CRUD
-  const handleAddSection3SubSection = async (item: Omit<MetalGuideSubSectionItem, 'id'>) => {
-    const newItem: MetalGuideSubSectionItem = { ...item, id: `s3sub_${Date.now()}` }
-    const updatedSubs = [...section3SubSections, newItem]
-    const response = await saveContent(
-      section1, section2,
-      section3Title, updatedSubs,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
-    toast.success(response.message)
-    setSection3SubSections(updatedSubs)
-    setIsSection3AddOpen(false)
-  }
-
-  const handleEditSection3SubSection = async (item: MetalGuideSubSectionItem) => {
-    const updatedSubs = section3SubSections.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(
-      section1, section2,
-      section3Title, updatedSubs,
-      section4Title, section4SubSections,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
-    toast.success(response.message)
-    setSection3SubSections(updatedSubs)
-    setIsSection3EditOpen(false)
-    setSelectedSection3Item(null)
-  }
-
-  const handleDeleteSection3SubSection = async (id: string) => {
-    const updatedSubs = section3SubSections.filter((s) => s.id !== id)
+  const handleRemoveGroup = async (groupId: string) => {
+    const updated = section3.filter((g) => g.id !== groupId)
     try {
-      const response = await saveContent(
-        section1, section2,
-        section3Title, updatedSubs,
-        section4Title, section4SubSections,
-        section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-        section6Title, section6Description.filter((l) => l.trim() !== ''),
-        section7Title, section7Content,
-        section8Title, section8Description.filter((l) => l.trim() !== '')
-      )
+      const response = await saveAll(section1, section2, updated)
       toast.success(response.message)
-      setSection3SubSections(updatedSubs)
+      setSection3(updated)
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      toast.error(error.response?.data?.message || 'Failed to delete group')
+    }
+  }
+
+  const handleGroupTitleChange = (groupId: string, value: string) => {
+    setSection3((prev) =>
+      prev.map((g) => (g.id === groupId ? { ...g, title: value } : g))
+    )
+  }
+
+  // ── Section 3 sub-section CRUD ────────────────────────────────────────────
+  const openSubSectionAdd = (groupId: string) => {
+    setActiveGroupId(groupId)
+    setIsSubSectionAddOpen(true)
+  }
+
+  const openSubSectionEdit = (groupId: string, sub: MetalGuideSubSectionItem) => {
+    setActiveGroupId(groupId)
+    setSelectedSubSectionItem(sub)
+    setIsSubSectionEditOpen(true)
+  }
+
+  const handleAddSubSection = async (item: Omit<MetalGuideSubSectionItem, 'id'>) => {
+    if (!activeGroupId) return
+    const newSub: MetalGuideSubSectionItem = { ...item, id: `s3sub_${Date.now()}` }
+    const updated = section3.map((g) =>
+      g.id === activeGroupId
+        ? { ...g, sub_sections: [...g.sub_sections, newSub] }
+        : g
+    )
+    const response = await saveAll(section1, section2, updated)
+    toast.success(response.message)
+    setSection3(updated)
+    setIsSubSectionAddOpen(false)
+    setActiveGroupId(null)
+  }
+
+  const handleEditSubSection = async (item: MetalGuideSubSectionItem) => {
+    if (!activeGroupId) return
+    const updated = section3.map((g) =>
+      g.id === activeGroupId
+        ? { ...g, sub_sections: g.sub_sections.map((s) => (s.id === item.id ? item : s)) }
+        : g
+    )
+    const response = await saveAll(section1, section2, updated)
+    toast.success(response.message)
+    setSection3(updated)
+    setIsSubSectionEditOpen(false)
+    setSelectedSubSectionItem(null)
+    setActiveGroupId(null)
+  }
+
+  const handleDeleteSubSection = async (groupId: string, subId: string) => {
+    const updated = section3.map((g) =>
+      g.id === groupId
+        ? { ...g, sub_sections: g.sub_sections.filter((s) => s.id !== subId) }
+        : g
+    )
+    try {
+      const response = await saveAll(section1, section2, updated)
+      toast.success(response.message)
+      setSection3(updated)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to delete sub-section')
     }
-  }
-
-  const openSection3Edit = (item: MetalGuideSubSectionItem) => {
-    setSelectedSection3Item(item)
-    setIsSection3EditOpen(true)
-  }
-
-  // Section 4 CRUD
-  const handleAddSection4SubSection = async (item: Omit<MetalGuideSubSectionItem, 'id'>) => {
-    const newItem: MetalGuideSubSectionItem = { ...item, id: `s4sub_${Date.now()}` }
-    const updatedSubs = [...section4SubSections, newItem]
-    const response = await saveContent(
-      section1, section2,
-      section3Title, section3SubSections,
-      section4Title, updatedSubs,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
-    toast.success(response.message)
-    setSection4SubSections(updatedSubs)
-    setIsSection4AddOpen(false)
-  }
-
-  const handleEditSection4SubSection = async (item: MetalGuideSubSectionItem) => {
-    const updatedSubs = section4SubSections.map((s) => (s.id === item.id ? item : s))
-    const response = await saveContent(
-      section1, section2,
-      section3Title, section3SubSections,
-      section4Title, updatedSubs,
-      section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-      section6Title, section6Description.filter((l) => l.trim() !== ''),
-      section7Title, section7Content,
-      section8Title, section8Description.filter((l) => l.trim() !== '')
-    )
-    toast.success(response.message)
-    setSection4SubSections(updatedSubs)
-    setIsSection4EditOpen(false)
-    setSelectedSection4Item(null)
-  }
-
-  const handleDeleteSection4SubSection = async (id: string) => {
-    const updatedSubs = section4SubSections.filter((s) => s.id !== id)
-    try {
-      const response = await saveContent(
-        section1, section2,
-        section3Title, section3SubSections,
-        section4Title, updatedSubs,
-        section5Title, section5Description.filter((l) => l.trim() !== ''), section5Content,
-        section6Title, section6Description.filter((l) => l.trim() !== ''),
-        section7Title, section7Content,
-        section8Title, section8Description.filter((l) => l.trim() !== '')
-      )
-      toast.success(response.message)
-      setSection4SubSections(updatedSubs)
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to delete sub-section')
-    }
-  }
-
-  const openSection4Edit = (item: MetalGuideSubSectionItem) => {
-    setSelectedSection4Item(item)
-    setIsSection4EditOpen(true)
   }
 
   if (isLoading) {
@@ -428,31 +305,23 @@ export function MetalGuideContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Metal Guide</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage the metal guide content
-          </p>
+          <p className="text-sm text-muted-foreground">Manage the metal guide content</p>
         </div>
         <Button onClick={handleSaveDetails} disabled={isSaving}>
           {isSaving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
           ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
-            </>
+            <><Save className="mr-2 h-4 w-4" />Save Changes</>
           )}
         </Button>
       </div>
 
-      {/* Card 1 - Title */}
+      {/* Page Title */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Page Title</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <div className="space-y-2">
             <Label htmlFor="mg_title">Title</Label>
             <Input
@@ -465,7 +334,7 @@ export function MetalGuideContent() {
         </CardContent>
       </Card>
 
-      {/* Card 2 - Section 1: Image Gallery */}
+      {/* Section 1 — Image Gallery */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -484,10 +353,7 @@ export function MetalGuideContent() {
           ) : (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {section1.map((item) => (
-                <div
-                  key={item.id}
-                  className="relative group rounded-lg border overflow-hidden"
-                >
+                <div key={item.id} className="relative group rounded-lg border overflow-hidden">
                   <img
                     src={getCdnUrl(item.image_url)}
                     alt={item.image_alt_text || 'Section 1 image'}
@@ -501,7 +367,7 @@ export function MetalGuideContent() {
                       size="icon"
                       variant="secondary"
                       className="h-6 w-6"
-                      onClick={() => openSection1Edit(item)}
+                      onClick={() => { setSelectedSection1Item(item); setIsSection1EditOpen(true) }}
                     >
                       <Pencil className="h-3 w-3" />
                     </Button>
@@ -521,7 +387,7 @@ export function MetalGuideContent() {
         </CardContent>
       </Card>
 
-      {/* Card 3 - Section 2: Text Items */}
+      {/* Section 2 — Text Items */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -540,14 +406,11 @@ export function MetalGuideContent() {
           ) : (
             <div className="space-y-2">
               {section2.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-md border px-4 py-3"
-                >
+                <div key={item.id} className="flex items-center justify-between rounded-md border px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{item.title}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {item.description.slice(0, 2).join(', ')}
+                      {item.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
                     </p>
                   </div>
                   <div className="ml-3 flex items-center gap-2 shrink-0">
@@ -555,7 +418,7 @@ export function MetalGuideContent() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8"
-                      onClick={() => openSection2Edit(item)}
+                      onClick={() => { setSelectedSection2Item(item); setIsSection2EditOpen(true) }}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
@@ -575,146 +438,183 @@ export function MetalGuideContent() {
         </CardContent>
       </Card>
 
-      {/* Card 4 - Section 3: Sub-sections */}
+      {/* Section 3 — Types of Metal We Offer */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Section 3</CardTitle>
-            <Button size="sm" onClick={() => setIsSection3AddOpen(true)}>
+            <CardTitle className="text-lg">Section 3 — Types of Metal We Offer</CardTitle>
+            <Button size="sm" onClick={handleAddGroup}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Sub-section
+              Add Group
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="s3_title">Section 3 Title</Label>
-            <Input
-              id="s3_title"
-              placeholder="Enter section 3 title"
-              value={section3Title}
-              onChange={(e) => setSection3Title(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground italic">
-              Section 3 title is saved by the global &quot;Save Changes&quot; button above.
-            </p>
-          </div>
-          {section3SubSections.length === 0 ? (
+        <CardContent className="space-y-6">
+          {section3.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No sub-sections yet. Click &quot;Add Sub-section&quot; to create one.
+              No groups yet. Click &quot;Add Group&quot; to create one.
             </p>
           ) : (
-            <div className="space-y-2">
-              {section3SubSections.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="flex items-center justify-between rounded-md border px-4 py-3"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{sub.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {sub.description.slice(0, 2).join(', ')}
-                    </p>
+            section3.map((group, groupIndex) => (
+              <div key={group.id} className="rounded-lg border p-4 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor={`s3g_title_${group.id}`}>
+                      Group {groupIndex + 1} Title
+                    </Label>
+                    <Input
+                      id={`s3g_title_${group.id}`}
+                      placeholder="Enter group title"
+                      value={group.title}
+                      onChange={(e) => handleGroupTitleChange(group.id, e.target.value)}
+                    />
                   </div>
-                  <div className="ml-3 flex items-center gap-2 shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => openSection3Edit(sub)}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteSection3SubSection(sub.id)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9 text-destructive hover:text-destructive mt-6 shrink-0"
+                    onClick={() => handleRemoveGroup(group.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
+
+                {group.sub_sections.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No sub-sections yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {group.sub_sections.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="flex items-center justify-between rounded-md border px-4 py-3 bg-muted/30"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm truncate">{sub.title}</p>
+                          {sub.description && (
+                            <p
+                              className="text-xs text-muted-foreground truncate max-w-sm"
+                              dangerouslySetInnerHTML={{
+                                __html: sub.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80),
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div className="ml-3 flex items-center gap-2 shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => openSubSectionEdit(group.id, sub)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteSubSection(group.id, sub.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <Button size="sm" variant="outline" onClick={() => openSubSectionAdd(group.id)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Sub-section
+                </Button>
+              </div>
+            ))
+          )}
+          {section3.length > 0 && (
+            <p className="text-xs text-muted-foreground italic">
+              Group titles are saved by the global &quot;Save Changes&quot; button above.
+            </p>
           )}
         </CardContent>
       </Card>
 
-      {/* Card 5 - Section 4: Sub-sections */}
+      {/* Section 4 — Purity of Gold */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Section 4</CardTitle>
-            <Button size="sm" onClick={() => setIsSection4AddOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Sub-section
-            </Button>
-          </div>
+          <CardTitle className="text-lg">Section 4 — Purity of Gold</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="s4_title">Section 4 Title</Label>
+            <Label htmlFor="s4_title">Title</Label>
             <Input
               id="s4_title"
               placeholder="Enter section 4 title"
               value={section4Title}
               onChange={(e) => setSection4Title(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground italic">
-              Section 4 title is saved by the global &quot;Save Changes&quot; button above.
-            </p>
           </div>
-          {section4SubSections.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No sub-sections yet. Click &quot;Add Sub-section&quot; to create one.
-            </p>
-          ) : (
+
+          <div className="space-y-3">
+            <Label>Description Lines</Label>
             <div className="space-y-2">
-              {section4SubSections.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="flex items-center justify-between rounded-md border px-4 py-3"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{sub.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {sub.description.slice(0, 2).join(', ')}
-                    </p>
-                  </div>
-                  <div className="ml-3 flex items-center gap-2 shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => openSection4Edit(sub)}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteSection4SubSection(sub.id)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+              {section4Description.map((line, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    placeholder={`Line ${index + 1}`}
+                    value={line}
+                    onChange={(e) =>
+                      setSection4Description((prev) =>
+                        prev.map((l, i) => (i === index ? e.target.value : l))
+                      )
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
+                    onClick={() =>
+                      setSection4Description((prev) => prev.filter((_, i) => i !== index))
+                    }
+                    disabled={section4Description.length === 1}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
-          )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSection4Description((prev) => [...prev, ''])}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Line
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Content</Label>
+            <RichTextEditor
+              value={section4Content}
+              onChange={setSection4Content}
+              placeholder="Write the section 4 content here..."
+              mediaRootPath="cms/guide/metal-guide/section4"
+            />
+          </div>
+
+          <p className="text-xs text-muted-foreground italic">
+            Section 4 is saved by the global &quot;Save Changes&quot; button above.
+          </p>
         </CardContent>
       </Card>
 
-      {/* Card 6 - Section 5: Title + Description + TipTap */}
+      {/* Section 5 — Text Items */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section 5</CardTitle>
+          <CardTitle className="text-lg">Section 5 — Text Items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="s5_title">Section 5 Title</Label>
+            <Label htmlFor="s5_title">Title</Label>
             <Input
               id="s5_title"
               placeholder="Enter section 5 title"
@@ -761,30 +661,20 @@ export function MetalGuideContent() {
             </Button>
           </div>
 
-          <div className="space-y-2">
-            <Label>Content</Label>
-            <RichTextEditor
-              value={section5Content}
-              onChange={setSection5Content}
-              placeholder="Write the section 5 content here..."
-              mediaRootPath="cms/guide/metal-guide/section5"
-            />
-          </div>
-
           <p className="text-xs text-muted-foreground italic">
             Section 5 is saved by the global &quot;Save Changes&quot; button above.
           </p>
         </CardContent>
       </Card>
 
-      {/* Card 7 - Section 6: Title + Description */}
+      {/* Section 6 — Metal Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section 6</CardTitle>
+          <CardTitle className="text-lg">Section 6 — Metal Table</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="s6_title">Section 6 Title</Label>
+            <Label htmlFor="s6_title">Title</Label>
             <Input
               id="s6_title"
               placeholder="Enter section 6 title"
@@ -793,42 +683,14 @@ export function MetalGuideContent() {
             />
           </div>
 
-          <div className="space-y-3">
-            <Label>Description Lines</Label>
-            <div className="space-y-2">
-              {section6Description.map((line, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder={`Line ${index + 1}`}
-                    value={line}
-                    onChange={(e) =>
-                      setSection6Description((prev) =>
-                        prev.map((l, i) => (i === index ? e.target.value : l))
-                      )
-                    }
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
-                    onClick={() =>
-                      setSection6Description((prev) => prev.filter((_, i) => i !== index))
-                    }
-                    disabled={section6Description.length === 1}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSection6Description((prev) => [...prev, ''])}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Line
-            </Button>
+          <div className="space-y-2">
+            <Label>Content</Label>
+            <RichTextEditor
+              value={section6Content}
+              onChange={setSection6Content}
+              placeholder="Write the section 6 content here..."
+              mediaRootPath="cms/guide/metal-guide/section6"
+            />
           </div>
 
           <p className="text-xs text-muted-foreground italic">
@@ -837,14 +699,14 @@ export function MetalGuideContent() {
         </CardContent>
       </Card>
 
-      {/* Card 8 - Section 7: Title + TipTap */}
+      {/* Section 7 — Text Items */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section 7</CardTitle>
+          <CardTitle className="text-lg">Section 7 — Text Items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="s7_title">Section 7 Title</Label>
+            <Label htmlFor="s7_title">Title</Label>
             <Input
               id="s7_title"
               placeholder="Enter section 7 title"
@@ -853,48 +715,16 @@ export function MetalGuideContent() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Content</Label>
-            <RichTextEditor
-              value={section7Content}
-              onChange={setSection7Content}
-              placeholder="Write the section 7 content here..."
-              mediaRootPath="cms/guide/metal-guide/section7"
-            />
-          </div>
-
-          <p className="text-xs text-muted-foreground italic">
-            Section 7 is saved by the global &quot;Save Changes&quot; button above.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Card 9 - Section 8: Title + Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Section 8</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="s8_title">Section 8 Title</Label>
-            <Input
-              id="s8_title"
-              placeholder="Enter section 8 title"
-              value={section8Title}
-              onChange={(e) => setSection8Title(e.target.value)}
-            />
-          </div>
-
           <div className="space-y-3">
             <Label>Description Lines</Label>
             <div className="space-y-2">
-              {section8Description.map((line, index) => (
+              {section7Description.map((line, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <Input
                     placeholder={`Line ${index + 1}`}
                     value={line}
                     onChange={(e) =>
-                      setSection8Description((prev) =>
+                      setSection7Description((prev) =>
                         prev.map((l, i) => (i === index ? e.target.value : l))
                       )
                     }
@@ -904,9 +734,9 @@ export function MetalGuideContent() {
                     size="icon"
                     className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
                     onClick={() =>
-                      setSection8Description((prev) => prev.filter((_, i) => i !== index))
+                      setSection7Description((prev) => prev.filter((_, i) => i !== index))
                     }
-                    disabled={section8Description.length === 1}
+                    disabled={section7Description.length === 1}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -916,7 +746,7 @@ export function MetalGuideContent() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSection8Description((prev) => [...prev, ''])}
+              onClick={() => setSection7Description((prev) => [...prev, ''])}
             >
               <Plus className="mr-2 h-4 w-4" />
               Add Line
@@ -924,7 +754,7 @@ export function MetalGuideContent() {
           </div>
 
           <p className="text-xs text-muted-foreground italic">
-            Section 8 is saved by the global &quot;Save Changes&quot; button above.
+            Section 7 is saved by the global &quot;Save Changes&quot; button above.
           </p>
         </CardContent>
       </Card>
@@ -971,49 +801,34 @@ export function MetalGuideContent() {
         }}
       />
 
-      {/* Section 3 Drawers */}
+      {/* Section 3 Sub-section Add Drawer */}
       <SubSectionDrawer
-        open={isSection3AddOpen}
-        onOpenChange={setIsSection3AddOpen}
+        open={isSubSectionAddOpen}
+        onOpenChange={(open) => {
+          setIsSubSectionAddOpen(open)
+          if (!open) setActiveGroupId(null)
+        }}
         item={null}
         sectionLabel="section 3"
         onSave={async (item) => {
-          await handleAddSection3SubSection(item as Omit<MetalGuideSubSectionItem, 'id'>)
-        }}
-      />
-      <SubSectionDrawer
-        open={isSection3EditOpen}
-        onOpenChange={(open) => {
-          setIsSection3EditOpen(open)
-          if (!open) setSelectedSection3Item(null)
-        }}
-        item={selectedSection3Item}
-        sectionLabel="section 3"
-        onSave={async (item) => {
-          await handleEditSection3SubSection(item as MetalGuideSubSectionItem)
+          await handleAddSubSection(item as Omit<MetalGuideSubSectionItem, 'id'>)
         }}
       />
 
-      {/* Section 4 Drawers */}
+      {/* Section 3 Sub-section Edit Drawer */}
       <SubSectionDrawer
-        open={isSection4AddOpen}
-        onOpenChange={setIsSection4AddOpen}
-        item={null}
-        sectionLabel="section 4"
-        onSave={async (item) => {
-          await handleAddSection4SubSection(item as Omit<MetalGuideSubSectionItem, 'id'>)
-        }}
-      />
-      <SubSectionDrawer
-        open={isSection4EditOpen}
+        open={isSubSectionEditOpen}
         onOpenChange={(open) => {
-          setIsSection4EditOpen(open)
-          if (!open) setSelectedSection4Item(null)
+          setIsSubSectionEditOpen(open)
+          if (!open) {
+            setSelectedSubSectionItem(null)
+            setActiveGroupId(null)
+          }
         }}
-        item={selectedSection4Item}
-        sectionLabel="section 4"
+        item={selectedSubSectionItem}
+        sectionLabel="section 3"
         onSave={async (item) => {
-          await handleEditSection4SubSection(item as MetalGuideSubSectionItem)
+          await handleEditSubSection(item as MetalGuideSubSectionItem)
         }}
       />
     </div>

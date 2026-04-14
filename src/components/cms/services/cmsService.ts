@@ -451,7 +451,7 @@ export interface DiamondEducationSection1Item {
 export interface DiamondEducationSection2Item {
   id: string
   title: string
-  description: string[]
+  description: string
 }
 
 // Section 3 — same structure as section 2 (text items)
@@ -475,7 +475,7 @@ export interface DiamondEducationSection5 {
 export interface DiamondEducationSection6SubSection {
   id: string
   title: string
-  description: string[]
+  description: string
   image_url: string
   mobile_image_url: string
   redirect_url?: string
@@ -510,46 +510,46 @@ export interface MetalGuideSection1Item {
 export interface MetalGuideSection2Item {
   id: string
   title: string
-  description: string[]
+  description: string
 }
 
 export interface MetalGuideSubSectionItem {
   id: string
   title: string
-  description: string[]
+  description: string
   image_url: string
   mobile_image_url: string
   redirect_url: string
   image_alt_text: string
 }
 
-export interface MetalGuideSection3 {
+export interface MetalGuideSection3Item {
+  id: string
   title: string
   sub_sections: MetalGuideSubSectionItem[]
 }
 
+// Section 4 — Purity of Gold
 export interface MetalGuideSection4 {
   title: string
-  sub_sections: MetalGuideSubSectionItem[]
+  description: string[]
+  content: string
 }
 
+// Section 5 — Text Items
 export interface MetalGuideSection5 {
   title: string
   description: string[]
-  content: string
 }
 
+// Section 6 — Metal Table
 export interface MetalGuideSection6 {
   title: string
-  description: string[]
-}
-
-export interface MetalGuideSection7 {
-  title: string
   content: string
 }
 
-export interface MetalGuideSection8 {
+// Section 7 — Text Items
+export interface MetalGuideSection7 {
   title: string
   description: string[]
 }
@@ -558,12 +558,11 @@ export interface MetalGuideContent {
   title: string
   section1: MetalGuideSection1Item[]
   section2: MetalGuideSection2Item[]
-  section3: MetalGuideSection3
+  section3: MetalGuideSection3Item[]
   section4: MetalGuideSection4
   section5: MetalGuideSection5
   section6: MetalGuideSection6
   section7: MetalGuideSection7
-  section8: MetalGuideSection8
 }
 
 // Types - Product for CMS selection
