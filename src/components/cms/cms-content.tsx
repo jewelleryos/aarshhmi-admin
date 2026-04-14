@@ -148,8 +148,8 @@ export function CMSContent() {
             activeSection === "promotional-banner-4" ? <Banner4/> :
             activeSection === "promotional-banner-5" ? <Banner5/> :
             activeSection === "product-list-details" ? <ProductListDetailsComponent title="Product List Details" description="Manage product list details content" getContent={() => cmsService.getProductListDetails()} updateContent={(content) => cmsService.updateProductListDetails(content)}/> :
-            activeSection === "jewellery-care" ? <JewelleryCareComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
-            activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getProductDescriptionPage()} updateContent={(content) => cmsService.updateProductDescriptionPage(content)}/> :
+            activeSection === "jewellery-care" ? <JewelleryCareComponent getContent={() => cmsService.getJewelleryCareSection()} updateContent={(content) => cmsService.updateJewelleryCareSection(content)}/> :
+            activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getWhatsInTheBoxSection()} updateContent={(content) => cmsService.updateWhatsInTheBoxSection(content)}/> :
             activeSection === "general" ? <GeneralContentComponent /> :
             activeSection === "blog" ? <BlogContentComponent /> :
             activeSection === "diamond-education" ? <DiamondEducationContent /> :

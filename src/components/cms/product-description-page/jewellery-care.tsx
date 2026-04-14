@@ -9,23 +9,21 @@ import { Loader2, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { MediaPickerInput } from '@/components/media'
 import {
-  type ProductDescriptionPageContent,
+  type JewelleryCareSectionContent,
   type JewelleryCareItem,
-  type WhatsInBoxItem,
   type CmsSectionResponse,
   type ApiResponse,
 } from '../services/cmsService'
 
 interface JewelleryCareComponentProps {
   getContent: () => Promise<ApiResponse<CmsSectionResponse | null>>
-  updateContent: (content: ProductDescriptionPageContent) => Promise<ApiResponse<CmsSectionResponse>>
+  updateContent: (content: JewelleryCareSectionContent) => Promise<ApiResponse<CmsSectionResponse>>
 }
 
 export function JewelleryCareComponent({ getContent, updateContent }: JewelleryCareComponentProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [items, setItems] = useState<JewelleryCareItem[]>([])
-  const [preservedWhatsInBox, setPreservedWhatsInBox] = useState<WhatsInBoxItem[]>([])
   const [buttonText, setButtonText] = useState('')
   const [buttonRedirectUrl, setButtonRedirectUrl] = useState('')
   const [itemsError, setItemsError] = useState<string>()
@@ -40,16 +38,15 @@ export function JewelleryCareComponent({ getContent, updateContent }: JewelleryC
     try {
       setIsLoading(true)
       const response = await getContent()
-      const content = response.data?.content as ProductDescriptionPageContent | undefined
+      const content = response.data?.content as JewelleryCareSectionContent | undefined
       if (content) {
         setItems(content.jewellery_care || [])
         setButtonText(content.button_text || '')
         setButtonRedirectUrl(content.button_redirect_url || '')
-        setPreservedWhatsInBox(content.whats_in_box || [])
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to fetch product description page')
+      toast.error(error.response?.data?.message || 'Failed to fetch jewellery care content')
     } finally {
       setIsLoading(false)
     }
@@ -107,7 +104,7 @@ export function JewelleryCareComponent({ getContent, updateContent }: JewelleryC
 
     try {
       setIsSaving(true)
-      const content: ProductDescriptionPageContent = {
+      const content: JewelleryCareSectionContent = {
         jewellery_care: items.map((item) => ({
           image_url: item.image_url,
           mobile_view_image_url: item.mobile_view_image_url?.trim() || '',
@@ -116,14 +113,13 @@ export function JewelleryCareComponent({ getContent, updateContent }: JewelleryC
         })),
         button_text: buttonText.trim(),
         button_redirect_url: buttonRedirectUrl.trim(),
-        whats_in_box: preservedWhatsInBox,
       }
       const response = await updateContent(content)
       toast.success(response.message)
       fetchData()
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to save product description page')
+      toast.error(error.response?.data?.message || 'Failed to save jewellery care content')
     } finally {
       setIsSaving(false)
     }

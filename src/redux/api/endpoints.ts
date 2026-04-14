@@ -392,7 +392,10 @@ const API_ENDPOINTS = {
       BANNER_5: '/api/cms/promotional-banners/banner-5',
     },
     PRODUCT_LIST_DETAILS: '/api/cms/product-list-details',
-    PRODUCT_DESCRIPTION_PAGE: '/api/cms/product-description-page',
+    PRODUCT_DESCRIPTION_PAGE: {
+      JEWELLERY_CARE: '/api/cms/product-description-page/jewellery-care',
+      WHATS_IN_THE_BOX: '/api/cms/product-description-page/whats-in-the-box',
+    },
     GENERAL: '/api/cms/general',
     BLOG: '/api/cms/blog',
     GUIDE: {

@@ -941,16 +941,29 @@ export const cmsService = {
     return response.data
   },
 
-  // Product Description Page
-  getProductDescriptionPage: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
-    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE)
+  // Product Description Page - Jewellery Care
+  getJewelleryCareSection: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.JEWELLERY_CARE)
     return response.data
   },
 
-  updateProductDescriptionPage: async (
-    content: ProductDescriptionPageContent
+  updateJewelleryCareSection: async (
+    content: JewelleryCareSectionContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
-    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE, { content })
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.JEWELLERY_CARE, { content })
+    return response.data
+  },
+
+  // Product Description Page - What's In The Box
+  getWhatsInTheBoxSection: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.WHATS_IN_THE_BOX)
+    return response.data
+  },
+
+  updateWhatsInTheBoxSection: async (
+    content: WhatsInBoxSectionContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_DESCRIPTION_PAGE.WHATS_IN_THE_BOX, { content })
     return response.data
   },
 
@@ -1064,9 +1077,12 @@ export interface WhatsInBoxItem {
   redirect_url?: string
 }
 
-export interface ProductDescriptionPageContent {
+export interface JewelleryCareSectionContent {
   jewellery_care: JewelleryCareItem[]
   button_text: string
   button_redirect_url: string
-  whats_in_box?: WhatsInBoxItem[]
+}
+
+export interface WhatsInBoxSectionContent {
+  whats_in_box: WhatsInBoxItem[]
 }

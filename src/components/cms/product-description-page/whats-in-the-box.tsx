@@ -9,16 +9,15 @@ import { Loader2, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { MediaPickerInput } from '@/components/media'
 import {
-  type ProductDescriptionPageContent,
+  type WhatsInBoxSectionContent,
   type WhatsInBoxItem,
-  type JewelleryCareItem,
   type CmsSectionResponse,
   type ApiResponse,
 } from '../services/cmsService'
 
 interface WhatsInTheBoxComponentProps {
   getContent: () => Promise<ApiResponse<CmsSectionResponse | null>>
-  updateContent: (content: ProductDescriptionPageContent) => Promise<ApiResponse<CmsSectionResponse>>
+  updateContent: (content: WhatsInBoxSectionContent) => Promise<ApiResponse<CmsSectionResponse>>
 }
 
 export function WhatsInTheBoxComponent({ getContent, updateContent }: WhatsInTheBoxComponentProps) {
@@ -26,11 +25,6 @@ export function WhatsInTheBoxComponent({ getContent, updateContent }: WhatsInThe
   const [isSaving, setIsSaving] = useState(false)
   const [items, setItems] = useState<WhatsInBoxItem[]>([])
   const [itemsError, setItemsError] = useState<string>()
-
-  // Preserved fields from the other section so we don't overwrite them on save
-  const [preservedJewelleryCare, setPreservedJewelleryCare] = useState<JewelleryCareItem[]>([])
-  const [preservedButtonText, setPreservedButtonText] = useState('')
-  const [preservedButtonRedirectUrl, setPreservedButtonRedirectUrl] = useState('')
 
   useEffect(() => {
     fetchData()
@@ -40,16 +34,13 @@ export function WhatsInTheBoxComponent({ getContent, updateContent }: WhatsInThe
     try {
       setIsLoading(true)
       const response = await getContent()
-      const content = response.data?.content as ProductDescriptionPageContent | undefined
+      const content = response.data?.content as WhatsInBoxSectionContent | undefined
       if (content) {
         setItems(content.whats_in_box || [])
-        setPreservedJewelleryCare(content.jewellery_care || [])
-        setPreservedButtonText(content.button_text || '')
-        setPreservedButtonRedirectUrl(content.button_redirect_url || '')
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to fetch product description page')
+      toast.error(error.response?.data?.message || "Failed to fetch what's in the box content")
     } finally {
       setIsLoading(false)
     }
@@ -86,10 +77,7 @@ export function WhatsInTheBoxComponent({ getContent, updateContent }: WhatsInThe
 
     try {
       setIsSaving(true)
-      const content: ProductDescriptionPageContent = {
-        jewellery_care: preservedJewelleryCare,
-        button_text: preservedButtonText,
-        button_redirect_url: preservedButtonRedirectUrl,
+      const content: WhatsInBoxSectionContent = {
         whats_in_box: items.map((item) => ({
           image_url: item.image_url,
           mobile_view_image_url: item.mobile_view_image_url?.trim() || '',
@@ -102,7 +90,7 @@ export function WhatsInTheBoxComponent({ getContent, updateContent }: WhatsInThe
       fetchData()
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to save product description page')
+      toast.error(error.response?.data?.message || "Failed to save what's in the box content")
     } finally {
       setIsSaving(false)
     }
