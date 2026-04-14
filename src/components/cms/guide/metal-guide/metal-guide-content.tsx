@@ -13,7 +13,6 @@ import {
   type MetalGuideSection1Item,
   type MetalGuideSection2Item,
   type MetalGuideSubSectionItem,
-  type MetalGuideSection3Item,
 } from '@/components/cms/services/cmsService'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import { getCdnUrl } from '@/utils/cdn'
@@ -29,8 +28,9 @@ export function MetalGuideContent() {
   const [section1, setSection1] = useState<MetalGuideSection1Item[]>([])
   const [section2, setSection2] = useState<MetalGuideSection2Item[]>([])
 
-  // Section 3 — Types of Metal We Offer
-  const [section3, setSection3] = useState<MetalGuideSection3Item[]>([])
+  // Section 3 — Types of Metal We Offer (single group)
+  const [section3Title, setSection3Title] = useState('')
+  const [section3SubSections, setSection3SubSections] = useState<MetalGuideSubSectionItem[]>([])
 
   // Section 4 — Purity of Gold
   const [section4Title, setSection4Title] = useState('')
@@ -60,7 +60,6 @@ export function MetalGuideContent() {
   const [selectedSection2Item, setSelectedSection2Item] = useState<MetalGuideSection2Item | null>(null)
 
   // Section 3 sub-section drawer states
-  const [activeGroupId, setActiveGroupId] = useState<string | null>(null)
   const [isSubSectionAddOpen, setIsSubSectionAddOpen] = useState(false)
   const [isSubSectionEditOpen, setIsSubSectionEditOpen] = useState(false)
   const [selectedSubSectionItem, setSelectedSubSectionItem] = useState<MetalGuideSubSectionItem | null>(null)
@@ -78,7 +77,8 @@ export function MetalGuideContent() {
         setTitle(content.title || '')
         setSection1(content.section1 || [])
         setSection2(content.section2 || [])
-        setSection3(content.section3 || [])
+        setSection3Title(content.section3?.title || '')
+        setSection3SubSections(content.section3?.sub_sections || [])
         setSection4Title(content.section4?.title || '')
         setSection4Description(
           content.section4?.description?.length ? content.section4.description : ['']
@@ -106,13 +106,14 @@ export function MetalGuideContent() {
   const saveAll = async (
     s1 = section1,
     s2 = section2,
-    s3 = section3
+    s3title = section3Title,
+    s3subs = section3SubSections
   ) => {
     return cmsService.updateMetalGuide({
       title,
       section1: s1,
       section2: s2,
-      section3: s3,
+      section3: { id: 'section3', title: s3title, sub_sections: s3subs },
       section4: {
         title: section4Title,
         description: section4Description.filter((l) => l.trim() !== ''),
@@ -205,86 +206,31 @@ export function MetalGuideContent() {
     }
   }
 
-  // ── Section 3 group CRUD ──────────────────────────────────────────────────
-  const handleAddGroup = () => {
-    const newGroup: MetalGuideSection3Item = {
-      id: `s3g_${Date.now()}`,
-      title: '',
-      sub_sections: [],
-    }
-    setSection3((prev) => [...prev, newGroup])
-  }
-
-  const handleRemoveGroup = async (groupId: string) => {
-    const updated = section3.filter((g) => g.id !== groupId)
-    try {
-      const response = await saveAll(section1, section2, updated)
-      toast.success(response.message)
-      setSection3(updated)
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } }
-      toast.error(error.response?.data?.message || 'Failed to delete group')
-    }
-  }
-
-  const handleGroupTitleChange = (groupId: string, value: string) => {
-    setSection3((prev) =>
-      prev.map((g) => (g.id === groupId ? { ...g, title: value } : g))
-    )
-  }
-
   // ── Section 3 sub-section CRUD ────────────────────────────────────────────
-  const openSubSectionAdd = (groupId: string) => {
-    setActiveGroupId(groupId)
-    setIsSubSectionAddOpen(true)
-  }
-
-  const openSubSectionEdit = (groupId: string, sub: MetalGuideSubSectionItem) => {
-    setActiveGroupId(groupId)
-    setSelectedSubSectionItem(sub)
-    setIsSubSectionEditOpen(true)
-  }
-
   const handleAddSubSection = async (item: Omit<MetalGuideSubSectionItem, 'id'>) => {
-    if (!activeGroupId) return
     const newSub: MetalGuideSubSectionItem = { ...item, id: `s3sub_${Date.now()}` }
-    const updated = section3.map((g) =>
-      g.id === activeGroupId
-        ? { ...g, sub_sections: [...g.sub_sections, newSub] }
-        : g
-    )
-    const response = await saveAll(section1, section2, updated)
+    const updated = [...section3SubSections, newSub]
+    const response = await saveAll(section1, section2, section3Title, updated)
     toast.success(response.message)
-    setSection3(updated)
+    setSection3SubSections(updated)
     setIsSubSectionAddOpen(false)
-    setActiveGroupId(null)
   }
 
   const handleEditSubSection = async (item: MetalGuideSubSectionItem) => {
-    if (!activeGroupId) return
-    const updated = section3.map((g) =>
-      g.id === activeGroupId
-        ? { ...g, sub_sections: g.sub_sections.map((s) => (s.id === item.id ? item : s)) }
-        : g
-    )
-    const response = await saveAll(section1, section2, updated)
+    const updated = section3SubSections.map((s) => (s.id === item.id ? item : s))
+    const response = await saveAll(section1, section2, section3Title, updated)
     toast.success(response.message)
-    setSection3(updated)
+    setSection3SubSections(updated)
     setIsSubSectionEditOpen(false)
     setSelectedSubSectionItem(null)
-    setActiveGroupId(null)
   }
 
-  const handleDeleteSubSection = async (groupId: string, subId: string) => {
-    const updated = section3.map((g) =>
-      g.id === groupId
-        ? { ...g, sub_sections: g.sub_sections.filter((s) => s.id !== subId) }
-        : g
-    )
+  const handleDeleteSubSection = async (id: string) => {
+    const updated = section3SubSections.filter((s) => s.id !== id)
     try {
-      const response = await saveAll(section1, section2, updated)
+      const response = await saveAll(section1, section2, section3Title, updated)
       toast.success(response.message)
-      setSection3(updated)
+      setSection3SubSections(updated)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast.error(error.response?.data?.message || 'Failed to delete sub-section')
@@ -443,96 +389,66 @@ export function MetalGuideContent() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Section 3 — Types of Metal We Offer</CardTitle>
-            <Button size="sm" onClick={handleAddGroup}>
+            <Button size="sm" onClick={() => setIsSubSectionAddOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Group
+              Add Sub-section
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {section3.length === 0 ? (
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="s3_title">Section Title</Label>
+            <Input
+              id="s3_title"
+              placeholder="Enter section 3 title"
+              value={section3Title}
+              onChange={(e) => setSection3Title(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground italic">
+              Title is saved by the global &quot;Save Changes&quot; button above.
+            </p>
+          </div>
+
+          {section3SubSections.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No groups yet. Click &quot;Add Group&quot; to create one.
+              No sub-sections yet. Click &quot;Add Sub-section&quot; to create one.
             </p>
           ) : (
-            section3.map((group, groupIndex) => (
-              <div key={group.id} className="rounded-lg border p-4 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor={`s3g_title_${group.id}`}>
-                      Group {groupIndex + 1} Title
-                    </Label>
-                    <Input
-                      id={`s3g_title_${group.id}`}
-                      placeholder="Enter group title"
-                      value={group.title}
-                      onChange={(e) => handleGroupTitleChange(group.id, e.target.value)}
-                    />
+            <div className="space-y-2">
+              {section3SubSections.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="flex items-center justify-between rounded-md border px-4 py-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{sub.title}</p>
+                    {sub.description && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {sub.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80)}
+                      </p>
+                    )}
                   </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9 text-destructive hover:text-destructive mt-6 shrink-0"
-                    onClick={() => handleRemoveGroup(group.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="ml-3 flex items-center gap-2 shrink-0">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      onClick={() => { setSelectedSubSectionItem(sub); setIsSubSectionEditOpen(true) }}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => handleDeleteSubSection(sub.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
-
-                {group.sub_sections.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No sub-sections yet.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {group.sub_sections.map((sub) => (
-                      <div
-                        key={sub.id}
-                        className="flex items-center justify-between rounded-md border px-4 py-3 bg-muted/30"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm truncate">{sub.title}</p>
-                          {sub.description && (
-                            <p
-                              className="text-xs text-muted-foreground truncate max-w-sm"
-                              dangerouslySetInnerHTML={{
-                                __html: sub.description.replace(/<[^>]+>/g, ' ').trim().slice(0, 80),
-                              }}
-                            />
-                          )}
-                        </div>
-                        <div className="ml-3 flex items-center gap-2 shrink-0">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8"
-                            onClick={() => openSubSectionEdit(group.id, sub)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteSubSection(group.id, sub.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <Button size="sm" variant="outline" onClick={() => openSubSectionAdd(group.id)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Sub-section
-                </Button>
-              </div>
-            ))
-          )}
-          {section3.length > 0 && (
-            <p className="text-xs text-muted-foreground italic">
-              Group titles are saved by the global &quot;Save Changes&quot; button above.
-            </p>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -804,10 +720,7 @@ export function MetalGuideContent() {
       {/* Section 3 Sub-section Add Drawer */}
       <SubSectionDrawer
         open={isSubSectionAddOpen}
-        onOpenChange={(open) => {
-          setIsSubSectionAddOpen(open)
-          if (!open) setActiveGroupId(null)
-        }}
+        onOpenChange={setIsSubSectionAddOpen}
         item={null}
         sectionLabel="section 3"
         onSave={async (item) => {
@@ -820,10 +733,7 @@ export function MetalGuideContent() {
         open={isSubSectionEditOpen}
         onOpenChange={(open) => {
           setIsSubSectionEditOpen(open)
-          if (!open) {
-            setSelectedSubSectionItem(null)
-            setActiveGroupId(null)
-          }
+          if (!open) setSelectedSubSectionItem(null)
         }}
         item={selectedSubSectionItem}
         sectionLabel="section 3"

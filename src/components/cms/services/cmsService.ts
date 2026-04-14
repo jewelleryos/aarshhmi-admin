@@ -558,7 +558,7 @@ export interface MetalGuideContent {
   title: string
   section1: MetalGuideSection1Item[]
   section2: MetalGuideSection2Item[]
-  section3: MetalGuideSection3Item[]
+  section3: MetalGuideSection3Item
   section4: MetalGuideSection4
   section5: MetalGuideSection5
   section6: MetalGuideSection6
@@ -1023,6 +1023,46 @@ export const cmsService = {
 
   updateMetalGuide: async (content: MetalGuideContent): Promise<ApiResponse<CmsSectionResponse>> => {
     const response = await apiService.put(API_ENDPOINTS.CMS.GUIDE.METAL_GUIDE, { content })
+    return response.data
+  },
+
+  getBanner1: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER1)
+    return response.data
+  },
+
+  updateBanner1: async (content: PromotionalBannerContent): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER1, { content })
+    return response.data
+  },
+
+  getBanner2: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER2)
+    return response.data
+  },
+
+  updateBanner2: async (content: PromotionalBannerContent): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER2, { content })
+    return response.data
+  },
+
+  getBanner3: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER3)
+    return response.data
+  },
+
+  updateBanner3: async (content: PromotionalBannerContent): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER3, { content })
+    return response.data
+  },
+
+  getBanner4: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER4)
+    return response.data
+  },
+
+  updateBanner4: async (content: PromotionalBannerContent): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.PROMOTIONAL_BANNER.BANNER4, { content })
     return response.data
   },
 }

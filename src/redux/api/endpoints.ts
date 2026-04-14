@@ -404,6 +404,12 @@ const API_ENDPOINTS = {
       DIAMOND_EDUCATION: '/api/cms/guide/diamond-education',
       METAL_GUIDE: '/api/cms/guide/metal-guide',
     },
+    PROMOTIONAL_BANNER: {
+      BANNER1: '/api/cms/promotional-banner/banner1',
+      BANNER2: '/api/cms/promotional-banner/banner2',
+      BANNER3: '/api/cms/promotional-banner/banner3',
+      BANNER4: '/api/cms/promotional-banner/banner4',
+    },
   },
 
   // Coupon endpoints
