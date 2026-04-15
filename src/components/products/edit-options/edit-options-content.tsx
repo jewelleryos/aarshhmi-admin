@@ -838,36 +838,60 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
         }
       })(),
       media: {
-        colorMedia: mediaDetails.colorMedia.map((cm) => ({
-          metalColorId: cm.colorId,
-          items: cm.items
-            .filter((item) => item.path && item.path.trim() !== '')
-            .map((item) => ({
-              id: item.id,
-              path: item.path,
-              type: item.type,
-              altText: item.altText || null,
-              position: item.position,
-            })),
-          gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => ({
-            gemstoneColorId: sm.gemstoneColorId,
-            items: sm.items
-              .filter((item) => item.path && item.path.trim() !== '')
+        colorMedia: mediaDetails.colorMedia.map((cm) => {
+          const metalColor = metalColors.find((c) => c.id === cm.colorId)
+          return {
+            metalColorId: cm.colorId,
+            colorSlug: metalColor?.slug || cm.colorId,
+            items: cm.items
+              .filter((item) => item.fileKey || (item.path && item.path.trim() !== ''))
               .map((item) => ({
-                id: item.id,
-                path: item.path,
+                ...(item.fileKey
+                  ? { fileKey: item.fileKey }
+                  : { id: item.id, path: item.path }),
                 type: item.type,
                 altText: item.altText || null,
                 position: item.position,
               })),
-          })),
-        })),
+            gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => {
+              const gemColor = gemstoneColors.find((c) => c.id === sm.gemstoneColorId)
+              return {
+                gemstoneColorId: sm.gemstoneColorId,
+                gemstoneColorSlug: gemColor?.slug || sm.gemstoneColorId,
+                items: sm.items
+                  .filter((item) => item.fileKey || (item.path && item.path.trim() !== ''))
+                  .map((item) => ({
+                    ...(item.fileKey
+                      ? { fileKey: item.fileKey }
+                      : { id: item.id, path: item.path }),
+                    type: item.type,
+                    altText: item.altText || null,
+                    position: item.position,
+                  })),
+              }
+            }),
+          }
+        }),
       },
+    }
+
+    // Build FormData: 'data' JSON + file attachments for new uploads
+    const formData = new FormData()
+    formData.append('data', JSON.stringify(requestData))
+    for (const cm of mediaDetails.colorMedia) {
+      for (const item of cm.items) {
+        if (item.fileKey && item.file) formData.append(item.fileKey, item.file)
+      }
+      for (const sm of cm.gemstoneSubMedia || []) {
+        for (const item of sm.items) {
+          if (item.fileKey && item.file) formData.append(item.fileKey, item.file)
+        }
+      }
     }
 
     setIsSubmitting(true)
     try {
-      const response = await productService.updateOptions(productId, requestData)
+      const response = await productService.updateOptions(productId, formData)
       toast.success(response.message)
       router.push(`/products/${productId}`)
     } catch (err: unknown) {

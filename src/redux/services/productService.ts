@@ -769,8 +769,11 @@ const productService = {
   },
 
   // Update product options (metal, stone, variants, media)
-  updateOptions: async (id: string, data: UpdateOptionsRequest): Promise<UpdateOptionsResponse> => {
-    const response = await apiService.put(API_ENDPOINTS.PRODUCT.UPDATE_OPTIONS(id), data)
+  // Accepts FormData: 'data' JSON field + file fields for new uploads
+  updateOptions: async (id: string, data: FormData): Promise<UpdateOptionsResponse> => {
+    const response = await apiService.put(API_ENDPOINTS.PRODUCT.UPDATE_OPTIONS(id), data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
     return response.data
   },
 
