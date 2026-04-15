@@ -913,14 +913,16 @@ export function JewelleryDefaultContent() {
             metalColorName: cm.colorName,
             colorSlug: color?.slug || "",
             // Direct items (when no gemstones)
-            items: cm.items.map((item) => ({
-              ...(item.fileKey
-                ? { fileKey: item.fileKey }
-                : { id: item.id, path: item.path }),
-              type: item.type,
-              altText: item.altText || null,
-              position: item.position,
-            })),
+            items: cm.items
+              .filter((item) => item.fileKey || (item.path && item.path.trim() !== ''))
+              .map((item) => ({
+                ...(item.fileKey
+                  ? { fileKey: item.fileKey }
+                  : { id: item.id, path: item.path }),
+                type: item.type,
+                altText: item.altText || null,
+                position: item.position,
+              })),
             // Gemstone sub-media (when gemstones are selected)
             gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => {
               const gemColor = gemstoneColors.find((gc) => gc.id === sm.gemstoneColorId)
@@ -928,12 +930,14 @@ export function JewelleryDefaultContent() {
                 gemstoneColorId: sm.gemstoneColorId,
                 gemstoneColorName: sm.gemstoneColorName,
                 gemstoneColorSlug: gemColor?.slug || "",
-                items: sm.items.map((item) => ({
-                  ...(item.fileKey
-                    ? { fileKey: item.fileKey }
-                    : { id: item.id, path: item.path }),
-                  type: item.type,
-                  altText: item.altText || null,
+                items: sm.items
+                  .filter((item) => item.fileKey || (item.path && item.path.trim() !== ''))
+                  .map((item) => ({
+                    ...(item.fileKey
+                      ? { fileKey: item.fileKey }
+                      : { id: item.id, path: item.path }),
+                    type: item.type,
+                    altText: item.altText || null,
                   position: item.position,
                 })),
               }

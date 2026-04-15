@@ -178,25 +178,47 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
     const metadata = product.metadata as Record<string, unknown>
 
     // Initialize metal details from metadata.availableMetals
+    // Supports both old array format and new object format
     if (metadata?.availableMetals) {
-      const availableMetals = metadata.availableMetals as {
-        colors: { colorId: string }[]
-        metals: {
+      const raw = metadata.availableMetals
+
+      let colorIds: string[]
+      let selectedMetals: { metalTypeId: string; purities: { purityId: string; weight: string }[] }[]
+
+      if (Array.isArray(raw)) {
+        // Old format: array of { metalTypeId, colors, purities }
+        const oldMetals = raw as {
           metalTypeId: string
+          colors: { colorId: string }[]
           purities: { purityId: string; weight: number }[]
         }[]
-      }
-
-      setMetalDetails({
-        colorIds: availableMetals.colors.map((c) => c.colorId),
-        selectedMetals: availableMetals.metals.map((metal) => ({
-          metalTypeId: metal.metalTypeId,
-          purities: metal.purities.map((p) => ({
+        const allColorIds = new Set<string>()
+        oldMetals.forEach((m) => m.colors?.forEach((c) => allColorIds.add(c.colorId)))
+        colorIds = Array.from(allColorIds)
+        selectedMetals = oldMetals.map((m) => ({
+          metalTypeId: m.metalTypeId,
+          purities: (m.purities || []).map((p) => ({
             purityId: p.purityId,
             weight: String(p.weight),
           })),
-        })),
-      })
+        }))
+      } else {
+        // New format: { colors: [{ colorId }], metals: [{ metalTypeId, purities }] }
+        const newMetals = raw as {
+          colors: { colorId: string }[]
+          metals: { metalTypeId: string; purities: { purityId: string; weight: number }[] }[]
+        }
+        colorIds = (newMetals.colors || []).map((c) => c.colorId)
+        selectedMetals = (newMetals.metals || []).map((metal) => ({
+          metalTypeId: metal.metalTypeId,
+          purities: (metal.purities || []).map((p) => ({
+            purityId: p.purityId,
+            weight: String(p.weight),
+          })),
+        }))
+      }
+
+      setMetalDetails({ colorIds, selectedMetals })
     }
 
     // Initialize stone details from metadata.stone
@@ -818,22 +840,26 @@ export function EditOptionsContent({ productId }: EditOptionsContentProps) {
       media: {
         colorMedia: mediaDetails.colorMedia.map((cm) => ({
           metalColorId: cm.colorId,
-          items: cm.items.map((item) => ({
-            id: item.id,
-            path: item.path,
-            type: item.type,
-            altText: item.altText || null,
-            position: item.position,
-          })),
-          gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => ({
-            gemstoneColorId: sm.gemstoneColorId,
-            items: sm.items.map((item) => ({
+          items: cm.items
+            .filter((item) => item.path && item.path.trim() !== '')
+            .map((item) => ({
               id: item.id,
               path: item.path,
               type: item.type,
               altText: item.altText || null,
               position: item.position,
             })),
+          gemstoneSubMedia: (cm.gemstoneSubMedia || []).map((sm) => ({
+            gemstoneColorId: sm.gemstoneColorId,
+            items: sm.items
+              .filter((item) => item.path && item.path.trim() !== '')
+              .map((item) => ({
+                id: item.id,
+                path: item.path,
+                type: item.type,
+                altText: item.altText || null,
+                position: item.position,
+              })),
           })),
         })),
       },
