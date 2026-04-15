@@ -111,7 +111,7 @@ const initialSeoDetails = {
   metaTitle: "",
   metaKeywords: "",
   metaDescription: "",
-  metaRobots: "",
+  metaRobots: "Index,Follow",
   metaCanonical: "",
   ogTitle: "",
   ogSiteName: "",

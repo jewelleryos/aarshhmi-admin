@@ -2,6 +2,9 @@ import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/com
 import { Loader2, Search } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const ROBOTS_OPTIONS = ["Index,Follow", "Index,NoFollow", "Noindex,Follow", "Noindex,Nofollow"]
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -191,14 +194,17 @@ export function SeoPageEditDrawer({ data, open, onOpenChange, onSuccess }: SeoPa
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="seo-metaRobots">Meta Robots</Label>
-                            <Input
-                                id="seo-metaRobots"
-                                placeholder="e.g., index, follow"
-                                value={metaRobots}
-                                onChange={(e) => handleFormChange("metaRobots", e.target.value)}
-                                maxLength={100}
-                            />
+                            <Label>Meta Robots</Label>
+                            <Select value={metaRobots || "Index,Follow"} onValueChange={(v) => handleFormChange("metaRobots", v)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ROBOTS_OPTIONS.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="space-y-2">

@@ -35,7 +35,6 @@ import { JewelleryCareComponent } from "./product-description-page/jewellery-car
 import { WhatsInTheBoxComponent } from "./product-description-page/whats-in-the-box";
 import { MoreFromTheCollectionComponent } from "./product-description-page/more-from-the-collection";
 import { GeneralContentComponent } from "./general/general-content";
-import { BlogContentComponent } from "./blog/blog-content";
 import { DiamondEducationContent } from "./guide/diamond-education/diamond-education-content";
 import { MetalGuideContent } from "./guide/metal-guide/metal-guide-content";
 import { cmsService } from "./services/cmsService";
@@ -151,7 +150,6 @@ export function CMSContent() {
             activeSection === "whats-in-the-box" ? <WhatsInTheBoxComponent getContent={() => cmsService.getWhatsInTheBoxSection()} updateContent={(content) => cmsService.updateWhatsInTheBoxSection(content)}/> :
             activeSection === "more-from-the-collection" ? <MoreFromTheCollectionComponent /> :
             activeSection === "general" ? <GeneralContentComponent /> :
-            activeSection === "blog" ? <BlogContentComponent /> :
             activeSection === "diamond-education" ? <DiamondEducationContent /> :
             activeSection === "metal-guide" ? <MetalGuideContent /> :
             <div className="flex h-full items-center justify-center">

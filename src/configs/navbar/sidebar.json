@@ -439,6 +439,44 @@
           "permissions": [
             "CONTACT_US.READ"
           ]
+        },
+        {
+          "id": "blog-management",
+          "type": "dropdown",
+          "label": "Blog Management",
+          "icon": "BookOpen",
+          "children": [
+            {
+              "id": "blog-posts",
+              "type": "item",
+              "label": "Blog Posts",
+              "icon": "FileText",
+              "href": "/blog-management/posts",
+              "permissions": [
+                "BLOG.READ"
+              ]
+            },
+            {
+              "id": "blog-categories",
+              "type": "item",
+              "label": "Blog Categories",
+              "icon": "FolderTree",
+              "href": "/blog-management/categories",
+              "permissions": [
+                "BLOG_CATEGORY.READ"
+              ]
+            },
+            {
+              "id": "blog-authors",
+              "type": "item",
+              "label": "Blog Authors",
+              "icon": "Users",
+              "href": "/blog-management/authors",
+              "permissions": [
+                "BLOG_AUTHOR.READ"
+              ]
+            }
+          ]
         }
       ]
     },

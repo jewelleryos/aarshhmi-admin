@@ -190,5 +190,23 @@
   },
   "CONTACT_US": {
     "READ": 3701
+  },
+  "BLOG": {
+    "CREATE": 3801,
+    "READ": 3802,
+    "UPDATE": 3803,
+    "DELETE": 3804
+  },
+  "BLOG_CATEGORY": {
+    "CREATE": 3901,
+    "READ": 3902,
+    "UPDATE": 3903,
+    "DELETE": 3904
+  },
+  "BLOG_AUTHOR": {
+    "CREATE": 4001,
+    "READ": 4002,
+    "UPDATE": 4003,
+    "DELETE": 4004
   }
 }

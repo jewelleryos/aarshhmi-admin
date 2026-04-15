@@ -71,6 +71,7 @@ interface RichTextEditorProps {
   error?: string
   className?: string
   mediaRootPath?: string // Root path for media picker (default: 'cms/content')
+  height?: number // Height of the editor in pixels (default: 200)
 }
 
 // Toolbar button component
@@ -119,6 +120,7 @@ export function RichTextEditor({
   error,
   className,
   mediaRootPath = 'cms/content',
+  height= 200,
 }: RichTextEditorProps) {
   // Link dialog state
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false)
@@ -163,7 +165,7 @@ export function RichTextEditor({
       attributes: {
         class: cn(
           'min-h-[200px]',
-          'prose prose-sm max-w-none focus:outline-none min-h-[200px] max-h-[200px] overflow-y-auto px-4 py-3',
+          `prose prose-sm max-w-none focus:outline-none min-h-[${height}px] max-h-[${height}px] overflow-y-auto px-4 py-3`,
           'prose-headings:font-semibold prose-headings:text-foreground',
           'prose-h1:text-3xl prose-h1:mt-6 prose-h1:mb-4',
           'prose-h2:text-2xl prose-h2:mt-5 prose-h2:mb-3',

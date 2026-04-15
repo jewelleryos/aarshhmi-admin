@@ -13,9 +13,12 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Loader2 } from "lucide-react"
 import { useAppDispatch } from "@/redux/store"
 import { updateCategorySeo } from "@/redux/slices/categorySlice"
+
+const ROBOTS_OPTIONS = ["Index,Follow", "Index,NoFollow", "Noindex,Follow", "Noindex,Nofollow"]
 import { toast } from "sonner"
 import type { Category } from "@/redux/services/categoryService"
 
@@ -36,7 +39,7 @@ export function CategorySeoDrawer({
   const [metaTitle, setMetaTitle] = useState("")
   const [metaKeywords, setMetaKeywords] = useState("")
   const [metaDescription, setMetaDescription] = useState("")
-  const [metaRobots, setMetaRobots] = useState("")
+  const [metaRobots, setMetaRobots] = useState("Index,Follow")
   const [metaCanonical, setMetaCanonical] = useState("")
 
   // Open Graph fields
@@ -63,7 +66,7 @@ export function CategorySeoDrawer({
       setMetaTitle(seo.meta_title || "")
       setMetaKeywords(seo.meta_keywords || "")
       setMetaDescription(seo.meta_description || "")
-      setMetaRobots(seo.meta_robots || "")
+      setMetaRobots(seo.meta_robots || "Index,Follow")
       setMetaCanonical(seo.meta_canonical || "")
       setOgTitle(seo.og_title || "")
       setOgSiteName(seo.og_site_name || "")
@@ -191,14 +194,17 @@ export function CategorySeoDrawer({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="seo-metaRobots">Meta Robots</Label>
-              <Input
-                id="seo-metaRobots"
-                placeholder="e.g., index, follow"
-                value={metaRobots}
-                onChange={(e) => setMetaRobots(e.target.value)}
-                maxLength={100}
-              />
+              <Label>Meta Robots</Label>
+              <Select value={metaRobots || "Index,Follow"} onValueChange={setMetaRobots}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROBOTS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

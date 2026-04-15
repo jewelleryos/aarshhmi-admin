@@ -88,11 +88,6 @@ export const cmsSections: CMSSection[] = [
         children:[]
     },
     {
-        id: "blog",
-        label: "Blog",
-        children:[]
-    },
-    {
         id: 'guide',
         label: 'Guide',
         children: [

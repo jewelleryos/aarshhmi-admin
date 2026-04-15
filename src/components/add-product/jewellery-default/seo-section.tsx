@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+const ROBOTS_OPTIONS = ["Index,Follow", "Index,NoFollow", "Noindex,Follow", "Noindex,Nofollow"]
 
 interface SeoData {
   metaTitle: string
@@ -82,14 +85,17 @@ export function SeoSection({ data, onChange }: SeoSectionProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="seo-metaRobots">Meta Robots</Label>
-            <Input
-              id="seo-metaRobots"
-              placeholder="e.g., index, follow"
-              value={data.metaRobots}
-              onChange={(e) => handleChange("metaRobots", e.target.value)}
-              maxLength={100}
-            />
+            <Label>Meta Robots</Label>
+            <Select value={data.metaRobots || "Index,Follow"} onValueChange={(v) => handleChange("metaRobots", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {ROBOTS_OPTIONS.map((opt) => (
+                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

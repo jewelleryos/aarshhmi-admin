@@ -872,7 +872,7 @@ export const cmsService = {
   },
 
   updateProductListPageHeroBanner: async (
-    content: PromotionalBannerContent
+    content: HeroBannerContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
     const response = await apiService.put(API_ENDPOINTS.CMS.PRODUCT_LIST_PAGE_BANNERS.HERO_BANNER, { content })
     return response.data
@@ -1096,6 +1096,23 @@ export interface PromotionalBannerItem {
 
 export interface PromotionalBannerContent {
   items: PromotionalBannerItem[]
+}
+
+// Types - Hero Banner (Product List Page) — with category filtering
+export interface HeroBannerItem {
+  id: string
+  image_url: string
+  mobile_view_image_url?: string
+  image_alt_text?: string
+  redirect_url?: string
+  category_ids?: string[]
+  sub_category_ids?: string[]
+  rank: number
+  status: boolean
+}
+
+export interface HeroBannerContent {
+  items: HeroBannerItem[]
 }
 
 // Types - Mid Size Banners (Product List Page)

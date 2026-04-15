@@ -973,6 +973,87 @@
           "requires": []
         }
       }
+    },
+    "blog": {
+      "id": 38,
+      "label": "Blog Posts",
+      "group": "Store",
+      "permissions": {
+        "read": {
+          "code": 3802,
+          "label": "View Blog Posts",
+          "requires": []
+        },
+        "create": {
+          "code": 3801,
+          "label": "Create Blog Posts",
+          "requires": [3802]
+        },
+        "update": {
+          "code": 3803,
+          "label": "Update Blog Posts",
+          "requires": [3802]
+        },
+        "delete": {
+          "code": 3804,
+          "label": "Delete Blog Posts",
+          "requires": [3802]
+        }
+      }
+    },
+    "blog_category": {
+      "id": 39,
+      "label": "Blog Categories",
+      "group": "Store",
+      "permissions": {
+        "read": {
+          "code": 3902,
+          "label": "View Blog Categories",
+          "requires": []
+        },
+        "create": {
+          "code": 3901,
+          "label": "Create Blog Categories",
+          "requires": [3902]
+        },
+        "update": {
+          "code": 3903,
+          "label": "Update Blog Categories",
+          "requires": [3902]
+        },
+        "delete": {
+          "code": 3904,
+          "label": "Delete Blog Categories",
+          "requires": [3902]
+        }
+      }
+    },
+    "blog_author": {
+      "id": 40,
+      "label": "Blog Authors",
+      "group": "Store",
+      "permissions": {
+        "read": {
+          "code": 4002,
+          "label": "View Blog Authors",
+          "requires": []
+        },
+        "create": {
+          "code": 4001,
+          "label": "Create Blog Authors",
+          "requires": [4002]
+        },
+        "update": {
+          "code": 4003,
+          "label": "Update Blog Authors",
+          "requires": [4002]
+        },
+        "delete": {
+          "code": 4004,
+          "label": "Delete Blog Authors",
+          "requires": [4002]
+        }
+      }
     }
   },
   "byCode": {
@@ -1856,6 +1937,78 @@
       "action": "read",
       "label": "View Contact Inquiries",
       "requires": []
+    },
+    "3801": {
+      "module": "Blog",
+      "action": "create",
+      "label": "Create Blog Posts",
+      "requires": [3802]
+    },
+    "3802": {
+      "module": "Blog",
+      "action": "read",
+      "label": "View Blog Posts",
+      "requires": []
+    },
+    "3803": {
+      "module": "Blog",
+      "action": "update",
+      "label": "Update Blog Posts",
+      "requires": [3802]
+    },
+    "3804": {
+      "module": "Blog",
+      "action": "delete",
+      "label": "Delete Blog Posts",
+      "requires": [3802]
+    },
+    "3901": {
+      "module": "blog_category",
+      "action": "create",
+      "label": "Create Blog Categories",
+      "requires": [3902]
+    },
+    "3902": {
+      "module": "blog_category",
+      "action": "read",
+      "label": "View Blog Categories",
+      "requires": []
+    },
+    "3903": {
+      "module": "blog_category",
+      "action": "update",
+      "label": "Update Blog Categories",
+      "requires": [3902]
+    },
+    "3904": {
+      "module": "blog_category",
+      "action": "delete",
+      "label": "Delete Blog Categories",
+      "requires": [3902]
+    },
+    "4001": {
+      "module": "blog_author",
+      "action": "create",
+      "label": "Create Blog Authors",
+      "requires": [4002]
+    },
+    "4002": {
+      "module": "blog_author",
+      "action": "read",
+      "label": "View Blog Authors",
+      "requires": []
+    },
+    "4003": {
+      "module": "blog_author",
+      "action": "update",
+      "label": "Update Blog Authors",
+      "requires": [4002]
+    },
+    "4004": {
+      "module": "blog_author",
+      "action": "delete",
+      "label": "Delete Blog Authors",
+      "requires": [4002]
     }
   }
 }
