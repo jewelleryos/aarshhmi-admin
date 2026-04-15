@@ -147,8 +147,6 @@ export function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>("")
   const [filteredCount, setFilteredCount] = useState<number>(0)
   const [search, setSearch] = useState("")
-  const [minPrice, setMinPrice] = useState("")
-  const [maxPrice, setMaxPrice] = useState("")
 
   // Permissions
   const { has } = usePermissions()
@@ -224,8 +222,6 @@ export function ProductsContent() {
   const clearAllFilters = () => {
     setSelectedCategory("")
     setSearch("")
-    setMinPrice("")
-    setMaxPrice("")
   }
 
   // Category filter options
@@ -238,25 +234,14 @@ export function ProductsContent() {
 
   // Client-side filtered products (search by name/SKU + price range)
   const filteredProducts = useMemo(() => {
-    let result = products
     const q = search.trim().toLowerCase()
-    if (q) {
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.base_sku.toLowerCase().includes(q)
-      )
-    }
-    const min = parseFloat(minPrice)
-    if (!isNaN(min)) {
-      result = result.filter((p) => p.min_price >= min)
-    }
-    const max = parseFloat(maxPrice)
-    if (!isNaN(max)) {
-      result = result.filter((p) => p.max_price <= max)
-    }
-    return result
-  }, [products, search, minPrice, maxPrice])
+    if (!q) return products
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.base_sku.toLowerCase().includes(q)
+    )
+  }, [products, search])
 
   // Keep filtered count in sync
   useEffect(() => {
@@ -264,7 +249,7 @@ export function ProductsContent() {
   }, [filteredProducts])
 
   // Check if any filter is active
-  const hasCustomFilter = !!selectedCategory || !!search || !!minPrice || !!maxPrice
+  const hasCustomFilter = !!selectedCategory || !!search
 
   // Filter toolbar component
   const filterComponent = (
@@ -278,22 +263,6 @@ export function ProductsContent() {
           className="h-9 w-[200px] lg:w-[260px] pl-8"
         />
       </div>
-      <Input
-        type="number"
-        placeholder="Min price"
-        value={minPrice}
-        onChange={(e) => setMinPrice(e.target.value)}
-        className="h-9 w-[110px]"
-        min={0}
-      />
-      <Input
-        type="number"
-        placeholder="Max price"
-        value={maxPrice}
-        onChange={(e) => setMaxPrice(e.target.value)}
-        className="h-9 w-[110px]"
-        min={0}
-      />
       <CategoryFilter
         options={categoryOptions}
         value={selectedCategory}
