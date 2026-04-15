@@ -5,8 +5,9 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
-import { Loader2, MoreVertical, Eye, Trash2, Plus, X } from "lucide-react"
+import { Loader2, MoreVertical, Eye, Trash2, Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,6 +146,9 @@ export function ProductsContent() {
   const [categories, setCategories] = useState<CategoryForFilter[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("")
   const [filteredCount, setFilteredCount] = useState<number>(0)
+  const [search, setSearch] = useState("")
+  const [minPrice, setMinPrice] = useState("")
+  const [maxPrice, setMaxPrice] = useState("")
 
   // Permissions
   const { has } = usePermissions()
@@ -216,9 +220,12 @@ export function ProductsContent() {
     setSelectedCategory(value)
   }
 
-  // Clear category filter (used by Reset button)
-  const clearCategoryFilter = () => {
+  // Clear all filters (used by Reset button)
+  const clearAllFilters = () => {
     setSelectedCategory("")
+    setSearch("")
+    setMinPrice("")
+    setMaxPrice("")
   }
 
   // Category filter options
@@ -229,23 +236,72 @@ export function ProductsContent() {
     }))
   }, [categories])
 
-  // Check if category filter is active
-  const hasCategoryFilter = !!selectedCategory
+  // Client-side filtered products (search by name/SKU + price range)
+  const filteredProducts = useMemo(() => {
+    let result = products
+    const q = search.trim().toLowerCase()
+    if (q) {
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.base_sku.toLowerCase().includes(q)
+      )
+    }
+    const min = parseFloat(minPrice)
+    if (!isNaN(min)) {
+      result = result.filter((p) => p.min_price >= min)
+    }
+    const max = parseFloat(maxPrice)
+    if (!isNaN(max)) {
+      result = result.filter((p) => p.max_price <= max)
+    }
+    return result
+  }, [products, search, minPrice, maxPrice])
 
-  // Category filter component
-  const categoryFilter = useMemo(() => (
-    <CategoryFilter
-      options={categoryOptions}
-      value={selectedCategory}
-      onChange={handleCategoryChange}
-      placeholder="Category"
-    />
-  ), [categoryOptions, selectedCategory])
+  // Keep filtered count in sync
+  useEffect(() => {
+    setFilteredCount(filteredProducts.length)
+  }, [filteredProducts])
 
-  // Handle filtered row count change from DataTable
-  const handleFilteredCountChange = (count: number) => {
-    setFilteredCount(count)
-  }
+  // Check if any filter is active
+  const hasCustomFilter = !!selectedCategory || !!search || !!minPrice || !!maxPrice
+
+  // Filter toolbar component
+  const filterComponent = (
+    <div className="flex items-center gap-2 flex-wrap">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by title or SKU..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-9 w-[200px] lg:w-[260px] pl-8"
+        />
+      </div>
+      <Input
+        type="number"
+        placeholder="Min price"
+        value={minPrice}
+        onChange={(e) => setMinPrice(e.target.value)}
+        className="h-9 w-[110px]"
+        min={0}
+      />
+      <Input
+        type="number"
+        placeholder="Max price"
+        value={maxPrice}
+        onChange={(e) => setMaxPrice(e.target.value)}
+        className="h-9 w-[110px]"
+        min={0}
+      />
+      <CategoryFilter
+        options={categoryOptions}
+        value={selectedCategory}
+        onChange={handleCategoryChange}
+        placeholder="Category"
+      />
+    </div>
+  )
 
   return (
     <div className="space-y-6">
@@ -281,16 +337,15 @@ export function ProductsContent() {
           ) : (
             <DataTable
               columns={columns}
-              data={products}
-              searchKey="name"
-              searchPlaceholder="Search products..."
+              data={filteredProducts}
               showPagination={true}
               maxHeight="400px"
               totalLabel={`Showing: ${filteredCount} product${filteredCount !== 1 ? 's' : ''}`}
-              filterComponent={categoryFilter}
-              onResetFilters={clearCategoryFilter}
-              hasCustomFilter={hasCategoryFilter}
-              onFilteredCountChange={handleFilteredCountChange}
+              filterComponent={filterComponent}
+              onResetFilters={clearAllFilters}
+              hasCustomFilter={hasCustomFilter}
+              showToolbar={true}
+              showColumnVisibility={true}
             />
           )}
         </CardContent>
