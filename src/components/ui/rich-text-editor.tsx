@@ -142,6 +142,7 @@ export function RichTextEditor({
         openOnClick: false,
         HTMLAttributes: {
           class: 'text-primary underline underline-offset-2',
+          target:'_self'
         },
       }),
       Image.configure({
@@ -216,7 +217,7 @@ export function RichTextEditor({
         .chain()
         .focus()
         .extendMarkRange('link')
-        .setLink({ href: linkUrl })
+        .setLink({ href: linkUrl, target: '_self' })
         .run()
     }
 

@@ -22,6 +22,7 @@ export const cmsSections: CMSSection[] = [
             { id: "assurance", label:"Assurance", children:[]},
             { id: 'instagram', label: 'Instagram', children: [] },
             { id: "experience", label:"Experience", children:[]},
+            { id: 'faq', label: 'FAQ', children: [] },
         ],
     },
     {
@@ -76,6 +77,11 @@ export const cmsSections: CMSSection[] = [
         id: "about-us",
         label: "About Us",
         children:[]
+    },
+    {
+        id: 'faqs',
+        label: 'FAQs',
+        children: [],
     },
     {
         id: "jewellery-care-guide",

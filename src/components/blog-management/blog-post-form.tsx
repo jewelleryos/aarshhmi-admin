@@ -92,7 +92,15 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
         setCategoryId(b.category_id || '')
         setAuthorId(b.author_id || '')
         setStatus(b.status)
-        setPublishedAt(b.published_at ? b.published_at.substring(0, 10) : '')
+        setPublishedAt(b.published_at ? (() => {
+          const d = new Date(b.published_at!)
+          const yyyy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          const hh = String(d.getHours()).padStart(2, '0')
+          const min = String(d.getMinutes()).padStart(2, '0')
+          return `${yyyy}-${mm}-${dd}T${hh}:${min}`
+        })() : '')
         setMetaTitle(b.meta_title || '')
         setMetaDescription(b.meta_description || '')
       } catch {
@@ -324,14 +332,18 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="published_at">Publish Date</Label>
+                <Label htmlFor="published_at">Publish Date & Time</Label>
                 <Input
                   id="published_at"
-                  type="date"
+                  type="datetime-local"
                   value={publishedAt}
+                  min={(() => {
+                    const n = new Date()
+                    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}T${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`
+                  })()}
                   onChange={(e) => setPublishedAt(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">Leave empty to use today's date when publishing.</p>
+                <p className="text-xs text-muted-foreground">Leave empty to use current date & time when publishing.</p>
               </div>
             </CardContent>
           </Card>

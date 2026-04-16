@@ -165,6 +165,19 @@ export interface ExperienceContent {
   second_section_title: string
 }
 
+// Types - FAQ
+export interface FAQItem {
+  id: string
+  question: string
+  answer: string
+  rank: number
+  status: boolean
+}
+
+export interface FAQContent {
+  items: FAQItem[]
+}
+
 // Types - Instagram
 export interface InstagramItem {
   id: string
@@ -186,6 +199,19 @@ export interface InstagramContent {
   items: InstagramItem[]
   button_text?: string
   button_redirect_url?: string
+}
+
+// Types - FAQs Section
+export interface FAQsSectionItem {
+  id: string
+  question: string
+  answer: string
+  rank: number
+  status: boolean
+}
+
+export interface FAQsSectionContent {
+  items: FAQsSectionItem[]
 }
 
 // Types - Policy Pages
@@ -572,7 +598,7 @@ export interface CmsSectionResponse {
   id: string
   name: string
   slug: string
-  content: HeroDesktopBannerContent | ProductRangeContent | ShopByShapeContent | CollectionsContent | GiftGuideContent| ShopFromBestsellersContent | InstagramContent | ExperienceContent | AssuranceContent | MuseContent | EngagementContent | PolicyPageContent | PartnerWithUsContent | AboutUsContent
+  content: HeroDesktopBannerContent | ProductRangeContent | ShopByShapeContent | CollectionsContent | GiftGuideContent | ShopFromBestsellersContent | InstagramContent | ExperienceContent | AssuranceContent | MuseContent | EngagementContent | FAQContent | FAQsSectionContent | PolicyPageContent | PartnerWithUsContent | AboutUsContent
   metadata: Record<string, unknown>
   created_at: string
   updated_at: string
@@ -761,6 +787,19 @@ export const cmsService = {
     return response.data
   },
 
+  // FAQ
+  getFAQ: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.HOMEPAGE.FAQ)
+    return response.data
+  },
+
+  updateFAQ: async (
+    content: FAQContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.HOMEPAGE.FAQ, { content })
+    return response.data
+  },
+
   // Privacy Policy
   getPrivacyPolicy: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
     const response = await apiService.get(API_ENDPOINTS.CMS.POLICY_PAGES.PRIVACY_POLICY)
@@ -849,6 +888,19 @@ export const cmsService = {
     content: AboutUsContent
   ): Promise<ApiResponse<CmsSectionResponse>> => {
     const response = await apiService.put(API_ENDPOINTS.CMS.ABOUT_US, { content })
+    return response.data
+  },
+
+  // FAQs Section
+  getFAQsSection: async (): Promise<ApiResponse<CmsSectionResponse | null>> => {
+    const response = await apiService.get(API_ENDPOINTS.CMS.FAQS)
+    return response.data
+  },
+
+  updateFAQsSection: async (
+    content: FAQsSectionContent
+  ): Promise<ApiResponse<CmsSectionResponse>> => {
+    const response = await apiService.put(API_ENDPOINTS.CMS.FAQS, { content })
     return response.data
   },
 

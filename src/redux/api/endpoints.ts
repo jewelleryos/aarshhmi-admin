@@ -373,6 +373,7 @@ const API_ENDPOINTS = {
       ASSURANCE: '/api/cms/homepage/assurance',
       MUSE: '/api/cms/homepage/muse',
       ENGAGEMENT: '/api/cms/homepage/engagement',
+      FAQ: '/api/cms/homepage/faq',
     },
     POLICY_PAGES: {
       PRIVACY_POLICY: '/api/cms/policy-pages/privacy-policy',
@@ -383,6 +384,7 @@ const API_ENDPOINTS = {
     },
     PARTNER_WITH_US: '/api/cms/partner-with-us',
     ABOUT_US: '/api/cms/about-us',
+    FAQS: '/api/cms/faqs',
     JEWELLERY_CARE_GUIDE: '/api/cms/jewellery-care-guide',
     PRODUCT_LIST_PAGE_BANNERS: {
       HERO_BANNER: '/api/cms/product-list-page/hero-banner',

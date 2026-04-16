@@ -17,6 +17,7 @@ import { CMSEngagement } from "./homepage/engagement/cms-engagement";
 import { CMSMuse } from "./homepage/muse/cms-muse";
 import { CMSInstagram } from "./homepage/instagram/cms-instagram";
 import { CMSExperience } from "./homepage/experience/cms-experience";
+import { CMSFAQ } from "./homepage/faq/cms-faq";
 import CMSPrivacyPolicy from "./policypage/privacy/cms-privacy-policy";
 import CMSLifetimeExchangeBuybackPolicy from "./policypage/lifetimeExchangeBuyback/cms-lifetime-exchange-buyback-policy";
 import CMSReturnRefundPolicy from "./policypage/returnRefund/return-refund-policy";
@@ -37,6 +38,7 @@ import { MoreFromTheCollectionComponent } from "./product-description-page/more-
 import { GeneralContentComponent } from "./general/general-content";
 import { DiamondEducationContent } from "./guide/diamond-education/diamond-education-content";
 import { MetalGuideContent } from "./guide/metal-guide/metal-guide-content";
+import { FAQsContentComponent } from "./faqs";
 import { cmsService } from "./services/cmsService";
 
 export function CMSContent() {
@@ -133,6 +135,7 @@ export function CMSContent() {
             activeSection === "assurance" ? <CMSAssurance /> :
             activeSection === "instagram" ? <CMSInstagram /> :
             activeSection === "experience" ? <CMSExperience /> :
+            activeSection === 'faq' ? <CMSFAQ /> :
             activeSection === "privacy-policy" ? <CMSPrivacyPolicy/> :
             activeSection === "lifetime-exchange-buyback-policy" ?    <CMSLifetimeExchangeBuybackPolicy/> :
             activeSection === "return-refund-exchange-policy" ? <CMSReturnRefundPolicy/> :
@@ -140,6 +143,7 @@ export function CMSContent() {
             activeSection === "shipping-policy" ? <CMSShoppingPolicy/> :
             activeSection === "partner-with-us" ? <CMSPartnerWithUs/> :
             activeSection === "about-us" ? <CMSAboutUs/> :
+            activeSection === 'faqs' ? <FAQsContentComponent /> :
             activeSection === "jewellery-care-guide" ? <CMSJewelleryCareGuide/> :
             activeSection === "product-list-page-hero-banner" ? <ProductListPageHeroBanner/> :
             activeSection === "product-list-page-mid-size-banners" ? <ProductListPageMidSizeBanners/> :
