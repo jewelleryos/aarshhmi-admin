@@ -362,6 +362,21 @@ export function CouponEdit({ id }: CouponEditProps) {
       }
     }
 
+    // Date range validation
+    if (validFrom && validUntil) {
+      if (new Date(validUntil) <= new Date(validFrom)) {
+        newErrors.validUntil = "Valid Until must be after Valid From"
+      }
+    }
+
+    // Usage limit validation
+    if (usageLimit) {
+      const limit = Number(usageLimit)
+      if (!Number.isInteger(limit) || limit < 1) {
+        newErrors.usageLimit = "Usage limit must be a positive whole number"
+      }
+    }
+
     // Customer targeting validation
     if (typeDefinition.requiresCustomerEmails) {
       const emails = emailInputs.map((e) => e.trim()).filter(Boolean)
@@ -1043,9 +1058,15 @@ export function CouponEdit({ id }: CouponEditProps) {
                   step="1"
                   placeholder="Unlimited"
                   value={usageLimit}
-                  onChange={(e) => setUsageLimit(e.target.value)}
+                  onChange={(e) => {
+                    setUsageLimit(e.target.value)
+                    if (errors.usageLimit) setErrors(({ usageLimit: _, ...rest }) => rest)
+                  }}
                   className="w-48"
                 />
+                {errors.usageLimit && (
+                  <p className="text-sm text-destructive">{errors.usageLimit}</p>
+                )}
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 mt-4">
@@ -1055,7 +1076,12 @@ export function CouponEdit({ id }: CouponEditProps) {
                   id="edit-validFrom"
                   type="datetime-local"
                   value={validFrom}
-                  onChange={(e) => setValidFrom(e.target.value)}
+                  onChange={(e) => {
+                    setValidFrom(e.target.value)
+                    if (validUntil && new Date(validUntil) > new Date(e.target.value)) {
+                      setErrors(({ validUntil: _, ...rest }) => rest)
+                    }
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -1064,8 +1090,15 @@ export function CouponEdit({ id }: CouponEditProps) {
                   id="edit-validUntil"
                   type="datetime-local"
                   value={validUntil}
-                  onChange={(e) => setValidUntil(e.target.value)}
+                  min={validFrom || undefined}
+                  onChange={(e) => {
+                    setValidUntil(e.target.value)
+                    if (errors.validUntil) setErrors(({ validUntil: _, ...rest }) => rest)
+                  }}
                 />
+                {errors.validUntil && (
+                  <p className="text-sm text-destructive">{errors.validUntil}</p>
+                )}
               </div>
             </div>
           </div>
