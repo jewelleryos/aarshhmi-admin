@@ -270,9 +270,13 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {showPagination && (
+      {showPagination ? (
         <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} totalLabel={totalLabel} />
-      )}
+      ) : totalLabel ? (
+        <div className="flex items-center px-2 py-3">
+          <p className="text-sm text-muted-foreground">Showing: {totalLabel}</p>
+        </div>
+      ) : null}
     </div>
   )
 }

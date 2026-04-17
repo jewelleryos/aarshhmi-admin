@@ -288,10 +288,8 @@ export function UsersContent() {
                 searchPlaceholder="Search users..."
                 showPagination={false}
                 maxHeight="500px"
+                totalLabel={`${users.length} user${users.length !== 1 ? 's' : ''}`}
               />
-              {/* <div className="mt-4 ml-3 text-sm text-muted-foreground">
-                {users.length} user{users.length !== 1 ? "s" : ""} total
-              </div> */}
             </>
           )}
         </CardContent>

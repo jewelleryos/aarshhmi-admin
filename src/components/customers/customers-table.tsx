@@ -185,6 +185,7 @@ export function CustomersTable({ items }: CustomersTableProps) {
       searchPlaceholder="Search by email..."
       showPagination={true}
       showToolbar={true}
+      totalLabel={`${items.length} customer${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

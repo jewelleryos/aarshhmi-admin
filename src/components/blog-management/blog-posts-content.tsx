@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Loader2, MoreVertical, Pencil, Trash2, FolderOpen } from 'lucide-react'
+import { Plus, Loader2, MoreVertical, Pencil, Trash2, FolderOpen, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { getCdnUrl } from '@/utils/cdn'
 import blogService, { type Blog } from './blog-service'
@@ -126,11 +126,16 @@ export function BlogPostsContent() {
       {
         accessorKey: 'status',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-        cell: ({ row }) => (
-          <Badge variant={row.original.status === 'published' ? 'default' : 'secondary'}>
-            {row.original.status === 'published' ? 'Published' : 'Draft'}
-          </Badge>
-        ),
+        cell: ({ row }) => {
+          const s = row.original.status
+          if (s === 'published') return <Badge variant="default">Published</Badge>
+          if (s === 'scheduled') return (
+            <Badge variant="outline" className="text-blue-600 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-700">
+              <Clock className="mr-1 h-3 w-3" />Scheduled
+            </Badge>
+          )
+          return <Badge variant="secondary">Draft</Badge>
+        },
         size: 100,
       },
       {
@@ -222,7 +227,7 @@ export function BlogPostsContent() {
               <p className="text-sm text-muted-foreground mt-1">Click &quot;New Post&quot; to create your first blog post</p>
             </div>
           ) : (
-            <DataTable columns={columns} data={blogs} showToolbar={false} />
+            <DataTable columns={columns} data={blogs} showToolbar={false} totalLabel={`${blogs.length} post${blogs.length !== 1 ? 's' : ''}`} />
           )}
         </CardContent>
       </Card>

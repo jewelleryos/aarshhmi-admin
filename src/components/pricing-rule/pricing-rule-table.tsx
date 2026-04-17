@@ -182,6 +182,7 @@ export function PricingRuleTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} rule${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

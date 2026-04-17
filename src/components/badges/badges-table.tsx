@@ -192,6 +192,7 @@ export function BadgesTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} badge${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

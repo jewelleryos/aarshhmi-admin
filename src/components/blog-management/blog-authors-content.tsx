@@ -235,7 +235,7 @@ export function BlogAuthorsContent() {
               <p className="text-sm text-muted-foreground mt-1">Click &quot;Add Author&quot; to create your first author</p>
             </div>
           ) : (
-            <DataTable columns={columns} data={authors} showToolbar={false} showPagination={false} />
+            <DataTable columns={columns} data={authors} showToolbar={false} showPagination={false} totalLabel={`${authors.length} author${authors.length !== 1 ? 's' : ''}`} />
           )}
         </CardContent>
       </Card>

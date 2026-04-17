@@ -184,6 +184,7 @@ export function GemstoneQualityTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} qualit${items.length !== 1 ? 'ies' : 'y'}`}
     />
   )
 }

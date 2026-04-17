@@ -186,6 +186,7 @@ export function GemstonePricingTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} price rule${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

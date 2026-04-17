@@ -184,6 +184,7 @@ export function GemstoneTypeTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} gemstone type${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

@@ -242,6 +242,7 @@ export function CategoriesTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} categor${items.length !== 1 ? 'ies' : 'y'}`}
     />
   )
 }

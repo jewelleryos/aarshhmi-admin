@@ -184,6 +184,7 @@ export function DiamondClarityColorTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} clarity/color${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

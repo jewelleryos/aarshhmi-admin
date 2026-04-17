@@ -228,6 +228,7 @@ export function PriceRecalculationTable({ jobs }: PriceRecalculationTableProps) 
         data={jobs}
         showPagination={false}
         showToolbar={false}
+        totalLabel={`${jobs.length} job${jobs.length !== 1 ? 's' : ''}`}
       />
       <ErrorDetailsDialog
         job={selectedJob}

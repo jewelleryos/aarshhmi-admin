@@ -251,6 +251,7 @@ export function MetalPurityTable({
         data={filteredItems}
         showPagination={false}
         showToolbar={false}
+        totalLabel={`${filteredItems.length} purit${filteredItems.length !== 1 ? 'ies' : 'y'}`}
       />
     </div>
   )

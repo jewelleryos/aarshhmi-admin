@@ -7,16 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MediaPickerInput } from '@/components/media'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
-import { Loader2, ArrowLeft, Save } from 'lucide-react'
+import { Loader2, ArrowLeft, Save, Clock, FileText, Globe } from 'lucide-react'
 import { toast } from 'sonner'
 import blogService, { type Blog, type BlogCategory, type BlogAuthor, type BlogStatus } from './blog-service'
 
@@ -91,7 +85,12 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
         setFeatureImageAlt(b.feature_image_alt || '')
         setCategoryId(b.category_id || '')
         setAuthorId(b.author_id || '')
-        setStatus(b.status)
+        // Normalise: if stored as 'published' but published_at is in future, treat as scheduled
+        const loadedStatus: BlogStatus =
+          b.status === 'published' && b.published_at && new Date(b.published_at) > new Date()
+            ? 'scheduled'
+            : b.status
+        setStatus(loadedStatus)
         setPublishedAt(b.published_at ? (() => {
           const d = new Date(b.published_at!)
           const yyyy = d.getFullYear()
@@ -130,10 +129,45 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
     if (!title.trim()) errs.title = 'Title is required'
     if (!slug.trim()) errs.slug = 'Slug is required'
     if (!featureImageUrl) errs.featureImageUrl = 'Feature image is required'
+    if (derivedStatus() === 'scheduled') {
+      if (!publishedAt) {
+        errs.publishedAt = 'A future date & time is required for scheduled posts'
+      } else if (new Date(publishedAt) <= new Date()) {
+        errs.publishedAt = 'Scheduled date must be in the future'
+      }
+    }
     return errs
   }
 
-  const handleSubmit = async (submitStatus?: BlogStatus) => {
+  // Derive the effective status from the current state
+  const derivedStatus = (): BlogStatus => {
+    if (status === 'draft') return 'draft'
+    if (publishedAt && new Date(publishedAt) > new Date()) return 'scheduled'
+    // Keep showing scheduled if user selected it but hasn't picked a date yet
+    if (status === 'scheduled') return 'scheduled'
+    return 'published'
+  }
+
+  // Handle date change — auto-switch status based on selected date
+  const handlePublishedAtChange = (val: string) => {
+    setPublishedAt(val)
+    if (val && new Date(val) > new Date()) {
+      setStatus('scheduled')
+    } else if (status === 'scheduled') {
+      setStatus('draft')
+      setPublishedAt('')
+    }
+    // Clear publishedAt error when user picks a date
+    if (val) setErrors((prev) => ({ ...prev, publishedAt: undefined as any }))
+  }
+
+  // Now-formatted string for datetime-local input
+  const nowLocalString = () => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  }
+
+  const handleSubmit = async (action: 'draft' | 'publish' | 'save') => {
     const errs = validate()
     if (Object.keys(errs).length > 0) {
       setErrors(errs)
@@ -142,7 +176,21 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
     }
     setErrors({})
 
-    const finalStatus = submitStatus || status
+    let finalStatus: BlogStatus = status
+    let finalPublishedAt: string | null = publishedAt ? new Date(publishedAt).toISOString() : null
+
+    if (action === 'draft') {
+      finalStatus = 'draft'
+      finalPublishedAt = null
+    } else if (action === 'publish') {
+      finalStatus = 'published'
+      finalPublishedAt = new Date().toISOString()
+      setPublishedAt(nowLocalString())
+      setStatus('published')
+    } else {
+      // save (edit mode) — use derived status
+      finalStatus = derivedStatus()
+    }
 
     const payload = {
       title: title.trim(),
@@ -154,7 +202,7 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
       category_id: categoryId || null,
       author_id: authorId || null,
       status: finalStatus,
-      published_at: publishedAt ? new Date(publishedAt).toISOString() : null,
+      published_at: finalPublishedAt,
       meta_title: metaTitle || undefined,
       meta_description: metaDescription || undefined,
     }
@@ -201,15 +249,26 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {!isEdit && (
-            <Button variant="outline" onClick={() => handleSubmit('draft')} disabled={isLoading}>
-              Save as Draft
+          <Button variant="outline" onClick={() => handleSubmit('draft')} disabled={isLoading}>
+            <FileText className="mr-2 h-4 w-4" />
+            Save as Draft
+          </Button>
+          {isEdit ? (
+            <Button onClick={() => handleSubmit('save')} disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save Changes
+            </Button>
+          ) : derivedStatus() === 'scheduled' ? (
+            <Button onClick={() => handleSubmit('save')} disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Clock className="mr-2 h-4 w-4" />}
+              Schedule
+            </Button>
+          ) : (
+            <Button onClick={() => handleSubmit('publish')} disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
+              Publish Now
             </Button>
           )}
-          <Button onClick={() => handleSubmit(isEdit ? undefined : 'published')} disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            {isEdit ? 'Save Changes' : 'Publish'}
-          </Button>
         </div>
       </div>
 
@@ -319,31 +378,78 @@ export function BlogPostForm({ blogId }: BlogPostFormProps) {
               <CardTitle className="text-base">Publishing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Status dropdown */}
               <div className="space-y-2">
                 <Label>Status</Label>
-                <Select value={status} onValueChange={(v) => setStatus(v as BlogStatus)}>
+                <Select
+                  value={derivedStatus()}
+                  onValueChange={(v) => {
+                    const s = v as BlogStatus
+                    setStatus(s)
+                    if (s === 'draft') {
+                      setPublishedAt('')
+                      setErrors((prev) => ({ ...prev, publishedAt: undefined as any }))
+                    }
+                    if (s === 'published') {
+                      // Auto-fill current date/time when switching to published
+                      setPublishedAt(nowLocalString())
+                      setErrors((prev) => ({ ...prev, publishedAt: undefined as any }))
+                    }
+                    if (s === 'scheduled') {
+                      // Clear date so user must pick a future one
+                      setPublishedAt('')
+                    }
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="draft">
+                      <span className="flex items-center gap-2">
+                        <FileText className="h-3.5 w-3.5 text-muted-foreground" /> Draft
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="scheduled">
+                      <span className="flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 text-blue-500" /> Scheduled
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="published">
+                      <span className="flex items-center gap-2">
+                        <Globe className="h-3.5 w-3.5 text-green-500" /> Published
+                      </span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="published_at">Publish Date & Time</Label>
+                <Label htmlFor="published_at">
+                  Publish Date & Time
+                  {derivedStatus() === 'scheduled' && (
+                    <span className="text-destructive ml-1">*</span>
+                  )}
+                </Label>
                 <Input
                   id="published_at"
                   type="datetime-local"
                   value={publishedAt}
-                  min={(() => {
-                    const n = new Date()
-                    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}T${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`
-                  })()}
-                  onChange={(e) => setPublishedAt(e.target.value)}
+                  min={derivedStatus() === 'scheduled' ? nowLocalString() : undefined}
+                  onChange={(e) => handlePublishedAtChange(e.target.value)}
+                  className={errors.publishedAt ? 'border-destructive' : ''}
                 />
-                <p className="text-xs text-muted-foreground">Leave empty to use current date & time when publishing.</p>
+                {errors.publishedAt ? (
+                  <p className="text-xs text-destructive">{errors.publishedAt}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {derivedStatus() === 'scheduled'
+                      ? 'Required. Post will go live on this date.'
+                      : derivedStatus() === 'published'
+                      ? 'Set to current time. You can adjust if needed.'
+                      : 'Pick a future date to schedule, or leave empty to publish immediately.'}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

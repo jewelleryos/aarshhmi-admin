@@ -184,6 +184,7 @@ export function PearlTypeTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} pearl type${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

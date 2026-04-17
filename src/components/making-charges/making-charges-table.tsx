@@ -228,6 +228,7 @@ export function MakingChargesTable({
         data={filteredItems}
         showPagination={false}
         showToolbar={false}
+        totalLabel={`${filteredItems.length} charge${filteredItems.length !== 1 ? 's' : ''}`}
       />
     </div>
   )

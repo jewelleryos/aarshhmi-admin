@@ -241,6 +241,7 @@ export function TagsTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} tag${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

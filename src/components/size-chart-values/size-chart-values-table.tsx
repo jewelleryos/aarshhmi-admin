@@ -210,6 +210,7 @@ export function SizeChartValuesTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} value${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

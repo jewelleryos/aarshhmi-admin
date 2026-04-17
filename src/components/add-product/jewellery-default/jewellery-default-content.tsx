@@ -103,6 +103,7 @@ const initialStoneDetails = {
 const initialAttributesDetails = {
   badgeIds: [] as string[],
   categoryIds: [] as string[],
+  primaryCategoryId: null as string | null,
   tagIds: [] as string[],
 }
 
@@ -896,6 +897,7 @@ export function JewelleryDefaultContent() {
         categories: attributesDetails.categoryIds.map((id) => ({
           id,
           name: findName(categories, id),
+          isPrimary: id === attributesDetails.primaryCategoryId,
         })),
         tags: attributesDetails.tagIds.map((id) => ({
           id,

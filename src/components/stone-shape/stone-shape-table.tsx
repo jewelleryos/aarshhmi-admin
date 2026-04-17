@@ -184,6 +184,7 @@ export function StoneShapeTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} shape${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

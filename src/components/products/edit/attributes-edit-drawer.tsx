@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
-import { Loader2, Tags } from "lucide-react"
+import { useState, useEffect, useMemo, useRef } from "react"
+import { Loader2, Tags, ChevronDown, Star } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Sheet,
   SheetContent,
@@ -71,6 +72,16 @@ export function AttributesEditDrawer({
   const [selectedBadgeIds, setSelectedBadgeIds] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Dropdown open states
+  const [catDropdownOpen, setCatDropdownOpen] = useState(false)
+  const [subDropdownOpen, setSubDropdownOpen] = useState(false)
+  const [catSearch, setCatSearch] = useState("")
+  const [subSearch, setSubSearch] = useState("")
+
+  // Refs for click-outside
+  const catDropdownRef = useRef<HTMLDivElement>(null)
+  const subDropdownRef = useRef<HTMLDivElement>(null)
+
   // Errors
   const [categoryError, setCategoryError] = useState<string | null>(null)
 
@@ -86,24 +97,28 @@ export function AttributesEditDrawer({
     return grouped
   }, [tags])
 
-  // Organize categories into parent-children structure
+  // Organize categories into parent/subcategory lists
   const organizedCategories = useMemo(() => {
     const parentCategories = categories.filter((c) => !c.parent_id)
-    const childCategories = categories.filter((c) => c.parent_id)
-
-    // Group children by parent_id
-    const childrenByParent: Record<string, typeof categories> = {}
-    childCategories.forEach((child) => {
-      if (child.parent_id) {
-        if (!childrenByParent[child.parent_id]) {
-          childrenByParent[child.parent_id] = []
-        }
-        childrenByParent[child.parent_id].push(child)
-      }
-    })
-
-    return { parentCategories, childrenByParent }
+    const subCategories = categories.filter((c) => !!c.parent_id)
+    const parentMap: Record<string, string> = {}
+    parentCategories.forEach((p) => { parentMap[p.id] = p.name })
+    return { parentCategories, subCategories, parentMap }
   }, [categories])
+
+  // Click-outside close
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (catDropdownRef.current && !catDropdownRef.current.contains(e.target as Node)) {
+        setCatDropdownOpen(false)
+      }
+      if (subDropdownRef.current && !subDropdownRef.current.contains(e.target as Node)) {
+        setSubDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
 
   // Fetch dropdown data when drawer opens
   useEffect(() => {
@@ -240,104 +255,180 @@ export function AttributesEditDrawer({
           ) : (
             <>
               {/* Categories Section */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
                   <Label className="text-base font-semibold">
                     Categories <span className="text-destructive">*</span>
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Select categories and mark one as primary
+                    Select categories and subcategories, then mark one as primary
                   </p>
                 </div>
 
-                <div className="border rounded-lg p-4 space-y-2 max-h-[250px] overflow-y-auto">
-                  {categories.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-2">
-                      No categories available
-                    </p>
-                  ) : (
-                    organizedCategories.parentCategories.map((parent) => {
-                      const children = organizedCategories.childrenByParent[parent.id] || []
-                      const isParentSelected = selectedCategoryIds.includes(parent.id)
+                {/* Primary indicator */}
+                {primaryCategoryId && (
+                  <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800 px-3 py-2">
+                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                      Primary:&nbsp;
+                      {(() => {
+                        const cat = categories.find((c) => c.id === primaryCategoryId)
+                        if (!cat) return "—"
+                        const parent = cat.parent_id ? organizedCategories.parentMap[cat.parent_id] : null
+                        return parent ? `${parent} › ${cat.name}` : cat.name
+                      })()}
+                    </span>
+                  </div>
+                )}
 
-                      return (
-                        <div key={parent.id} className="space-y-1">
-                          {/* Parent Category */}
-                          <div className="flex items-center justify-between py-1">
-                            <div className="flex items-center space-x-3">
+                {/* Categories Dropdown */}
+                <div ref={catDropdownRef} className="relative">
+                  <Label className="text-sm font-medium mb-1.5 block">Categories</Label>
+                  <button
+                    type="button"
+                    onClick={() => { setCatDropdownOpen((v) => !v); setSubDropdownOpen(false) }}
+                    className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-muted/30"
+                  >
+                    <span className="text-muted-foreground">
+                      {organizedCategories.parentCategories.filter((p) => selectedCategoryIds.includes(p.id)).length > 0
+                        ? `${organizedCategories.parentCategories.filter((p) => selectedCategoryIds.includes(p.id)).length} selected`
+                        : "Select categories..."}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${catDropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {catDropdownOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-md">
+                      <div className="p-2 border-b">
+                        <Input
+                          placeholder="Search categories..."
+                          value={catSearch}
+                          onChange={(e) => setCatSearch(e.target.value)}
+                          className="h-8 text-sm"
+                          autoFocus
+                        />
+                      </div>
+                      <ScrollArea className="max-h-48">
+                        {organizedCategories.parentCategories
+                          .filter((p) => !catSearch || p.name.toLowerCase().includes(catSearch.toLowerCase()))
+                          .map((parent) => (
+                            <div
+                              key={parent.id}
+                              className="flex items-center gap-2 px-3 py-2 hover:bg-muted/50 cursor-pointer"
+                              onClick={() => handleCategoryToggle(parent.id, !selectedCategoryIds.includes(parent.id))}
+                            >
                               <Checkbox
-                                id={`category-${parent.id}`}
-                                checked={isParentSelected}
-                                onCheckedChange={(checked) =>
-                                  handleCategoryToggle(parent.id, checked === true)
-                                }
+                                checked={selectedCategoryIds.includes(parent.id)}
+                                onCheckedChange={(checked) => handleCategoryToggle(parent.id, checked === true)}
+                                onClick={(e) => e.stopPropagation()}
                               />
-                              <Label
-                                htmlFor={`category-${parent.id}`}
-                                className="cursor-pointer font-medium"
-                              >
-                                {parent.name}
-                              </Label>
+                              <span className="text-sm flex-1">{parent.name}</span>
+                              {selectedCategoryIds.includes(parent.id) && (
+                                <button
+                                  type="button"
+                                  title={primaryCategoryId === parent.id ? "Primary" : "Set as primary"}
+                                  onClick={(e) => { e.stopPropagation(); handlePrimaryChange(parent.id) }}
+                                  className="shrink-0"
+                                >
+                                  <Star className={`h-3.5 w-3.5 transition-colors ${primaryCategoryId === parent.id ? "fill-amber-400 text-amber-400" : "text-muted-foreground hover:text-amber-400"}`} />
+                                </button>
+                              )}
                             </div>
-                            {isParentSelected && selectedCategoryIds.length > 1 && (
-                              <RadioGroup
-                                value={primaryCategoryId}
-                                onValueChange={handlePrimaryChange}
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem
-                                    value={parent.id}
-                                    id={`primary-${parent.id}`}
-                                  />
-                                  <Label
-                                    htmlFor={`primary-${parent.id}`}
-                                    className="text-xs text-muted-foreground cursor-pointer"
-                                  >
-                                    Primary
-                                  </Label>
-                                </div>
-                              </RadioGroup>
-                            )}
-                            {isParentSelected && selectedCategoryIds.length === 1 && (
-                              <Badge variant="secondary" className="text-xs">
-                                Primary
-                              </Badge>
-                            )}
-                          </div>
+                          ))}
+                        {organizedCategories.parentCategories.filter((p) => !catSearch || p.name.toLowerCase().includes(catSearch.toLowerCase())).length === 0 && (
+                          <p className="py-4 text-center text-sm text-muted-foreground">No categories found</p>
+                        )}
+                      </ScrollArea>
+                    </div>
+                  )}
+                </div>
 
-                          {/* Child Categories */}
-                          {children.length > 0 && (
-                            <div className="ml-6 border-l pl-4 space-y-1">
-                              {children.map((child) => {
-                                const isChildSelected = selectedCategoryIds.includes(child.id)
-                                return (
-                                  <div
-                                    key={child.id}
-                                    className="flex items-center py-1"
-                                  >
-                                    <div className="flex items-center space-x-3">
-                                      <Checkbox
-                                        id={`category-${child.id}`}
-                                        checked={isChildSelected}
-                                        onCheckedChange={(checked) =>
-                                          handleCategoryToggle(child.id, checked === true)
-                                        }
-                                      />
-                                      <Label
-                                        htmlFor={`category-${child.id}`}
-                                        className="cursor-pointer text-sm"
-                                      >
-                                        {child.name}
-                                      </Label>
-                                    </div>
-                                  </div>
-                                )
-                              })}
+                {/* Subcategories Dropdown */}
+                <div ref={subDropdownRef} className="relative">
+                  <Label className="text-sm font-medium mb-1.5 block">Subcategories</Label>
+                  <button
+                    type="button"
+                    onClick={() => { setSubDropdownOpen((v) => !v); setCatDropdownOpen(false) }}
+                    className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-muted/30"
+                  >
+                    <span className="text-muted-foreground">
+                      {(() => {
+                        const selCount = organizedCategories.subCategories.filter((s) => selectedCategoryIds.includes(s.id)).length
+                        if (selCount > 0) return `${selCount} selected`
+                        const hasParents = organizedCategories.subCategories.some((s) => s.parent_id && selectedCategoryIds.includes(s.parent_id))
+                        return hasParents ? "Select subcategories..." : "Select a category first"
+                      })()}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${subDropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {subDropdownOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-md">
+                      <div className="p-2 border-b">
+                        <Input
+                          placeholder="Search subcategories..."
+                          value={subSearch}
+                          onChange={(e) => setSubSearch(e.target.value)}
+                          className="h-8 text-sm"
+                          autoFocus
+                        />
+                      </div>
+                      <ScrollArea className="max-h-48">
+                        {(() => {
+                          const filtered = organizedCategories.subCategories.filter((s) => {
+                            // Only show subcategories whose parent is selected
+                            if (!s.parent_id || !selectedCategoryIds.includes(s.parent_id)) return false
+                            if (!subSearch) return true
+                            const pname = organizedCategories.parentMap[s.parent_id] || ""
+                            return (
+                              s.name.toLowerCase().includes(subSearch.toLowerCase()) ||
+                              pname.toLowerCase().includes(subSearch.toLowerCase())
+                            )
+                          })
+                          if (filtered.length === 0) {
+                            return <p className="py-4 text-center text-sm text-muted-foreground">No subcategories found</p>
+                          }
+                          // Group by parent
+                          const groups: { parentId: string; parentName: string; subs: typeof filtered }[] = []
+                          filtered.forEach((sub) => {
+                            const pid = sub.parent_id || ""
+                            const pname = pid ? (organizedCategories.parentMap[pid] || "Other") : "Other"
+                            const existing = groups.find((g) => g.parentId === pid)
+                            if (existing) existing.subs.push(sub)
+                            else groups.push({ parentId: pid, parentName: pname, subs: [sub] })
+                          })
+                          return groups.map((group) => (
+                            <div key={group.parentId}>
+                              <div className="px-3 pt-2 pb-1">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group.parentName}</span>
+                              </div>
+                              {group.subs.map((sub) => (
+                                <div
+                                  key={sub.id}
+                                  className="flex items-center gap-2 pl-5 pr-3 py-2 hover:bg-muted/50 cursor-pointer"
+                                  onClick={() => handleCategoryToggle(sub.id, !selectedCategoryIds.includes(sub.id))}
+                                >
+                                  <Checkbox
+                                    checked={selectedCategoryIds.includes(sub.id)}
+                                    onCheckedChange={(checked) => handleCategoryToggle(sub.id, checked === true)}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <span className="text-sm flex-1">{sub.name}</span>
+                                  {selectedCategoryIds.includes(sub.id) && (
+                                    <button
+                                      type="button"
+                                      title={primaryCategoryId === sub.id ? "Primary" : "Set as primary"}
+                                      onClick={(e) => { e.stopPropagation(); handlePrimaryChange(sub.id) }}
+                                      className="shrink-0"
+                                    >
+                                      <Star className={`h-3.5 w-3.5 transition-colors ${primaryCategoryId === sub.id ? "fill-amber-400 text-amber-400" : "text-muted-foreground hover:text-amber-400"}`} />
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          )}
-                        </div>
-                      )
-                    })
+                          ))
+                        })()}
+                      </ScrollArea>
+                    </div>
                   )}
                 </div>
 

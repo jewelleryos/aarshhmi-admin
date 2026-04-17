@@ -84,9 +84,9 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">{order.order_number}</h1>
-            <Badge variant="outline" className={stageInfo?.className || "bg-gray-50 text-gray-500 border-gray-200"}>
+            {/* <Badge variant="outline" className={stageInfo?.className || "bg-gray-50 text-gray-500 border-gray-200"}>
               {stageInfo?.label || `Stage ${order.stage}`}
-            </Badge>
+            </Badge> */}
             <Badge variant="outline" className={paymentInfo?.className || "bg-gray-50 text-gray-500 border-gray-200"}>
               {paymentInfo?.label || order.payment_status}
             </Badge>

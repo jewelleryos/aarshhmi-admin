@@ -184,6 +184,7 @@ export function MetalTypeTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} metal type${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

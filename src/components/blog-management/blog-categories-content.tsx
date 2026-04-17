@@ -237,7 +237,7 @@ export function BlogCategoriesContent() {
               <p className="text-sm text-muted-foreground mt-1">Click &quot;Add Category&quot; to create your first category</p>
             </div>
           ) : (
-            <DataTable columns={columns} data={categories} showToolbar={false} showPagination={false} />
+            <DataTable columns={columns} data={categories} showToolbar={false} showPagination={false} totalLabel={`${categories.length} categor${categories.length !== 1 ? 'ies' : 'y'}`} />
           )}
         </CardContent>
       </Card>

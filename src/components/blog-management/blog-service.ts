@@ -1,6 +1,6 @@
 import apiService from '@/configs/axios'
 
-export type BlogStatus = 'draft' | 'published'
+export type BlogStatus = 'draft' | 'published' | 'scheduled'
 
 export interface BlogCategory {
   id: string

@@ -222,6 +222,7 @@ export function CouponsTable({
       searchPlaceholder="Search by code..."
       showPagination={true}
       showToolbar={true}
+      totalLabel={`${items.length} coupon${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

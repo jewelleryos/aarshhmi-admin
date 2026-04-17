@@ -160,6 +160,7 @@ export function OtherChargesTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} charge${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

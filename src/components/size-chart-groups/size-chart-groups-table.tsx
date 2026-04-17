@@ -135,6 +135,7 @@ export function SizeChartGroupsTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} group${items.length !== 1 ? 's' : ''}`}
     />
   )
 }

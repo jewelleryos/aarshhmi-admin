@@ -184,6 +184,7 @@ export function GemstoneColorTable({
       data={items}
       showPagination={false}
       showToolbar={false}
+      totalLabel={`${items.length} color${items.length !== 1 ? 's' : ''}`}
     />
   )
 }
