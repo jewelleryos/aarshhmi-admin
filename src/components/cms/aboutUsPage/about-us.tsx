@@ -36,8 +36,8 @@ const defaultSection1: AboutUsSection1 = {
 const defaultSection2Item: AboutUsSection2Item = {
     title: '',
     description: '',
-    image_url: '',
-    mobile_view_image_url: '',
+    images: [''],
+    mobile_images: [],
     image_alt_text: '',
 }
 
@@ -115,7 +115,14 @@ export default function CMSAboutUs() {
             if (content) {
                 if (content.section1) setSection1({ ...defaultSection1, ...content.section1 })
                 if (content.section2 && content.section2.length > 0) {
-                    setSection2(content.section2.map((item) => ({ ...defaultSection2Item, ...item })))
+                    setSection2(
+                        content.section2.map((item) => ({
+                            ...defaultSection2Item,
+                            ...item,
+                            images: item.images?.length ? item.images : [''],
+                            mobile_images: item.mobile_images ?? [],
+                        }))
+                    )
                 }
                 if (content.section3 && content.section3.sub_sections?.length === 2) {
                     setSection3({
@@ -157,7 +164,9 @@ export default function CMSAboutUs() {
         section2.forEach((item, i) => {
             if (!item.title) newErrors[`s2_${i}_title`] = 'Title is required'
             if (!item.description) newErrors[`s2_${i}_description`] = 'Description is required'
-            if (!item.image_url) newErrors[`s2_${i}_image_url`] = 'Image is required'
+            if (!item.images || item.images.length === 0 || item.images.every((url) => !url)) {
+                newErrors[`s2_${i}_images`] = 'At least one image is required'
+            }
         })
 
         // Section 3 validation
@@ -220,17 +229,73 @@ export default function CMSAboutUs() {
         }
     }
 
-    // Helper to update section2 array items
+    // Helper to update section2 scalar fields (title, description, image_alt_text)
     const updateSection2 = (index: number, field: keyof AboutUsSection2Item, value: string) => {
         setSection2((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
     }
 
     const addSection2Item = () => {
-        setSection2((prev) => [...prev, { ...defaultSection2Item }])
+        setSection2((prev) => [...prev, { ...defaultSection2Item, images: [''], mobile_images: [] }])
     }
 
     const removeSection2Item = (index: number) => {
         setSection2((prev) => prev.filter((_, i) => i !== index))
+    }
+
+    // Section 2 image array helpers
+    const updateSection2Image = (itemIndex: number, imgIndex: number, value: string) => {
+        setSection2((prev) =>
+            prev.map((item, i) => {
+                if (i !== itemIndex) return item
+                const images = [...item.images]
+                images[imgIndex] = value
+                return { ...item, images }
+            })
+        )
+    }
+
+    const addSection2Image = (itemIndex: number) => {
+        setSection2((prev) =>
+            prev.map((item, i) => (i === itemIndex ? { ...item, images: [...item.images, ''] } : item))
+        )
+    }
+
+    const removeSection2Image = (itemIndex: number, imgIndex: number) => {
+        setSection2((prev) =>
+            prev.map((item, i) => {
+                if (i !== itemIndex) return item
+                return { ...item, images: item.images.filter((_, j) => j !== imgIndex) }
+            })
+        )
+    }
+
+    // Section 2 mobile image array helpers
+    const updateSection2MobileImage = (itemIndex: number, imgIndex: number, value: string) => {
+        setSection2((prev) =>
+            prev.map((item, i) => {
+                if (i !== itemIndex) return item
+                const mobile_images = [...(item.mobile_images ?? [])]
+                mobile_images[imgIndex] = value
+                return { ...item, mobile_images }
+            })
+        )
+    }
+
+    const addSection2MobileImage = (itemIndex: number) => {
+        setSection2((prev) =>
+            prev.map((item, i) =>
+                i === itemIndex ? { ...item, mobile_images: [...(item.mobile_images ?? []), ''] } : item
+            )
+        )
+    }
+
+    const removeSection2MobileImage = (itemIndex: number, imgIndex: number) => {
+        setSection2((prev) =>
+            prev.map((item, i) => {
+                if (i !== itemIndex) return item
+                return { ...item, mobile_images: (item.mobile_images ?? []).filter((_, j) => j !== imgIndex) }
+            })
+        )
     }
 
     // Helper to update section3 sub_sections
@@ -483,28 +548,93 @@ export default function CMSAboutUs() {
                                     {errors[`s2_${index}_description`] && <p className="text-sm text-destructive">{errors[`s2_${index}_description`]}</p>}
                                 </div>
 
-                                <MediaPickerInput
-                                    label="Image"
-                                    value={item.image_url || null}
-                                    onChange={(path) => {
-                                        updateSection2(index, 'image_url', path || '')
-                                        clearError(`s2_${index}_image_url`)
-                                    }}
-                                    rootPath="cms/about-us/section2"
-                                    required
-                                    error={errors[`s2_${index}_image_url`]}
-                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
-                                />
+                                {/* Images (normal view) */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <Label>
+                                            Images <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addSection2Image(index)}
+                                        >
+                                            <Plus className="mr-1 h-3 w-3" />
+                                            Add Image
+                                        </Button>
+                                    </div>
+                                    {errors[`s2_${index}_images`] && <p className="text-sm text-destructive">{errors[`s2_${index}_images`]}</p>}
+                                    <div className="space-y-2">
+                                        {item.images.map((imgUrl, imgIndex) => (
+                                            <div key={imgIndex} className="flex items-start gap-2">
+                                                <div className="flex-1">
+                                                    <MediaPickerInput
+                                                        label={`Image ${imgIndex + 1}`}
+                                                        value={imgUrl || null}
+                                                        onChange={(path) => {
+                                                            updateSection2Image(index, imgIndex, path || '')
+                                                            clearError(`s2_${index}_images`)
+                                                        }}
+                                                        rootPath="cms/about-us/section2"
+                                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                                    />
+                                                </div>
+                                                {item.images.length > 1 && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="mt-6 h-8 w-8 text-destructive hover:text-destructive shrink-0"
+                                                        onClick={() => removeSection2Image(index, imgIndex)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
-                                <MediaPickerInput
-                                    label="Mobile View Image"
-                                    value={item.mobile_view_image_url || null}
-                                    onChange={(path) => {
-                                        updateSection2(index, 'mobile_view_image_url', path || '')
-                                    }}
-                                    rootPath="cms/about-us/section2/mobile"
-                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
-                                />
+                                {/* Mobile Images */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <Label>Mobile View Images</Label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addSection2MobileImage(index)}
+                                        >
+                                            <Plus className="mr-1 h-3 w-3" />
+                                            Add Mobile Image
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {(item.mobile_images ?? []).map((imgUrl, imgIndex) => (
+                                            <div key={imgIndex} className="flex items-start gap-2">
+                                                <div className="flex-1">
+                                                    <MediaPickerInput
+                                                        label={`Mobile Image ${imgIndex + 1}`}
+                                                        value={imgUrl || null}
+                                                        onChange={(path) => updateSection2MobileImage(index, imgIndex, path || '')}
+                                                        rootPath="cms/about-us/section2/mobile"
+                                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                                    />
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="mt-6 h-8 w-8 text-destructive hover:text-destructive shrink-0"
+                                                    onClick={() => removeSection2MobileImage(index, imgIndex)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
                                 <div className="space-y-2">
                                     <Label>Image Alt Text</Label>

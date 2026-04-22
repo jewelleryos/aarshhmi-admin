@@ -1056,11 +1056,13 @@ export function CouponCreate() {
                       type="datetime-local"
                       value={validFrom}
                       onChange={(e) => {
-                        setValidFrom(e.target.value)
-                        // Clear validUntil error if now valid
-                        if (validUntil && new Date(validUntil) > new Date(e.target.value)) {
-                          setErrors(({ validUntil: _, ...rest }) => rest)
+                        const newFrom = e.target.value
+                        setValidFrom(newFrom)
+                        // If validUntil is now <= validFrom, clear it so user must re-pick
+                        if (validUntil && new Date(validUntil) <= new Date(newFrom)) {
+                          setValidUntil('')
                         }
+                        setErrors(({ validUntil: _, ...rest }) => rest)
                       }}
                     />
                   </div>
@@ -1072,8 +1074,13 @@ export function CouponCreate() {
                       value={validUntil}
                       min={validFrom || undefined}
                       onChange={(e) => {
-                        setValidUntil(e.target.value)
-                        if (errors.validUntil) setErrors(({ validUntil: _, ...rest }) => rest)
+                        const newUntil = e.target.value
+                        setValidUntil(newUntil)
+                        if (validFrom && newUntil && new Date(newUntil) <= new Date(validFrom)) {
+                          setErrors((prev) => ({ ...prev, validUntil: 'Valid Until must be after Valid From' }))
+                        } else {
+                          setErrors(({ validUntil: _, ...rest }) => rest)
+                        }
                       }}
                     />
                     {errors.validUntil && (

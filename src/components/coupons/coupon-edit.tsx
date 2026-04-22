@@ -66,6 +66,19 @@ function generateConditionId(): string {
   return `cond_${Date.now()}_${conditionIdCounter}`
 }
 
+/**
+ * Convert a UTC ISO string to the "YYYY-MM-DDTHH:mm" format in LOCAL time,
+ * which is what <input type="datetime-local"> expects.
+ */
+function toLocalDateTimeString(utcString: string): string {
+  const d = new Date(utcString)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return (
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+    `T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  )
+}
+
 export function CouponEdit({ id }: CouponEditProps) {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -198,10 +211,10 @@ export function CouponEdit({ id }: CouponEditProps) {
           setMinCartValue(String(couponData.min_cart_value / 100))
         }
         if (couponData.valid_from) {
-          setValidFrom(couponData.valid_from.slice(0, 16))
+          setValidFrom(toLocalDateTimeString(couponData.valid_from))
         }
         if (couponData.valid_until) {
-          setValidUntil(couponData.valid_until.slice(0, 16))
+          setValidUntil(toLocalDateTimeString(couponData.valid_until))
         }
         if (couponData.usage_limit) {
           setUsageLimit(String(couponData.usage_limit))
@@ -1077,10 +1090,13 @@ export function CouponEdit({ id }: CouponEditProps) {
                   type="datetime-local"
                   value={validFrom}
                   onChange={(e) => {
-                    setValidFrom(e.target.value)
-                    if (validUntil && new Date(validUntil) > new Date(e.target.value)) {
-                      setErrors(({ validUntil: _, ...rest }) => rest)
+                    const newFrom = e.target.value
+                    setValidFrom(newFrom)
+                    // If validUntil is now <= validFrom, clear it so user must re-pick
+                    if (validUntil && new Date(validUntil) <= new Date(newFrom)) {
+                      setValidUntil('')
                     }
+                    setErrors(({ validUntil: _, ...rest }) => rest)
                   }}
                 />
               </div>
@@ -1092,8 +1108,13 @@ export function CouponEdit({ id }: CouponEditProps) {
                   value={validUntil}
                   min={validFrom || undefined}
                   onChange={(e) => {
-                    setValidUntil(e.target.value)
-                    if (errors.validUntil) setErrors(({ validUntil: _, ...rest }) => rest)
+                    const newUntil = e.target.value
+                    setValidUntil(newUntil)
+                    if (validFrom && newUntil && new Date(newUntil) <= new Date(validFrom)) {
+                      setErrors((prev) => ({ ...prev, validUntil: 'Valid Until must be after Valid From' }))
+                    } else {
+                      setErrors(({ validUntil: _, ...rest }) => rest)
+                    }
                   }}
                 />
                 {errors.validUntil && (

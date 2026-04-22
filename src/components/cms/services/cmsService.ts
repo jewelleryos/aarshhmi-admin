@@ -280,8 +280,8 @@ export interface AboutUsSection1 {
 export interface AboutUsSection2Item {
   title: string
   description: string
-  image_url: string
-  mobile_view_image_url?: string
+  images: string[]
+  mobile_images?: string[]
   image_alt_text: string
 }
 
