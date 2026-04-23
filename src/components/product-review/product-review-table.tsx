@@ -15,6 +15,7 @@ import {
 import {
   CheckCircle2,
   Edit,
+  Eye,
   FolderOpen,
   MoreVertical,
   Trash2,
@@ -24,6 +25,7 @@ import type { ProductReviewListItem } from "@/redux/services/productReviewServic
 
 interface ProductReviewTableProps {
   items: ProductReviewListItem[]
+  onView: (item: ProductReviewListItem) => void
   onEdit: (item: ProductReviewListItem) => void
   onDelete: (item: ProductReviewListItem) => void
   onStatusToggle: (item: ProductReviewListItem) => void
@@ -50,6 +52,7 @@ function truncate(text: string | null, maxLength: number): string {
 }
 
 function createColumns(
+  onView: (item: ProductReviewListItem) => void,
   onEdit: (item: ProductReviewListItem) => void,
   onDelete: (item: ProductReviewListItem) => void,
   onStatusToggle: (item: ProductReviewListItem) => void,
@@ -186,7 +189,10 @@ function createColumns(
         const showApproval = !isSystem && canUserStatusUpdate
         const showStatusToggle = isSystem ? canUpdate : canUserStatusUpdate
 
-        if (!showEdit && !showDelete && !showApproval && !showStatusToggle) return null
+        // Always show View option
+        const showView = true
+
+        if (!showView && !showEdit && !showDelete && !showApproval && !showStatusToggle) return null
 
         return (
           <DropdownMenu>
@@ -196,6 +202,10 @@ function createColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onView(item)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View
+              </DropdownMenuItem>
               {showEdit && (
                 <DropdownMenuItem onClick={() => onEdit(item)}>
                   <Edit className="mr-2 h-4 w-4" />
@@ -252,6 +262,7 @@ function createColumns(
 
 export function ProductReviewTable({
   items,
+  onView,
   onEdit,
   onDelete,
   onStatusToggle,
@@ -265,6 +276,7 @@ export function ProductReviewTable({
   const columns = useMemo(
     () =>
       createColumns(
+        onView,
         onEdit,
         onDelete,
         onStatusToggle,
@@ -275,7 +287,7 @@ export function ProductReviewTable({
         canUserStatusUpdate,
         canUserDelete
       ),
-    [onEdit, onDelete, onStatusToggle, onApprove, onReject, canUpdate, canDelete, canUserStatusUpdate, canUserDelete]
+    [onView, onEdit, onDelete, onStatusToggle, onApprove, onReject, canUpdate, canDelete, canUserStatusUpdate, canUserDelete]
   )
 
   if (items.length === 0) {

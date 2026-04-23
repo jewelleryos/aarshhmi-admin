@@ -21,6 +21,8 @@ export interface ProductReviewListItem {
 export interface ProductReview {
   id: string
   product_id: string
+  product_name: string
+  product_sku: string
   type: 'system' | 'user'
   user_id: string | null
   order_id: string | null

@@ -567,30 +567,18 @@ export default function CMSAboutUs() {
                                     {errors[`s2_${index}_images`] && <p className="text-sm text-destructive">{errors[`s2_${index}_images`]}</p>}
                                     <div className="space-y-2">
                                         {item.images.map((imgUrl, imgIndex) => (
-                                            <div key={imgIndex} className="flex items-start gap-2">
-                                                <div className="flex-1">
-                                                    <MediaPickerInput
-                                                        label={`Image ${imgIndex + 1}`}
-                                                        value={imgUrl || null}
-                                                        onChange={(path) => {
-                                                            updateSection2Image(index, imgIndex, path || '')
-                                                            clearError(`s2_${index}_images`)
-                                                        }}
-                                                        rootPath="cms/about-us/section2"
-                                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
-                                                    />
-                                                </div>
-                                                {item.images.length > 1 && (
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="mt-6 h-8 w-8 text-destructive hover:text-destructive shrink-0"
-                                                        onClick={() => removeSection2Image(index, imgIndex)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                )}
+                                            <div key={imgIndex} className="space-y-1">
+                                                <Label className="text-sm">Image {imgIndex + 1}</Label>
+                                                <MediaPickerInput
+                                                    label=""
+                                                    value={imgUrl || null}
+                                                    onChange={(path) => {
+                                                        updateSection2Image(index, imgIndex, path || '')
+                                                        clearError(`s2_${index}_images`)
+                                                    }}
+                                                    rootPath="cms/about-us/section2"
+                                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -612,25 +600,15 @@ export default function CMSAboutUs() {
                                     </div>
                                     <div className="space-y-2">
                                         {(item.mobile_images ?? []).map((imgUrl, imgIndex) => (
-                                            <div key={imgIndex} className="flex items-start gap-2">
-                                                <div className="flex-1">
-                                                    <MediaPickerInput
-                                                        label={`Mobile Image ${imgIndex + 1}`}
-                                                        value={imgUrl || null}
-                                                        onChange={(path) => updateSection2MobileImage(index, imgIndex, path || '')}
-                                                        rootPath="cms/about-us/section2/mobile"
-                                                        accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
-                                                    />
-                                                </div>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="mt-6 h-8 w-8 text-destructive hover:text-destructive shrink-0"
-                                                    onClick={() => removeSection2MobileImage(index, imgIndex)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                            <div key={imgIndex} className="space-y-1">
+                                                <Label className="text-sm">Mobile Image {imgIndex + 1}</Label>
+                                                <MediaPickerInput
+                                                    label=""
+                                                    value={imgUrl || null}
+                                                    onChange={(path) => updateSection2MobileImage(index, imgIndex, path || '')}
+                                                    rootPath="cms/about-us/section2/mobile"
+                                                    accept={['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']}
+                                                />
                                             </div>
                                         ))}
                                     </div>

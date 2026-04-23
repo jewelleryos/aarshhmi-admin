@@ -10,6 +10,7 @@ import { fetchProductReviews } from "@/redux/slices/productReviewSlice"
 import { ProductReviewTable } from "./product-review-table"
 import { ProductReviewAddDrawer } from "./product-review-add-drawer"
 import { ProductReviewEditDrawer } from "./product-review-edit-drawer"
+import { ProductReviewViewDrawer } from "./product-review-view-drawer"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
 import productReviewService from "@/redux/services/productReviewService"
@@ -33,6 +34,7 @@ export function ProductReviewContent() {
   // Drawer state
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false)
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false)
+  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState<ProductReview | null>(null)
 
   // Delete dialog state
@@ -67,6 +69,17 @@ export function ProductReviewContent() {
       const response = await productReviewService.getById(item.id)
       setSelectedReview(response.data)
       setIsEditDrawerOpen(true)
+    } catch {
+      toast.error("Failed to load review details")
+    }
+  }
+
+  // Handle view - fetch full review then open drawer
+  const handleView = async (item: ProductReviewListItem) => {
+    try {
+      const response = await productReviewService.getById(item.id)
+      setSelectedReview(response.data)
+      setIsViewDrawerOpen(true)
     } catch {
       toast.error("Failed to load review details")
     }
@@ -162,6 +175,7 @@ export function ProductReviewContent() {
           ) : (
             <ProductReviewTable
               items={items}
+              onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
               onStatusToggle={handleStatusToggle}
@@ -192,6 +206,13 @@ export function ProductReviewContent() {
           onOpenChange={setIsEditDrawerOpen}
         />
       )}
+
+      {/* View Drawer */}
+      <ProductReviewViewDrawer
+        review={selectedReview}
+        open={isViewDrawerOpen}
+        onOpenChange={setIsViewDrawerOpen}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
