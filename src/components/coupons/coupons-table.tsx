@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import type { ReactNode } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +23,9 @@ interface CouponsTableProps {
   onDelete: (item: CouponListItem) => void
   canUpdate: boolean
   canDelete: boolean
+  filterComponent?: ReactNode
+  hasCustomFilter?: boolean
+  onResetFilters?: () => void
 }
 
 function formatDate(dateStr: string | null): string {
@@ -196,13 +200,16 @@ export function CouponsTable({
   onDelete,
   canUpdate,
   canDelete,
+  filterComponent,
+  hasCustomFilter,
+  onResetFilters,
 }: CouponsTableProps) {
   const columns = useMemo(
     () => createColumns(onEdit, onDelete, canUpdate, canDelete),
     [onEdit, onDelete, canUpdate, canDelete]
   )
 
-  if (items.length === 0) {
+  if (items.length === 0 && !hasCustomFilter) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <FolderOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
@@ -223,6 +230,9 @@ export function CouponsTable({
       showPagination={true}
       showToolbar={true}
       totalLabel={`${items.length} coupon${items.length !== 1 ? 's' : ''}`}
+      filterComponent={filterComponent}
+      hasCustomFilter={hasCustomFilter}
+      onResetFilters={onResetFilters}
     />
   )
 }

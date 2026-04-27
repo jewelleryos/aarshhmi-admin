@@ -267,9 +267,9 @@ export function AttributesEditDrawer({
 
                 {/* Primary indicator */}
                 {primaryCategoryId && (
-                  <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800 px-3 py-2">
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                    <span className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                  <div className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2">
+                    <Star className="h-3.5 w-3.5 fill-primary text-primary shrink-0" />
+                    <span className="text-sm font-medium text-foreground">
                       Primary:&nbsp;
                       {(() => {
                         const cat = categories.find((c) => c.id === primaryCategoryId)

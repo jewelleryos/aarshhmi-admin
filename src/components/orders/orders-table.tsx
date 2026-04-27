@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
+import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
@@ -23,9 +24,12 @@ import {
 
 interface OrdersTableProps {
   items: OrderListItem[]
+  filterComponent?: ReactNode
+  hasCustomFilter?: boolean
+  onResetFilters?: () => void
 }
 
-export function OrdersTable({ items }: OrdersTableProps) {
+export function OrdersTable({ items, filterComponent, hasCustomFilter, onResetFilters }: OrdersTableProps) {
   const router = useRouter()
   const [filteredCount, setFilteredCount] = useState<number>(0)
 
@@ -194,6 +198,9 @@ export function OrdersTable({ items }: OrdersTableProps) {
       maxHeight="400px"
       totalLabel={`Showing: ${filteredCount} order${filteredCount !== 1 ? 's' : ''}`}
       onFilteredCountChange={setFilteredCount}
+      filterComponent={filterComponent}
+      hasCustomFilter={hasCustomFilter}
+      onResetFilters={onResetFilters}
     />
   )
 }

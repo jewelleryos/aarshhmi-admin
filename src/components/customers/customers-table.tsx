@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import type { ReactNode } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -160,12 +161,15 @@ function createColumns(): ColumnDef<CustomerListItem>[] {
 
 interface CustomersTableProps {
   items: CustomerListItem[]
+  filterComponent?: ReactNode
+  hasCustomFilter?: boolean
+  onResetFilters?: () => void
 }
 
-export function CustomersTable({ items }: CustomersTableProps) {
+export function CustomersTable({ items, filterComponent, hasCustomFilter, onResetFilters }: CustomersTableProps) {
   const columns = useMemo(() => createColumns(), [])
 
-  if (items.length === 0) {
+  if (items.length === 0 && !hasCustomFilter) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Users className="h-12 w-12 text-muted-foreground/50 mb-4" />
@@ -186,6 +190,9 @@ export function CustomersTable({ items }: CustomersTableProps) {
       showPagination={true}
       showToolbar={true}
       totalLabel={`${items.length} customer${items.length !== 1 ? 's' : ''}`}
+      filterComponent={filterComponent}
+      hasCustomFilter={hasCustomFilter}
+      onResetFilters={onResetFilters}
     />
   )
 }

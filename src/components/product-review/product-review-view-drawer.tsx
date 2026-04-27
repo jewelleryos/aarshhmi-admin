@@ -171,30 +171,39 @@ export function ProductReviewViewDrawer({
               Status
             </span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant="outline"
-              className={
-                review.status
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : "bg-red-50 text-red-600 border-red-200"
-              }
-            >
-              {review.status ? "Active" : "Inactive"}
-            </Badge>
-            <Badge
-              variant="outline"
-              className={
-                review.approval_status === "approved"
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : review.approval_status === "pending"
-                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2">
+              <span className="text-xs text-muted-foreground">Visibility</span>
+              <Badge
+                variant="outline"
+                className={
+                  review.status
+                    ? "bg-green-50 text-green-700 border-green-200"
                     : "bg-red-50 text-red-600 border-red-200"
-              }
-            >
-              {review.approval_status}
-            </Badge>
-            <Badge variant="secondary">{review.type}</Badge>
+                }
+              >
+                {review.status ? "Active" : "Inactive"}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2">
+              <span className="text-xs text-muted-foreground">Approval</span>
+              <Badge
+                variant="outline"
+                className={
+                  review.approval_status === "approved"
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : review.approval_status === "pending"
+                      ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                      : "bg-red-50 text-red-600 border-red-200"
+                }
+              >
+                {review.approval_status}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2">
+              <span className="text-xs text-muted-foreground">Type</span>
+              <Badge variant="secondary">{review.type}</Badge>
+            </div>
           </div>
         </div>
 
@@ -229,15 +238,6 @@ export function ProductReviewViewDrawer({
                 </p>
               </div>
             )}
-            <div className="bg-muted/50 rounded-md p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Created</span>
-              </div>
-              <p className="text-sm font-medium">
-                {formatDate(review.created_at)}
-              </p>
-            </div>
           </div>
         </div>
       </SheetContent>

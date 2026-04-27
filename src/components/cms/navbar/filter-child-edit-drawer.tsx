@@ -33,7 +33,6 @@ export function FilterChildEditDrawer({
   const [name, setName] = useState('')
   const [redirectLink, setRedirectLink] = useState('')
   const [imageUrl, setImageUrl] = useState('')
-  const [mobileViewImageUrl, setMobileViewImageUrl] = useState('')
   const [imageAltText, setImageAltText] = useState('')
   const [rank, setRank] = useState(0)
 
@@ -45,7 +44,6 @@ export function FilterChildEditDrawer({
       setName(child.name || '')
       setRedirectLink(child.redirectLink || '')
       setImageUrl(child.imageUrl || '')
-      setMobileViewImageUrl(child.mobileViewImageUrl || '')
       setImageAltText(child.imageAltText || '')
       setRank(child.rank || 0)
       setErrors({})
@@ -76,7 +74,7 @@ export function FilterChildEditDrawer({
     setIsLoading(true)
 
     try {
-      await onSave({ id: child.id, name, redirectLink, imageUrl, mobileViewImageUrl, imageAltText, rank })
+      await onSave({ id: child.id, name, redirectLink, imageUrl, imageAltText, rank })
     } finally {
       setIsLoading(false)
     }
@@ -149,14 +147,6 @@ export function FilterChildEditDrawer({
             value={imageUrl || null}
             onChange={(path) => setImageUrl(path || '')}
             rootPath="cms/navbar"
-          />
-
-          {/* Mobile View Image */}
-          <MediaPickerInput
-            label="Mobile View Image"
-            value={mobileViewImageUrl || null}
-            onChange={(path) => setMobileViewImageUrl(path || '')}
-            rootPath="cms/navbar/mobile"
           />
 
           {/* Image Alt Text */}

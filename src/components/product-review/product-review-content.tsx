@@ -1,10 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchProductReviews } from "@/redux/slices/productReviewSlice"
 import { ProductReviewTable } from "./product-review-table"
@@ -50,6 +57,11 @@ export function ProductReviewContent() {
   }>({ open: false, item: null, action: "approved" })
   const [isApproving, setIsApproving] = useState(false)
 
+  // Filters
+  const [typeFilter, setTypeFilter] = useState<"all" | "system" | "user">("all")
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all")
+  const [approvalFilter, setApprovalFilter] = useState<"all" | "approved" | "pending" | "rejected">("all")
+
   // Permissions
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.PRODUCT_REVIEW.CREATE)
@@ -61,6 +73,60 @@ export function ProductReviewContent() {
   useEffect(() => {
     dispatch(fetchProductReviews())
   }, [dispatch])
+
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      if (typeFilter !== "all" && item.type !== typeFilter) return false
+      if (statusFilter === "active" && !item.status) return false
+      if (statusFilter === "inactive" && item.status) return false
+      if (approvalFilter !== "all" && item.approval_status !== approvalFilter) return false
+      return true
+    })
+  }, [items, typeFilter, statusFilter, approvalFilter])
+
+  const hasCustomFilter = typeFilter !== "all" || statusFilter !== "all" || approvalFilter !== "all"
+
+  const handleResetFilters = () => {
+    setTypeFilter("all")
+    setStatusFilter("all")
+    setApprovalFilter("all")
+  }
+
+  const filterComponent = (
+    <>
+      <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as typeof typeFilter)}>
+        <SelectTrigger className="h-9 w-[130px]">
+          <SelectValue placeholder="Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Types</SelectItem>
+          <SelectItem value="system">System</SelectItem>
+          <SelectItem value="user">User</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
+        <SelectTrigger className="h-9 w-[130px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="inactive">Inactive</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select value={approvalFilter} onValueChange={(v) => setApprovalFilter(v as typeof approvalFilter)}>
+        <SelectTrigger className="h-9 w-[150px]">
+          <SelectValue placeholder="Approval" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Approvals</SelectItem>
+          <SelectItem value="approved">Approved</SelectItem>
+          <SelectItem value="pending">Pending</SelectItem>
+          <SelectItem value="rejected">Rejected</SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  )
 
   // Handle edit - fetch full review then open drawer
   const handleEdit = async (item: ProductReviewListItem) => {
@@ -174,7 +240,8 @@ export function ProductReviewContent() {
             </div>
           ) : (
             <ProductReviewTable
-              items={items}
+              items={filteredItems}
+              totalItems={items.length}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
@@ -185,6 +252,9 @@ export function ProductReviewContent() {
               canDelete={canDelete}
               canUserStatusUpdate={canUserStatusUpdate}
               canUserDelete={canUserDelete}
+              filterComponent={filterComponent}
+              hasCustomFilter={hasCustomFilter}
+              onResetFilters={handleResetFilters}
             />
           )}
         </CardContent>

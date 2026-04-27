@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import type { ReactNode } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, DataTableColumnHeader } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,7 @@ import type { ProductReviewListItem } from "@/redux/services/productReviewServic
 
 interface ProductReviewTableProps {
   items: ProductReviewListItem[]
+  totalItems: number
   onView: (item: ProductReviewListItem) => void
   onEdit: (item: ProductReviewListItem) => void
   onDelete: (item: ProductReviewListItem) => void
@@ -35,6 +37,9 @@ interface ProductReviewTableProps {
   canDelete: boolean
   canUserStatusUpdate: boolean
   canUserDelete: boolean
+  filterComponent?: ReactNode
+  hasCustomFilter?: boolean
+  onResetFilters?: () => void
 }
 
 function formatDate(dateString: string): string {
@@ -262,6 +267,7 @@ function createColumns(
 
 export function ProductReviewTable({
   items,
+  totalItems,
   onView,
   onEdit,
   onDelete,
@@ -272,6 +278,9 @@ export function ProductReviewTable({
   canDelete,
   canUserStatusUpdate,
   canUserDelete,
+  filterComponent,
+  hasCustomFilter,
+  onResetFilters,
 }: ProductReviewTableProps) {
   const columns = useMemo(
     () =>
@@ -290,7 +299,7 @@ export function ProductReviewTable({
     [onView, onEdit, onDelete, onStatusToggle, onApprove, onReject, canUpdate, canDelete, canUserStatusUpdate, canUserDelete]
   )
 
-  if (items.length === 0) {
+  if (items.length === 0 && !hasCustomFilter) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -310,7 +319,10 @@ export function ProductReviewTable({
       data={items}
       searchKey="product_name"
       searchPlaceholder="Filter by product name..."
-      totalLabel={`Total: ${items.length} review${items.length !== 1 ? "s" : ""}`}
+      totalLabel={`Total: ${totalItems} review${totalItems !== 1 ? "s" : ""}`}
+      filterComponent={filterComponent}
+      hasCustomFilter={hasCustomFilter}
+      onResetFilters={onResetFilters}
     />
   )
 }

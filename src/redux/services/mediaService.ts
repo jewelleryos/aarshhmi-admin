@@ -19,6 +19,10 @@ interface MediaListResponse {
   data: {
     path: string
     items: MediaItem[]
+    total: number
+    page: number
+    limit: number
+    hasMore: boolean
   }
 }
 
@@ -54,9 +58,9 @@ interface MediaCreateFolderResponse {
 // Media service
 const mediaService = {
   // List files and folders
-  list: async (path: string = ''): Promise<MediaListResponse> => {
+  list: async (path: string = '', page = 1, limit = 48): Promise<MediaListResponse> => {
     const response = await apiService.get(API_ENDPOINTS.MEDIA.LIST, {
-      params: { path },
+      params: { path, page, limit },
     })
     return response.data
   },

@@ -25,7 +25,6 @@ interface NavbarEditDrawerProps {
 
 const emptyRightSideBanner: RightSideBanner = {
   imageUrl: '',
-  mobileViewImageUrl: '',
   imageAltText: '',
   mainText: '',
 }
@@ -215,14 +214,6 @@ export function NavbarEditDrawer({
                     setRightSideBanner((prev) => ({ ...prev, imageUrl: path || '' }))
                   }
                   rootPath="cms/navbar"
-                />
-                <MediaPickerInput
-                  label="Mobile View Image"
-                  value={rightSideBanner.mobileViewImageUrl || null}
-                  onChange={(path) =>
-                    setRightSideBanner((prev) => ({ ...prev, mobileViewImageUrl: path || '' }))
-                  }
-                  rootPath="cms/navbar/mobile"
                 />
                 <div className="space-y-1">
                   <Label className="text-xs font-semibold">Image Alt Text</Label>

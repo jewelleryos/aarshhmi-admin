@@ -1,10 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2, Ticket } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { DeleteDialogWithDelay } from "@/components/ui/delete-dialog-with-delay"
 import { usePermissions } from "@/hooks/usePermissions"
 import PERMISSIONS from "@/configs/permissions.json"
@@ -15,6 +22,24 @@ import { toast } from "sonner"
 import { CouponsTable } from "./coupons-table"
 import type { CouponListItem } from "./types"
 
+type StatusFilter = "all" | "active" | "inactive"
+type UsageLimitFilter = "all" | "hit" | "within" | "no_limit"
+
+function applyFilters(items: CouponListItem[], statusFilter: StatusFilter, usageLimitFilter: UsageLimitFilter): CouponListItem[] {
+  return items.filter((item) => {
+    if (statusFilter === "active" && !item.isActive) return false
+    if (statusFilter === "inactive" && item.isActive) return false
+    if (usageLimitFilter !== "all") {
+      const hasLimit = item.usageLimit !== null && item.usageLimit !== undefined
+      const isHit = hasLimit && item.usageCount >= (item.usageLimit as number)
+      if (usageLimitFilter === "hit" && !isHit) return false
+      if (usageLimitFilter === "within" && (isHit || !hasLimit)) return false
+      if (usageLimitFilter === "no_limit" && hasLimit) return false
+    }
+    return true
+  })
+}
+
 export function CouponsContent() {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -24,6 +49,9 @@ export function CouponsContent() {
   const [selectedCoupon, setSelectedCoupon] = useState<CouponListItem | null>(null)
   const [deleteWarning, setDeleteWarning] = useState<string | null>(null)
 
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
+  const [usageLimitFilter, setUsageLimitFilter] = useState<UsageLimitFilter>("all")
+
   const { has } = usePermissions()
   const canCreate = has(PERMISSIONS.COUPON.CREATE)
   const canUpdate = has(PERMISSIONS.COUPON.UPDATE)
@@ -32,6 +60,44 @@ export function CouponsContent() {
   useEffect(() => {
     dispatch(fetchCoupons(undefined))
   }, [dispatch])
+
+  const filteredItems = useMemo(
+    () => applyFilters(items, statusFilter, usageLimitFilter),
+    [items, statusFilter, usageLimitFilter]
+  )
+
+  const hasCustomFilter = statusFilter !== "all" || usageLimitFilter !== "all"
+
+  const handleResetFilters = () => {
+    setStatusFilter("all")
+    setUsageLimitFilter("all")
+  }
+
+  const filterComponent = (
+    <>
+      <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+        <SelectTrigger className="h-9 w-32.5">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="inactive">Inactive</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select value={usageLimitFilter} onValueChange={(v) => setUsageLimitFilter(v as UsageLimitFilter)}>
+        <SelectTrigger className="h-9 w-37.5">
+          <SelectValue placeholder="Usage Limit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Usage</SelectItem>
+          <SelectItem value="hit">Limit Hit</SelectItem>
+          <SelectItem value="within">Within Limit</SelectItem>
+          <SelectItem value="no_limit">No Limit</SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  )
 
   const handleEdit = (coupon: CouponListItem) => {
     if (!canUpdate) return
@@ -101,11 +167,14 @@ export function CouponsContent() {
             </div>
           ) : (
             <CouponsTable
-              items={items}
+              items={filteredItems}
               onEdit={handleEdit}
               onDelete={handleDelete}
               canUpdate={canUpdate}
               canDelete={canDelete}
+              filterComponent={filterComponent}
+              hasCustomFilter={hasCustomFilter}
+              onResetFilters={handleResetFilters}
             />
           )}
         </CardContent>

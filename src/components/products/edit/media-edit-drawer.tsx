@@ -439,17 +439,30 @@ export function MediaEditDrawer({
                       <div className="w-20">
                         <Label className="text-xs text-muted-foreground">Position</Label>
                         <Input
-                          type="number"
-                          min={0}
+                          type="text"
+                          inputMode="numeric"
                           value={item.position}
-                          onChange={(e) =>
+                          onKeyDown={(e) => {
+                            if (
+                              !e.key.match(/^\d$/) &&
+                              e.key !== "Backspace" &&
+                              e.key !== "Delete" &&
+                              e.key !== "ArrowLeft" &&
+                              e.key !== "ArrowRight" &&
+                              e.key !== "Tab"
+                            ) {
+                              e.preventDefault()
+                            }
+                          }}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, "")
                             handlePositionChange(
                               metalColorId,
                               gemstoneColorId,
                               item.id,
-                              parseInt(e.target.value) || 0
+                              raw === "" ? 0 : parseInt(raw, 10)
                             )
-                          }
+                          }}
                           className="h-8"
                         />
                       </div>

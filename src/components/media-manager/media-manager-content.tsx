@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RefreshCw, ArrowLeft, LayoutGrid, List, Loader2 } from "lucide-react"
@@ -11,47 +11,76 @@ import { MediaPreviewDialog } from "./media-preview-dialog"
 import mediaService, { type MediaItem } from "@/redux/services/mediaService"
 import { toast } from "sonner"
 
+const PAGE_SIZE = 48
+
 export function MediaManagerContent() {
-  // State
   const [currentPath, setCurrentPath] = useState("")
   const [items, setItems] = useState<MediaItem[]>([])
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [isLoading, setIsLoading] = useState(true)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Preview dialog state
   const [previewItem, setPreviewItem] = useState<MediaItem | null>(null)
 
-  // Check if we can go back
+  const pageRef = useRef(1)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
   const canGoBack = currentPath !== "" && currentPath !== "/"
 
-  // Fetch items for current path
-  const fetchItems = useCallback(async () => {
+  const fetchPage = useCallback(async (path: string, page: number, append: boolean) => {
     try {
-      setIsLoading(true)
-      setError(null)
-      const response = await mediaService.list(currentPath)
-      setItems(response.data.items)
+      if (append) {
+        setIsFetchingMore(true)
+      } else {
+        setIsLoading(true)
+        setError(null)
+        setItems([])
+        setHasMore(false)
+      }
+
+      const response = await mediaService.list(path, page, PAGE_SIZE)
+      const { items: newItems, hasMore: more } = response.data
+
+      setItems((prev) => append ? [...prev, ...newItems] : newItems)
+      setHasMore(more)
+      pageRef.current = page
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load files"
-      setError(message)
+      if (!append) setError(message)
       toast.error(message)
     } finally {
-      setIsLoading(false)
+      if (append) setIsFetchingMore(false)
+      else setIsLoading(false)
     }
-  }, [currentPath])
+  }, [])
 
-  // Fetch on mount and when path changes
+  // Reset and load page 1 whenever path changes
   useEffect(() => {
-    fetchItems()
-  }, [fetchItems])
+    pageRef.current = 1
+    fetchPage(currentPath, 1, false)
+  }, [currentPath, fetchPage])
 
-  // Navigate to folder
-  const handleNavigate = (path: string) => {
-    setCurrentPath(path)
-  }
+  // IntersectionObserver — fires when sentinel is visible
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
 
-  // Go back to parent folder
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetchingMore && !isLoading) {
+          fetchPage(currentPath, pageRef.current + 1, true)
+        }
+      },
+      { rootMargin: "200px" }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasMore, isFetchingMore, isLoading, currentPath, fetchPage])
+
+  const handleNavigate = (path: string) => setCurrentPath(path)
+
   const handleGoBack = () => {
     const segments = currentPath.split("/").filter((s) => s.length > 0)
     if (segments.length <= 1) {
@@ -62,7 +91,6 @@ export function MediaManagerContent() {
     }
   }
 
-  // Handle item click
   const handleItemClick = (item: MediaItem) => {
     if (item.type === "folder") {
       handleNavigate(item.path)
@@ -71,7 +99,6 @@ export function MediaManagerContent() {
     }
   }
 
-  // Handle download
   const handleDownload = async (item: MediaItem) => {
     try {
       if (item.type === "folder") {
@@ -89,9 +116,9 @@ export function MediaManagerContent() {
     }
   }
 
-  // Refresh
   const handleRefresh = () => {
-    fetchItems()
+    pageRef.current = 1
+    fetchPage(currentPath, 1, false)
   }
 
   return (
@@ -174,15 +201,20 @@ export function MediaManagerContent() {
                 items={items}
                 onItemClick={handleItemClick}
                 onDownload={handleDownload}
+                isLoadingMore={isFetchingMore}
               />
             ) : (
               <MediaListView
                 items={items}
                 onItemClick={handleItemClick}
                 onDownload={handleDownload}
+                isLoadingMore={isFetchingMore}
               />
             )
           )}
+
+          {/* Sentinel — triggers next page load when scrolled into view */}
+          <div ref={sentinelRef} className="h-1" />
         </CardContent>
       </Card>
 

@@ -76,10 +76,25 @@ export function MediaItemCard({
       <div className="space-y-1 mb-2">
         <Label className="text-xs">Position</Label>
         <Input
-          type="number"
-          min="1"
+          type="text"
+          inputMode="numeric"
           value={item.position}
-          onChange={(e) => onUpdatePosition(parseInt(e.target.value) || 1)}
+          onKeyDown={(e) => {
+            if (
+              !e.key.match(/^\d$/) &&
+              e.key !== "Backspace" &&
+              e.key !== "Delete" &&
+              e.key !== "ArrowLeft" &&
+              e.key !== "ArrowRight" &&
+              e.key !== "Tab"
+            ) {
+              e.preventDefault()
+            }
+          }}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D/g, "")
+            onUpdatePosition(raw === "" ? 0 : parseInt(raw, 10))
+          }}
           className="h-8 text-sm"
         />
       </div>

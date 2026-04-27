@@ -9,15 +9,16 @@ interface MediaGridViewProps {
   items: MediaItem[]
   onItemClick: (item: MediaItem) => void
   onDownload: (item: MediaItem) => void
+  isLoadingMore?: boolean
 }
 
 export function MediaGridView({
   items,
   onItemClick,
   onDownload,
+  isLoadingMore = false,
 }: MediaGridViewProps) {
-  // Empty state
-  if (items.length === 0) {
+  if (items.length === 0 && !isLoadingMore) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -28,28 +29,31 @@ export function MediaGridView({
     )
   }
 
-  // Sort: folders first, then files
-  const sortedItems = [...items].sort((a, b) => {
-    if (a.type === "folder" && b.type !== "folder") return -1
-    if (a.type !== "folder" && b.type === "folder") return 1
-    return a.name.localeCompare(b.name)
-  })
-
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-      {sortedItems.map((item) => (
-        <MediaItemCard
-          key={item.path}
-          item={item}
-          onClick={() => onItemClick(item)}
-          onDownload={() => onDownload(item)}
-        />
-      ))}
+    <div className="space-y-3">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+        {items.map((item) => (
+          <MediaItemCard
+            key={item.path}
+            item={item}
+            onClick={() => onItemClick(item)}
+            onDownload={() => onDownload(item)}
+          />
+        ))}
+        {/* Loading-more skeletons appended to the same grid */}
+        {isLoadingMore &&
+          Array.from({ length: 8 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="space-y-1.5">
+              <Skeleton className="aspect-square rounded-md" />
+              <Skeleton className="h-3 w-3/4" />
+            </div>
+          ))}
+      </div>
     </div>
   )
 }
 
-// Loading skeleton component
+// Initial loading skeleton (full grid)
 export function MediaGridSkeleton() {
   return (
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">

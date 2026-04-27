@@ -17,6 +17,7 @@ import {
   FolderOpen,
   Download,
 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { MediaItem } from "@/redux/services/mediaService"
 
 // Format file size
@@ -45,12 +46,14 @@ interface MediaListViewProps {
   items: MediaItem[]
   onItemClick: (item: MediaItem) => void
   onDownload: (item: MediaItem) => void
+  isLoadingMore?: boolean
 }
 
 export function MediaListView({
   items,
   onItemClick,
   onDownload,
+  isLoadingMore = false,
 }: MediaListViewProps) {
   // Get icon based on item type
   const getIcon = (item: MediaItem) => {
@@ -73,7 +76,7 @@ export function MediaListView({
   }
 
   // Empty state
-  if (items.length === 0) {
+  if (items.length === 0 && !isLoadingMore) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <FolderOpen className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -83,13 +86,6 @@ export function MediaListView({
       </div>
     )
   }
-
-  // Sort: folders first, then files
-  const sortedItems = [...items].sort((a, b) => {
-    if (a.type === "folder" && b.type !== "folder") return -1
-    if (a.type !== "folder" && b.type === "folder") return 1
-    return a.name.localeCompare(b.name)
-  })
 
   return (
     <div className="border rounded-md">
@@ -103,7 +99,7 @@ export function MediaListView({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedItems.map((item) => (
+          {items.map((item) => (
             <TableRow
               key={item.path}
               className="cursor-pointer hover:bg-muted/50"
@@ -135,6 +131,20 @@ export function MediaListView({
               </TableCell>
             </TableRow>
           ))}
+          {isLoadingMore &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <TableRow key={`skeleton-${i}`}>
+                <TableCell className="py-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                </TableCell>
+                <TableCell className="py-2"><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell className="py-2"><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell className="py-2"><Skeleton className="h-7 w-7 rounded" /></TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>

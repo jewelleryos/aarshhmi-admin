@@ -11,8 +11,17 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Download, Link, X } from "lucide-react"
+import { getCdnUrl } from "@/utils/cdn"
 import type { MediaItem } from "@/redux/services/mediaService"
 import { toast } from "sonner"
+
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif"]
+const VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "avi"]
+
+function getFileExtension(filename: string): string {
+  const lastDot = filename.lastIndexOf(".")
+  return lastDot === -1 ? "" : filename.slice(lastDot + 1).toLowerCase()
+}
 
 // Format file size
 function formatFileSize(bytes: number): string {
@@ -49,13 +58,15 @@ export function MediaPreviewDialog({
   item,
   onDownload,
 }: MediaPreviewDialogProps) {
-  const isImage = item.contentType?.startsWith("image/")
-  const isVideo = item.contentType?.startsWith("video/")
+  const ext = getFileExtension(item.name)
+  const isImage = item.contentType?.startsWith("image/") || IMAGE_EXTENSIONS.includes(ext)
+  const isVideo = item.contentType?.startsWith("video/") || VIDEO_EXTENSIONS.includes(ext)
+  const previewUrl = item.url || getCdnUrl(item.path)
 
   // Copy URL to clipboard
   const handleCopyUrl = () => {
-    if (item.url) {
-      navigator.clipboard.writeText(item.url)
+    if (previewUrl) {
+      navigator.clipboard.writeText(previewUrl)
       toast.success("URL copied to clipboard")
     }
   }
@@ -81,22 +92,23 @@ export function MediaPreviewDialog({
           </Button>
 
           {/* Preview area */}
-          <div className="bg-muted/50 flex items-center justify-center min-h-[300px] max-h-[60vh]">
-            {isImage && item.url && (
+          <div className="bg-muted/50 flex items-center justify-center min-h-75 max-h-[60vh]">
+            {isImage && previewUrl ? (
               <img
-                src={item.url}
+                src={previewUrl}
                 alt={item.name}
                 className="max-w-full max-h-[60vh] object-contain"
               />
-            )}
-            {isVideo && item.url && (
+            ) : isVideo && previewUrl ? (
               <video
-                src={item.url}
+                src={previewUrl}
                 controls
                 className="max-w-full max-h-[60vh]"
               >
                 Your browser does not support the video tag.
               </video>
+            ) : (
+              <p className="text-sm text-muted-foreground">Preview not available</p>
             )}
           </div>
 
@@ -119,10 +131,10 @@ export function MediaPreviewDialog({
                 <span className="text-muted-foreground">Modified:</span>{" "}
                 <span className="font-medium">{formatDate(item.lastModified)}</span>
               </div>
-              {item.url && (
+              {previewUrl && (
                 <div className="col-span-2">
                   <span className="text-muted-foreground">URL:</span>{" "}
-                  <span className="font-medium text-xs break-all">{item.url}</span>
+                  <span className="font-medium text-xs break-all">{previewUrl}</span>
                 </div>
               )}
             </div>

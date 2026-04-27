@@ -79,7 +79,7 @@ export function NavbarAddDrawer({
         megaMenuData: isMegaMenu
           ? {
               filterData: [],
-              rightSideBanner: { imageUrl: '', mobileViewImageUrl: '', imageAltText: '', mainText: '' },
+              rightSideBanner: { imageUrl: '', imageAltText: '', mainText: '' },
             }
           : null,
       })

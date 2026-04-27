@@ -396,7 +396,6 @@ export interface FilterChild {
   name: string
   redirectLink: string
   imageUrl: string
-  mobileViewImageUrl?: string
   imageAltText: string
   rank: number
 }
@@ -411,7 +410,6 @@ export interface FilterGroup {
 
 export interface RightSideBanner {
   imageUrl: string
-  mobileViewImageUrl?: string
   imageAltText: string
   mainText: string
 }

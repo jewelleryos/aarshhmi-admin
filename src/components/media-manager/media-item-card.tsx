@@ -3,7 +3,16 @@
 import { cn } from "@/lib/utils"
 import { Folder, Image, Video, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getCdnUrl } from "@/utils/cdn"
 import type { MediaItem } from "@/redux/services/mediaService"
+
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif"]
+const VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "avi"]
+
+function getFileExtension(filename: string): string {
+  const lastDot = filename.lastIndexOf(".")
+  return lastDot === -1 ? "" : filename.slice(lastDot + 1).toLowerCase()
+}
 
 // Format file size
 function formatFileSize(bytes: number): string {
@@ -30,8 +39,11 @@ export function MediaItemCard({
   onDownload,
 }: MediaItemCardProps) {
   const isFolder = item.type === "folder"
-  const isImage = item.contentType?.startsWith("image/")
-  const isVideo = item.contentType?.startsWith("video/")
+  const ext = getFileExtension(item.name)
+  const isImage = item.contentType?.startsWith("image/") || IMAGE_EXTENSIONS.includes(ext)
+  const isVideo = item.contentType?.startsWith("video/") || VIDEO_EXTENSIONS.includes(ext)
+  // Prefer item.url from backend; fall back to CDN path construction
+  const previewUrl = item.url || getCdnUrl(item.path)
 
   // Handle download click
   const handleDownloadClick = (e: React.MouseEvent) => {
@@ -53,19 +65,26 @@ export function MediaItemCard({
           <div className="absolute inset-0 flex items-center justify-center">
             <Folder className="h-10 w-10 text-amber-500" />
           </div>
-        ) : isImage && item.url ? (
+        ) : isImage && previewUrl ? (
           <img
-            src={item.url}
+            src={previewUrl}
             alt={item.name}
             className="absolute inset-0 w-full h-full object-cover"
           />
-        ) : isVideo ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10">
-            <Video className="h-10 w-10 text-blue-500" />
-          </div>
+        ) : isVideo && previewUrl ? (
+          <video
+            src={previewUrl}
+            className="absolute inset-0 w-full h-full object-cover"
+            muted
+            preload="metadata"
+          />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <Image className="h-10 w-10 text-muted-foreground" />
+            {isVideo ? (
+              <Video className="h-10 w-10 text-blue-500" />
+            ) : (
+              <Image className="h-10 w-10 text-muted-foreground" />
+            )}
           </div>
         )}
 
