@@ -53,35 +53,16 @@ function normalizePath(path: string): string {
   return normalized
 }
 
-// Get breadcrumb segments from path relative to root
-function getBreadcrumbs(currentPath: string, rootPath: string): { name: string; path: string }[] {
-  const normalizedCurrent = normalizePath(currentPath)
-  const normalizedRoot = normalizePath(rootPath)
-
-  // Get the relative part after root
-  const relativePath = normalizedCurrent.slice(normalizedRoot.length)
-
-  if (!relativePath) {
-    return []
-  }
-
-  const segments = relativePath.split("/").filter(Boolean)
-  const breadcrumbs: { name: string; path: string }[] = []
-
-  let accumulatedPath = normalizedRoot
-  for (const segment of segments) {
-    accumulatedPath = `${accumulatedPath}/${segment}`
-    breadcrumbs.push({ name: segment, path: accumulatedPath })
-  }
-
-  return breadcrumbs
-}
-
-// Get root folder name from path
-function getRootName(rootPath: string): string {
-  const normalized = normalizePath(rootPath)
+// Build breadcrumb segments for the current path.
+// Shows ALL path segments so clicking any navigates to that exact level.
+function getBreadcrumbs(currentPath: string): { name: string; path: string }[] {
+  const normalized = normalizePath(currentPath)
   const segments = normalized.split("/").filter(Boolean)
-  return segments[segments.length - 1] || "Root"
+
+  return segments.map((name, i) => ({
+    name,
+    path: "/" + segments.slice(0, i + 1).join("/"),
+  }))
 }
 
 // Get file extension from filename
@@ -277,8 +258,7 @@ export function MediaPickerModal({
   }
 
   // Get breadcrumbs
-  const breadcrumbs = getBreadcrumbs(currentPath, normalizedRootPath)
-  const rootName = getRootName(normalizedRootPath)
+  const breadcrumbs = getBreadcrumbs(currentPath)
 
   // Check if item is an image (using extension only - contentType not reliable from backend)
   const isImage = (item: MediaItem) => {
@@ -306,23 +286,25 @@ export function MediaPickerModal({
           <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1 text-sm overflow-x-auto flex-1">
-              <button
-                onClick={handleRootClick}
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium shrink-0"
-              >
-                {rootName}
-              </button>
-              {breadcrumbs.map((crumb) => (
-                <div key={crumb.path} className="flex items-center gap-1 shrink-0">
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  <button
-                    onClick={() => handleBreadcrumbClick(crumb.path)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {crumb.name}
-                  </button>
-                </div>
-              ))}
+              {breadcrumbs.length === 0 ? (
+                <span className="text-foreground font-medium shrink-0">Root</span>
+              ) : (
+                breadcrumbs.map((crumb, index) => (
+                  <div key={`${crumb.path}-${index}`} className="flex items-center gap-1 shrink-0">
+                    {index > 0 && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                    {index === breadcrumbs.length - 1 ? (
+                      <span className="text-foreground font-medium">{crumb.name}</span>
+                    ) : (
+                      <button
+                        onClick={() => handleBreadcrumbClick(crumb.path)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {crumb.name}
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Actions */}

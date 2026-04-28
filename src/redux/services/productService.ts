@@ -140,7 +140,7 @@ export interface ProductListItem {
   id: string
   name: string
   base_sku: string
-  status: 'draft' | 'active' | 'archived'
+  status: 'draft' | 'inactive' | 'active' | 'archived'
   min_price: number
   max_price: number
   variant_count: number
@@ -514,10 +514,10 @@ interface UpdateVariantStockResponse {
 // Product service with API calls
 const productService = {
   // Get all products for listing
-  getList: async (categoryIds?: string[]): Promise<ProductListResponse> => {
-    const params = categoryIds && categoryIds.length > 0 
-      ? { categoryIds: categoryIds.join(',') } 
-      : {}
+  getList: async (categoryIds?: string[], status?: string): Promise<ProductListResponse> => {
+    const params: Record<string, string> = {}
+    if (categoryIds && categoryIds.length > 0) params.categoryIds = categoryIds.join(',')
+    if (status) params.status = status
     const response = await apiService.get(API_ENDPOINTS.PRODUCT.LIST, { params })
     return response.data
   },

@@ -21,12 +21,27 @@ import PERMISSIONS from "@/configs/permissions.json"
 import { formatCurrency } from "@/utils/currency"
 import Link from "next/link"
 import { CategoryFilter } from "@/components/products/category-filter"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const statusColors = {
   draft: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+  inactive: "bg-orange-500/10 text-orange-500 border-orange-500/20",
   active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
   archived: "bg-gray-500/10 text-gray-500 border-gray-500/20",
 }
+
+const STATUS_OPTIONS = [
+  { value: "draft", label: "Draft" },
+  { value: "inactive", label: "Inactive" },
+  { value: "active", label: "Active" },
+  { value: "archived", label: "Archived" },
+]
 
 // Action handlers interface
 interface ActionHandlers {
@@ -145,6 +160,7 @@ export function ProductsContent() {
   const [error, setError] = useState<string | null>(null)
   const [categories, setCategories] = useState<CategoryForFilter[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("")
+  const [selectedStatus, setSelectedStatus] = useState<string>("")
   const [filteredCount, setFilteredCount] = useState<number>(0)
   const [search, setSearch] = useState("")
 
@@ -192,7 +208,7 @@ export function ProductsContent() {
       setIsLoading(true)
       setError(null)
       const categoryIds = selectedCategory ? [selectedCategory] : undefined
-      const response = await productService.getList(categoryIds)
+      const response = await productService.getList(categoryIds, selectedStatus || undefined)
       setProducts(response.data.items)
       // Set initial filtered count to match total items from API
       setFilteredCount(response.data.items.length)
@@ -211,7 +227,7 @@ export function ProductsContent() {
 
   useEffect(() => {
     fetchProducts()
-  }, [selectedCategory])
+  }, [selectedCategory, selectedStatus])
 
   // Handle category change
   const handleCategoryChange = (value: string) => {
@@ -221,6 +237,7 @@ export function ProductsContent() {
   // Clear all filters (used by Reset button)
   const clearAllFilters = () => {
     setSelectedCategory("")
+    setSelectedStatus("")
     setSearch("")
   }
 
@@ -249,7 +266,7 @@ export function ProductsContent() {
   }, [filteredProducts])
 
   // Check if any filter is active
-  const hasCustomFilter = !!selectedCategory || !!search
+  const hasCustomFilter = !!selectedCategory || !!selectedStatus || !!search
 
   // Filter toolbar component
   const filterComponent = (
@@ -269,6 +286,18 @@ export function ProductsContent() {
         onChange={handleCategoryChange}
         placeholder="Category"
       />
+      <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+        <SelectTrigger className="h-9 w-[150px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUS_OPTIONS.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 
